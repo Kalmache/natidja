@@ -1,0 +1,82 @@
+{
+  "sessionId": "bac-2026",
+  "islandId": "mwali",
+  "islandName": "Mwali (Mohéli)",
+  "generatedAt": "2026-10-30T18:00:00Z",
+  "totalCandidates": 350,
+  "stats": {
+    "total": 12,
+    "admitted": 8,
+    "oralSecondGroup": 3,
+    "rejected": 1,
+    "successRate": "66.7%"
+  },
+  "candidates": [
+    {
+      "id": "MWL-BAC-001",
+      "tableNumber": "BAC-26-MWL-0301",
+      "lastName": "BOINA",
+      "firstName": "Salim",
+      "birthDate": "2007-03-15",
+      "birthPlace": "Fomboni",
+      "series": "D",
+      "center": "Lycée de Fomboni",
+      "island": "Mwali",
+      "status": "ADMIS",
+      "mention": "BIEN",
+      "average": 14.75,
+      "decision": "Admis d'office au premier groupe",
+      "grades": [
+        { "subject": "SVT", "coef": 5, "score": 15 },
+        { "subject": "Physique-Chimie", "coef": 4, "score": 14 },
+        { "subject": "Mathématiques", "coef": 4, "score": 15 },
+        { "subject": "Français / Philosophie", "coef": 3, "score": 14 },
+        { "subject": "Anglais", "coef": 2, "score": 16 }
+      ]
+    },
+    {
+      "id": "MWL-BAC-002",
+      "tableNumber": "BAC-26-MWL-0302",
+      "lastName": "DJANFAR",
+      "firstName": "Moinaécha",
+      "birthDate": "2006-09-08",
+      "birthPlace": "Nioumachoua",
+      "series": "A4",
+      "center": "Lycée de Fomboni",
+      "island": "Mwali",
+      "status": "ADMIS",
+      "mention": "ASSEZ_BIEN",
+      "average": 12.60,
+      "decision": "Admis d'office au premier groupe",
+      "grades": [
+        { "subject": "Philosophie", "coef": 5, "score": 13 },
+        { "subject": "Français", "coef": 4, "score": 13.5 },
+        { "subject": "Histoire-Géo", "coef": 3, "score": 12 },
+        { "subject": "Arabe", "coef": 3, "score": 12 },
+        { "subject": "Anglais", "coef": 2, "score": 13 }
+      ]
+    },
+    {
+      "id": "MWL-BAC-003",
+      "tableNumber": "BAC-26-MWL-0303",
+      "lastName": "HAMADA",
+      "firstName": "Assoumani",
+      "birthDate": "2006-05-18",
+      "birthPlace": "Djando",
+      "series": "A1",
+      "center": "Lycée de Fomboni",
+      "island": "Mwali",
+      "status": "SECOND_GROUPE",
+      "mention": "SANS",
+      "average": 9.75,
+      "decision": "Admis à passer les épreuves orales du second groupe",
+      "grades": [
+        { "subject": "Français", "coef": 4, "score": 10 },
+        { "subject": "Philosophie", "coef": 4, "score": 9.5 },
+        { "subject": "Histoire-Géo", "coef": 3, "score": 10 },
+        { "subject": "Arabe", "coef": 3, "score": 9 },
+        { "subject": "Anglais", "coef": 2, "score": 11 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "updatedAt": "2026-10-30T20:00:00Z",
+  "defaultSessionId": "bac-2026",
+  "sessions": [
+    {
+      "id": "bac-2026",
+      "examType": "BAC",
+      "title": "Baccalauréat Général & Technique",
+      "year": 2026,
+      "sessionDate": "Juillet 2026",
+      "status": "PUBLISHED",
+      "series": ["A1", "A4", "C", "D", "G"],
+      "islands": [
+        {
+          "id": "ngazidja",
+          "name": "Ngazidja (Grande Comore)",
+          "dataFile": "data/bac-2026-ngazidja.json",
+          "candidatesCount": 1420
+        },
+        {
+          "id": "ndzuwani",
+          "name": "Ndzuwani (Anjouan)",
+          "dataFile": "data/bac-2026-ndzuwani.json",
+          "candidatesCount": 980
+        },
+        {
+          "id": "mwali",
+          "name": "Mwali (Mohéli)",
+          "dataFile": "data/bac-2026-mwali.json",
+          "candidatesCount": 350
+        }
+      ]
+    },
+    {
+      "id": "bepc-2026",
+      "examType": "BEPC",
+      "title": "Brevet d'Études du Premier Cycle (BEPC)",
+      "year": 2026,
+      "sessionDate": "Juin 2026",
+      "status": "PUBLISHED",
+      "series": ["Général"],
+      "islands": [
+        {
+          "id": "ngazidja",
+          "name": "Ngazidja (Grande Comore)",
+          "dataFile": "data/bepc-2026-ngazidja.json",
+          "candidatesCount": 1850
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+# ====================================================================
+# Configuration Apache / OVH Hébergement Mutualisé (Offre Perso)
+# Projet : Ndeze Natidja (Résultats des Examens Comores)
+# ====================================================================
+
+# 1. Activation de la compression GZIP / Deflate
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript text/javascript
+  AddOutputFilterByType DEFLATE application/json application/manifest+json
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# 2. En-têtes de sécurité et Service Worker
+<IfModule mod_headers.c>
+  # Autoriser le Service Worker à contrôler toute l'application
+  <Files "sw.js">
+    Header set Service-Worker-Allowed "/"
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </Files>
+  <Files "registerSW.js">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </Files>
+  
+  # Cache long pour les assets hachés (CSS, JS, images)
+  <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2|woff)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Cache pour les fichiers JSON de résultats (1 heure avec revalidation stale)
+  <FilesMatch "\.json$">
+    Header set Cache-Control "public, max-age=3600, stale-while-revalidate=86400"
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+</IfModule>
+
+# 3. MIME Types pour PWA
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType application/json .json
+  AddType image/svg+xml .svg
+</IfModule>
+
+# 4. Redirection vers index.html pour SPA
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # Si le fichier ou dossier physique existe, le servir directement
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  
+  # Sinon, renvoyer sur index.html
+  RewriteRule ^ index.html [L]
+</IfModule>
