@@ -27,9 +27,10 @@
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 
-  # Cache pour les fichiers JSON de résultats (1 heure avec revalidation stale)
+  # Cache des fichiers JSON de résultats : 5 minutes (une correction du ministère
+  # devient visible vite), puis copie servie pendant la revérification
   <FilesMatch "\.json$">
-    Header set Cache-Control "public, max-age=3600, stale-while-revalidate=86400"
+    Header set Cache-Control "public, max-age=300, stale-while-revalidate=86400"
     Header set Access-Control-Allow-Origin "*"
   </FilesMatch>
 </IfModule>
@@ -46,10 +47,19 @@
   RewriteEngine On
   RewriteBase /
   
+  # Toujours utiliser HTTPS (indispensable pour le Service Worker et "Copier")
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
   # Si le fichier ou dossier physique existe, le servir directement
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
+
+  # Un fichier de résultats absent (ex : aucun nom en "ZZ") doit répondre
+  # "404 introuvable", et non renvoyer la page d'accueil.
+  RewriteRule \.json$ - [L]
   
   # Sinon, renvoyer sur index.html
   RewriteRule ^ index.html [L]
