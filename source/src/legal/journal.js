@@ -9,7 +9,7 @@ export const JOURNAL = [
     date: '31/10/2026',
     titre: 'Signature, licence et pages légales',
     points: [
-      'Pied de page signé M.M.B.T avec contact et liens vers les pages légales',
+      'Pied de page signé M.M.B.T avec contact, TikTok, Instagram et liens vers les pages légales',
       'Pages Mentions légales, Confidentialité, Conditions d’utilisation, Licence et Journal de bord',
       'Licences des composants libres utilisés (React, Vite, Workbox, générateur de QR code)',
     ],
