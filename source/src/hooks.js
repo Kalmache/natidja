@@ -183,8 +183,12 @@ export function useSwipe({ onNext, onPrev, dir = 'ltr', actif = true }) {
       const dx = t.clientX - d.x
       const dy = t.clientY - d.y
       if (e.timeStamp - d.temps > 1200) return // trop lent : ce n'est plus un geste de glissement
-      if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8) return // trop court ou trop vertical
-      if (d.x < 24 || d.x > window.innerWidth - 24) return // bord d'écran
+      // Deux façons de réussir : un glissement assez long, OU un coup de doigt rapide
+      // (même court). Le geste doit surtout être horizontal.
+      const duree = Math.max(1, e.timeStamp - d.temps)
+      const rapide = Math.abs(dx) >= 40 && Math.abs(dx) / duree > 0.35 // > 0,35 px/ms
+      if ((Math.abs(dx) < 55 && !rapide) || Math.abs(dx) < Math.abs(dy) * 1.25) return
+      if (d.x < 16 || d.x > window.innerWidth - 16) return // bord d'écran (geste « retour » du système)
       if (geste_reserve(d.cible) || window.getSelection?.().toString()) return
       const versSuivant = dir === 'rtl' ? dx > 0 : dx < 0
       if (versSuivant) onNext?.()
