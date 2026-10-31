@@ -16,7 +16,7 @@ const BLOCS = { mentions: MENTIONS, privacy: PRIVACY, terms: TERMS }
 /** Affiche une liste de blocs {h} / {p} / {ul}. */
 function Blocs({ blocs }) {
   return blocs.map((b, i) =>
-    b.h ? <h2 key={i}>{b.h}</h2> : b.p ? <p key={i}>{b.p}</p> : <ul key={i}>{b.ul.map((x) => <li key={x}>{x}</li>)}</ul>,
+    b.h ? <h2 key={i}>{b.h}</h2> : b.small ? <p key={i} className="legal__meta">{b.small}</p> : b.p ? <p key={i}>{b.p}</p> : <ul key={i}>{b.ul.map((x) => <li key={x}>{x}</li>)}</ul>,
   )
 }
 
@@ -30,6 +30,7 @@ function Licence() {
         <p className="certificate__eyebrow">{t('legal.certificate')}</p>
         <h2 className="certificate__title">Ndeze Natidja</h2>
         <div className="certificate__sign"><Signature size="lg" link /></div>
+        <p className="certificate__protected">{t('legal.protected')}</p>
         <p className="certificate__rights">
           © {EDITOR.year} {EDITOR.name} · {t('legal.rights')}
         </p>

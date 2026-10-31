@@ -11,7 +11,8 @@ export const JOURNAL = [
     points: [
       'Pied de page signé M.M.B.T avec contact, TikTok, Instagram et liens vers les pages légales',
       'Pages Mentions légales, Confidentialité, Conditions d’utilisation, Licence et Journal de bord',
-      'Licences des composants libres utilisés (React, Vite, Workbox, générateur de QR code)',
+      'Textes juridiques rédigés selon le droit français (propriété intellectuelle, LCEN, RGPD)',
+      'Licence « Tous droits réservés » et licences des composants libres utilisés',
     ],
   },
   {
