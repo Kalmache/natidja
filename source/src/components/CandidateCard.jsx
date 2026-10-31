@@ -3,7 +3,7 @@
 // ============================================================================
 import Icon from './Icon.jsx'
 import { useI18n } from '../i18n/index.jsx'
-import { MENTIONS, note, titleCase } from '../lib/format.js'
+import { MENTIONS, dateNaissance, note, titleCase } from '../lib/format.js'
 
 /** Petit anneau de progression : la moyenne sur 20 matérialisée en cercle. */
 function AverageRing({ value, status }) {
@@ -67,6 +67,11 @@ export default function CandidateCard({ candidat, onOpen, index = 0 }) {
       </div>
 
       <ul className="card__meta">
+        {dateNaissance(candidat.birthDate) && (
+          <li>
+            <Icon name="calendar" size={14} /> {t('card.born', { date: dateNaissance(candidat.birthDate) })}
+          </li>
+        )}
         {candidat.birthPlace && (
           <li>
             <Icon name="pin" size={14} /> {candidat.birthPlace}

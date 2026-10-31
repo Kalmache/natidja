@@ -12,7 +12,7 @@ import Flag from './Flag.jsx'
 import Confetti from './Confetti.jsx'
 import QrCode from './QrCode.jsx'
 import { useI18n } from '../i18n/index.jsx'
-import { MENTIONS, note, titleCase } from '../lib/format.js'
+import { MENTIONS, dateNaissance, note, titleCase } from '../lib/format.js'
 import { registerPlugin } from '@capacitor/core'
 import { Share } from '@capacitor/share'
 import { isNativeApp, verificationCode, verificationUrl } from '../lib/verify.js'
@@ -95,6 +95,7 @@ export default function CandidateModal({ candidat, session, onClose }) {
   const details = [
     [t('att.table'), candidat.tableNumber],
     [t('att.series'), candidat.series],
+    [t('att.birthDate'), dateNaissance(candidat.birthDate)],
     [t('att.birth'), candidat.birthPlace],
     [t('att.island'), candidat.island],
     [t('att.school'), candidat.school],
