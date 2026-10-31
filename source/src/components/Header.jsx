@@ -6,6 +6,9 @@ import Icon from './Icon.jsx'
 import Flag from './Flag.jsx'
 import { LANGS, useI18n } from '../i18n/index.jsx'
 import { navigate, useInstallPrompt, useOnline } from '../hooks.js'
+import Signature from './Signature.jsx'
+import { EDITOR, VERSION } from '../legal/config.js'
+import { PAGES_LEGALES } from '../views/LegalView.jsx'
 
 export const PALETTES = [
   { id: 'emerald', name: 'Émeraude', color: '#059669' },
@@ -117,11 +120,35 @@ export function BottomNav({ view }) {
 
 export function Footer() {
   const { t } = useI18n()
+  const reseaux = [
+    ['TikTok', EDITOR.tiktok],
+    ['Instagram', EDITOR.instagram],
+  ].filter(([, url]) => url) // un lien vide n'est pas affiché
   return (
     <footer className="footer no-print">
-      <p><strong>{t('footer.line')}</strong></p>
-      <p>{t('footer.org')}</p>
-      <p><a href="#/verif">{t('footer.verify')}</a></p>
+      {/* Filet animé aux couleurs du drapeau */}
+      <div className="footer__flagline" aria-hidden="true" />
+      <div className="footer__inner">
+        <p className="footer__org">
+          <strong>{t('footer.line')}</strong>
+          <span>{t('footer.org')}</span>
+        </p>
+        <p className="footer__made">
+          <Signature link /> · {EDITOR.year} ·{' '}
+          <a href={EDITOR.website} target="_blank" rel="noopener noreferrer">{EDITOR.websiteLabel}</a>
+        </p>
+        <p className="footer__contact">
+          {t('footer.contact')} : <a href={`mailto:${EDITOR.email}`}>{EDITOR.email}</a>
+          {reseaux.map(([nom, url]) => (
+            <span key={nom}> · <a href={url} target="_blank" rel="noopener noreferrer">{nom}</a></span>
+          ))}
+        </p>
+        <nav className="footer__legal" aria-label="Pages légales">
+          {PAGES_LEGALES.map((p) => <a key={p} href={`#/legal/${p}`}>{t(`legal.${p}`)}</a>)}
+          <a href="#/verif">{t('footer.verify')}</a>
+        </nav>
+        <p className="footer__small">v{VERSION} · {t('demo.short')}</p>
+      </div>
     </footer>
   )
 }
