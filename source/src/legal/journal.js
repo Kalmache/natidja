@@ -12,6 +12,7 @@ export const JOURNAL = [
       'Pied de page signé M.M.B.T avec contact, TikTok, Instagram et liens vers les pages légales',
       'Pages Mentions légales, Confidentialité, Conditions d’utilisation, Licence et Journal de bord',
       'Textes juridiques rédigés selon le droit français (propriété intellectuelle, LCEN, RGPD)',
+      'Textes alignés sur ceux de mmbt.fr (éditeur à titre personnel, statistiques anonymes de l’hébergeur)',
       'Licence « Tous droits réservés » et licences des composants libres utilisés',
     ],
   },
