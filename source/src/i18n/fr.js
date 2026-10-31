@@ -198,8 +198,8 @@ export default {
   'settings.resetHint': 'Supprime vos préférences et les résultats gardés en mémoire pour le mode hors-ligne.',
   'settings.resetConfirm': 'Effacer vos préférences et les données hors-ligne de cet appareil ?',
   'settings.managerTitle': 'Espace responsable',
-  'settings.managerBadge': 'Phase 2',
-  'settings.managerBody': 'Réservé aux responsables des examens : publication des résultats avec compte personnel, double authentification et validation à deux personnes. Cet espace n’est pas encore disponible dans la démonstration : aucune connexion n’est proposée tant qu’elle n’est pas réellement sécurisée.',
-  'settings.managerButton': 'Connexion (bientôt)',
+  'settings.managerBadge': 'Prototype',
+  'settings.managerBody': 'Réservé aux responsables des examens. La console de publication (connexion personnelle, double authentification, validation par deux personnes, journal d’audit) existe en version de test sur un serveur séparé. Le site public, lui, ne comporte aucune connexion : il n’y a donc rien à y attaquer. Cet espace n’est pas accessible depuis la démonstration.',
+  'settings.managerButton': 'Accès réservé',
   'settings.managerContact': 'Demander des informations',
 }

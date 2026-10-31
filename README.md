@@ -74,6 +74,28 @@ npm run publish-site                                                   # reconst
 ```
 ⚠️ Avec de **vraies** données de candidats, ne pas passer par un dépôt public : voir la section 8 du guide.
 
+## Console de publication (responsables des examens)
+Une application **séparée du site public** pour publier les résultats en sécurité : connexion + double authentification,
+dépôt du fichier par un préparateur, **approbation par une autre personne**, publication immédiate ou programmée,
+sauvegarde automatique, journal d'audit. Installation, sécurité et **limites connues** : [`source/docs/CONSOLE.md`](source/docs/CONSOLE.md).
+```bash
+npm run console:utilisateur -- creer --nom amina --roles preparateur   # crée un compte (dans source/)
+npm run console                                                        # lance la console (derrière HTTPS en production)
+```
+
+## Dossier de présentation
+Document de 10 pages pour les autorités organisatrices (besoin, démonstration, charge, sécurité, exploitation, feuille de route,
+déroulé de démonstration de 10 minutes) : [`source/docs/dossier-presentation/dossier-presentation.pdf`](source/docs/dossier-presentation/dossier-presentation.pdf).
+
+## Charge et hébergement du jour J
+Poids mesurés, modèle de capacité, résultats du test de charge, comparaison des hébergements :
+[`source/docs/CHARGE-ET-HEBERGEMENT.md`](source/docs/CHARGE-ET-HEBERGEMENT.md).
+```bash
+npm run capacite -- --visiteurs 100000 --minutes 30     # combien de requêtes/s et de Go ?
+npm run serveur -- --port 8081                          # sert le site en local
+npm run charge -- --url http://127.0.0.1:8081 --utilisateurs 500 --duree 20
+```
+
 ## Sécurité — ce qui est fait, et ses limites
 **En place :** HTTPS forcé + HSTS, politique CSP stricte (aucun code externe), anti-clickjacking,
 aucun traceur ni cookie, pas de CORS ouvert, pas de listing de dossiers, **aucun mot de passe

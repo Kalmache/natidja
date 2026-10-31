@@ -5,6 +5,17 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.5.0',
+    date: '31/10/2026',
+    titre: 'Console de publication et préparation du jour J',
+    points: [
+      'Console de publication sécurisée, séparée du site public : connexion, double authentification, validation par deux personnes, publication programmée, journal d’audit à chaîne',
+      'Test de charge réaliste, modèle de capacité et comparaison des options d’hébergement pour le jour des résultats',
+      'Tests de sécurité automatiques (66 tests au total)',
+      'Dossier de présentation à destination des autorités organisatrices (10 pages) et déroulé de démonstration',
+    ],
+  },
+  {
     version: '2.4.1',
     date: '31/10/2026',
     titre: 'Écran d’ouverture plus lisible',
