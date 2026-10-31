@@ -1,7 +1,7 @@
 // ============================================================================
 // Splash.jsx – l'écran d'ouverture animé (l'effet « waouh »)
 // ----------------------------------------------------------------------------
-// Déroulé (≈ 2,6 s) : le drapeau apparaît bande par bande → le titre se
+// Déroulé (≈ 6,5 s, le temps de LIRE le slogan) : le drapeau apparaît bande par bande → le titre se
 // dévoile lettre par lettre → une barre de progression se remplit → fondu.
 // Pendant ce temps, l'application charge déjà les données en arrière-plan :
 // l'animation ne fait donc PERDRE aucun temps à l'utilisateur.
@@ -9,7 +9,8 @@
 // Règles de bonne conduite :
 //  - affiché une seule fois par session (pas à chaque rechargement) ;
 //  - jamais affiché si la personne a demandé « moins d'animations » ;
-//  - on peut le passer en touchant l'écran ou avec Entrée / Échap.
+//  - on peut le passer avec le bouton « Passer » (ou Entrée / Échap). Un simple toucher
+//    ailleurs ne le coupe PAS : sinon un effleurement accidentel l'interromprait.
 // ============================================================================
 import { useEffect, useState } from 'react'
 import Flag from './Flag.jsx'
@@ -17,7 +18,8 @@ import Signature from './Signature.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { prefersReducedMotion } from '../hooks.js'
 
-const DUREE_MS = 2600
+// Durée totale de l'écran d'ouverture. La barre de progression et le fondu suivent cette valeur.
+const DUREE_MS = 6500
 const CLE = 'ndeze_splash_vu'
 
 const dejaVu = () => {
@@ -31,7 +33,8 @@ const dejaVu = () => {
 export default function Splash({ onDone }) {
   const { t } = useI18n()
   const [visible] = useState(() => !prefersReducedMotion() && !dejaVu())
-  const [sortie, setSortie] = useState(false)
+  const [sortie, setSortie] = useState(false) // fondu de sortie en cours
+  const [fini, setFini] = useState(false) // fondu terminé : on retire l'écran de la page
 
   // Si on ne doit pas l'afficher, on prévient tout de suite l'application.
   useEffect(() => {
@@ -45,7 +48,10 @@ export default function Splash({ onDone }) {
     } catch {
       /* ignoré */
     }
-    setTimeout(onDone, 550) // le temps du fondu de sortie
+    setTimeout(() => {
+      setFini(true)
+      onDone()
+    }, 550) // le temps du fondu de sortie
   }
 
   useEffect(() => {
@@ -60,14 +66,14 @@ export default function Splash({ onDone }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
 
-  if (!visible) return null
+  if (!visible || fini) return null
 
   const titre = 'Ndeze Natidja'
 
   return (
     <div
       className={`splash ${sortie ? 'splash--out' : ''}`}
-      onClick={terminer}
+      style={{ '--duree': `${DUREE_MS}ms` }}
       role="dialog"
       aria-label={t('app.name')}
     >
