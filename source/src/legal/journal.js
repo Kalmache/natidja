@@ -5,6 +5,16 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.4.0',
+    date: '31/10/2026',
+    titre: 'Navigation par glissement',
+    points: [
+      'Glisser le doigt vers la gauche ou la droite pour passer d’un onglet à l’autre (Résultats, Statistiques, À propos, Réglages)',
+      'Même geste entre les pages légales (Mentions, Confidentialité, Conditions, Licence, Journal de bord)',
+      'Animation de transition entre les pages ; sens du geste inversé en arabe',
+    ],
+  },
+  {
     version: '2.3.1',
     date: '31/10/2026',
     titre: 'Application Android : affichage et mises à jour',
