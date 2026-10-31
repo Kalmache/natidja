@@ -177,7 +177,7 @@ async function ecranDetail() {
   const motif = h('input', { type: 'text', id: 'motif', maxlength: '500', placeholder: 'Motif du refus' })
   const agir = async (action, corps = {}) => {
     const rep = await api('POST', `/api/propositions/${p.id}/${action}`, corps)
-    if (rep.ok) return dire('succes', { approuver: 'Approbation enregistrée.', refuser: 'Proposition refusée.', annuler: 'Proposition annulée.' }[action])
+    if (rep.ok) return dire('succes', { approuver: 'Approbation enregistrée.', refuser: 'Proposition refusée.', annuler: 'Proposition annulée.', 'mise-en-ligne': 'Mise en ligne réussie : le site public se met à jour dans quelques instants.' }[action])
     if (rep.json?.code === 'base_modifiee' && confirm(`${rep.json.erreur}\n\nRemplacer malgré tout la version publiée ?`)) return agir(action, { ...corps, confirmerEcrasement: true })
     dire('erreur', rep.json?.erreur ?? 'Action impossible.')
   }
@@ -201,6 +201,7 @@ async function ecranDetail() {
     p.refus && h('div', { class: 'message erreur' }, `Refusée par ${p.refus.par.nom} le ${date(p.refus.le)} : ${p.refus.motif}`),
     p.erreurPublication && h('div', { class: 'message erreur' }, `Échec de la publication : ${p.erreurPublication}`),
     p.publieLe && h('div', { class: 'message succes' }, `Publiée le ${date(p.publieLe)}.`),
+    p.publieLe && miseEnLigne(p, monRole, agir),
     p.statut === 'proposee' && monRole('approbateur') && (p.auteur.nom === moi
       ? h('div', { class: 'message info' }, 'Règle des deux personnes : vous avez déposé ce fichier, un AUTRE responsable doit l’approuver.')
       : h('div', { class: 'carte' }, h('h3', null, 'Décision'),
@@ -210,6 +211,18 @@ async function ecranDetail() {
         h('label', { for: 'motif' }, 'Ou refuser'), motif,
         h('p', null, h('button', { class: 'btn danger', onclick: () => agir('refuser', { motif: motif.value }) }, 'Refuser')))),
     actif && (p.auteur.nom === moi || monRole('admin')) && h('p', null, h('button', { class: 'btn danger', onclick: () => confirm('Annuler cette proposition ?') && agir('annuler') }, 'Annuler la proposition')))
+}
+
+/** Bloc « Mise en ligne » : l'envoi des fichiers publiés vers le site public. */
+function miseEnLigne(p, monRole, agir) {
+  const m = p.miseEnLigne
+  if (!m || m.etat === 'non_configuree')
+    return h('div', { class: 'message alerte' }, 'La mise en ligne automatique n’est pas activée : les fichiers sont publiés sur la console, mais pas encore sur le site public (voir le guide de déploiement).')
+  if (m.etat === 'ok')
+    return h('div', { class: 'message succes' }, `Envoyée vers le site public le ${date(m.le)} (modification ${m.commit}, ${m.fichiers} fichiers). Le site se met à jour dès que l’hébergeur a terminé son déploiement.`)
+  return h('div', { class: 'message erreur' },
+    `La publication est faite, mais l’envoi vers le site public a échoué : ${m.erreur}`,
+    (monRole('approbateur') || monRole('admin')) && h('p', null, h('button', { class: 'btn primaire', onclick: () => agir('mise-en-ligne') }, 'Réessayer la mise en ligne')))
 }
 
 async function ecranJournal() {

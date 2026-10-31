@@ -5,6 +5,17 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.6.0',
+    date: '31/10/2026',
+    titre: 'Console de publication prête à être mise en ligne',
+    points: [
+      'Envoi automatique des résultats publiés vers le site public : un seul envoi par publication, déploiement automatique chez l’hébergeur, plus aucun transfert à la main',
+      'En cas d’échec de l’envoi, la publication reste valide et un bouton permet de réessayer ; chaque envoi est inscrit au journal d’audit',
+      'Kit d’installation sur serveur avec HTTPS automatique et guide pas à pas',
+      '77 tests automatiques',
+    ],
+  },
+  {
     version: '2.5.4',
     date: '31/10/2026',
     titre: 'Saisie plus confortable avec le clavier',

@@ -60,6 +60,7 @@ CONSOLE_PORT=8787 CONSOLE_DATA=/var/lib/ndeze/console PUBLISH_DATA=/var/www/nati
 |---|---|---|
 | `CONSOLE_PORT` / `CONSOLE_HOST` | où écouter | `8787` / `127.0.0.1` |
 | `CONSOLE_DATA` | dossier **privé** de la console (comptes, propositions, journal) | `source/console-data` |
+| `GITHUB_TOKEN_PUBLICATION`, `GITHUB_REPO`, `GITHUB_BRANCHE` | active l'envoi vers le site public via GitHub (jeton limité à ce dépôt, permission *Contents : lecture/écriture*) | désactivé |
 | `PUBLISH_DATA` | dossier `data/` du site public à mettre à jour | `data/` du dépôt |
 | `CONSOLE_TRUST_PROXY=1` | lire l'adresse du visiteur dans `X-Forwarded-For` (seulement derrière un proxy de confiance) | non |
 | `CONSOLE_DEV=1` | cookies non sécurisés — **jamais en production** | non |
@@ -84,7 +85,7 @@ Avec `CONSOLE_TRUST_PROXY=1` pour que le verrouillage tienne compte de l'adresse
 
 La console écrit dans `PUBLISH_DATA`. Deux montages possibles :
 - **console et site public sur le même serveur** : `PUBLISH_DATA` pointe directement sur le dossier `data/` servi au public ;
-- **site public ailleurs** (CDN, autre hébergeur) : synchroniser ensuite `data/` vers lui (SFTP, `rsync`…). *Cette synchronisation automatique n'est pas encore incluse.*
+- **site public ailleurs** (cas de l'hébergement OVH actuel) : la console envoie elle-même les fichiers publiés vers le dépôt GitHub, en **un seul commit** par publication ; OVH redéploie ensuite le site grâce à son webhook. Elle s'active quand `GITHUB_TOKEN_PUBLICATION` et `GITHUB_REPO` sont définis (`GITHUB_BRANCHE`, par défaut `main`). Un échec d'envoi n'annule pas la publication : il est affiché dans la proposition avec un bouton **Réessayer la mise en ligne**, et inscrit au journal d'audit. Installation complète sur un serveur, avec HTTPS : [`DEPLOIEMENT-CONSOLE.md`](DEPLOIEMENT-CONSOLE.md).
 
 Pour revenir en arrière : les sauvegardes sont dans `<CONSOLE_DATA>/sauvegardes/` ; la commande `npm run restaurer` fonctionne sur ces dossiers.
 
