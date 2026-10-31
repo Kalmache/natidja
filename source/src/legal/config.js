@@ -9,6 +9,7 @@
 // ============================================================================
 export const EDITOR = {
   name: 'M.M.B.T',
+  person: 'Maabadi Ben Tamou', // éditeur à titre personnel (nom déjà publié sur mmbt.fr)
   website: 'https://mmbt.fr',
   websiteLabel: 'mmbt.fr',
   email: 'contact@mmbt.fr',
@@ -21,7 +22,7 @@ export const EDITOR = {
   // --- À compléter si vous le souhaitez (laisser '' pour masquer) ---
   address: '', // ex. '12 rue Exemple, 75000 Paris'
   siret: '', // ex. '123 456 789 00012'
-  publisher: '', // nom du directeur de publication, si différent de M.M.B.T
+  publisher: 'Maabadi Ben Tamou', // directeur de la publication
 }
 
 export const HOST = {
