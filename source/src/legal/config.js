@@ -14,12 +14,14 @@ export const EDITOR = {
   email: 'contact@mmbt.fr',
   year: 2026,
 
-  // --- À compléter par vous (laisser '' pour masquer) ---
+  // --- Réseaux sociaux (renseignés ; laisser '' pour masquer un lien) ---
+  tiktok: 'https://www.tiktok.com/@mmbt.fr',
+  instagram: 'https://www.instagram.com/mmbt.fr',
+
+  // --- À compléter si vous le souhaitez (laisser '' pour masquer) ---
   address: '', // ex. '12 rue Exemple, 75000 Paris'
   siret: '', // ex. '123 456 789 00012'
   publisher: '', // nom du directeur de publication, si différent de M.M.B.T
-  tiktok: '', // ex. 'https://www.tiktok.com/@votrecompte'
-  instagram: '', // ex. 'https://www.instagram.com/votrecompte'
 }
 
 export const HOST = {
