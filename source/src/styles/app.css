@@ -285,7 +285,7 @@ button { cursor: pointer; }
 .verify-result p { color: var(--text-2); font-size: 0.9rem; } .verify-result__who { font-weight: 800; color: var(--text) !important; margin-top: 4px; }
 
 /* ---------- 9. ÉCRAN D'OUVERTURE (Splash) ---------- */
-.splash { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; color: #fff; overflow: hidden; cursor: pointer;
+.splash { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; color: #fff; overflow: hidden;
   background: radial-gradient(900px 600px at 50% 40%, var(--p-800), var(--p-950) 70%); transition: opacity 0.55s ease, transform 0.55s ease, visibility 0.55s; }
 .splash--out { opacity: 0; transform: scale(1.04); visibility: hidden; pointer-events: none; }
 .splash__aurora { position: absolute; inset: -20%; background: conic-gradient(from 0deg at 50% 50%, transparent, color-mix(in srgb, var(--flag-yellow) 20%, transparent), transparent 30%, color-mix(in srgb, var(--flag-blue) 28%, transparent), transparent 60%, color-mix(in srgb, var(--p-400) 25%, transparent), transparent); filter: blur(60px); animation: spin 14s linear infinite; }
@@ -302,11 +302,12 @@ button { cursor: pointer; }
 @keyframes letterIn { to { opacity: 1; transform: none; } }
 .splash__tagline { color: var(--flag-yellow); font-weight: 800; letter-spacing: 0.08em; font-size: clamp(0.78rem, 2.2vw, 0.95rem); text-transform: uppercase; animation: rise 0.7s 1.7s both; }
 .splash__bar { width: min(240px, 60vw); height: 4px; border-radius: 4px; background: rgb(255 255 255 / 0.18); overflow: hidden; margin-top: 10px; }
-.splash__bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--flag-yellow), #fff, var(--flag-yellow)); transform-origin: left; transform: scaleX(0); animation: fillBar 2.4s 0.2s linear forwards; }
+.splash__bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--flag-yellow), #fff, var(--flag-yellow)); transform-origin: left; transform: scaleX(0); animation: fillBar calc(var(--duree, 6500ms) - 0.5s) 0.2s linear forwards; }
 [dir='rtl'] .splash__bar i { transform-origin: right; }
 @keyframes fillBar { to { transform: scaleX(1); } }
 .splash__loading { font-size: 0.78rem; color: rgb(255 255 255 / 0.65); }
-.splash__skip { position: absolute; bottom: calc(24px + var(--safe-bottom)); inset-inline-end: 24px; background: rgb(255 255 255 / 0.12); color: #fff; border: 1px solid rgb(255 255 255 / 0.25); padding: 8px 18px; border-radius: 999px; font-weight: 700; backdrop-filter: blur(6px); }
+.splash__skip { position: absolute; bottom: calc(24px + var(--safe-bottom)); inset-inline-end: 24px; background: rgb(255 255 255 / 0.12); color: #fff; border: 1px solid rgb(255 255 255 / 0.25); padding: 12px 26px; border-radius: 999px; font-weight: 800; font-size: 1rem; cursor: pointer; backdrop-filter: blur(6px); transition: background 0.2s; }
+.splash__skip:hover, .splash__skip:focus-visible { background: rgb(255 255 255 / 0.25); }
 
 /* ---------- 10. IMPRESSION : on n'imprime QUE l'attestation ---------- */
 @media print {
@@ -364,7 +365,7 @@ button { cursor: pointer; }
 .signature--lg .signature__by { font-size: 0.4em; letter-spacing: 0.3em; text-transform: uppercase; }
 .signature--lg .signature__name { letter-spacing: 0.18em; }
 
-.splash__credit { position: absolute; bottom: calc(30px + var(--safe-bottom)); inset-inline: 0; text-align: center; font-size: 0.8rem; color: rgb(255 255 255 / 0.75); animation: rise 0.8s 1.9s both; }
+.splash__credit { position: absolute; bottom: calc(96px + var(--safe-bottom)); inset-inline: 0; text-align: center; font-size: 0.8rem; color: rgb(255 255 255 / 0.75); animation: rise 0.8s 1.9s both; }
 
 /* Pied de page : filet animé + blocs centrés */
 .footer { position: relative; padding: 0; gap: 0; text-align: center; }
