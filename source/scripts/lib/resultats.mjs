@@ -26,6 +26,8 @@ export const COLONNES = [
     alias: ['numero de table', 'n de table', 'n table', 'numero', 'table'] },
   { champ: 'lastName', titre: 'Nom', requis: true, largeur: 20, alias: ['nom de famille'] },
   { champ: 'firstName', titre: 'Prénom', requis: true, largeur: 20, alias: ['prenoms'] },
+  { champ: 'birthDate', titre: 'Date de naissance', requis: true, largeur: 16,
+    alias: ['date naissance', 'date de naiss', 'ne le', 'nee le', 'ne e le', 'naissance', 'date n'] },
   { champ: 'birthPlace', titre: 'Lieu de naissance', largeur: 22, alias: ['village', 'village lieu de naissance', 'ne a'] },
   { champ: 'series', titre: 'Série', largeur: 9, alias: ['serie bac', 'filiere'] },
   { champ: 'center', titre: 'Centre d’examen', largeur: 38, alias: ['centre', 'centre d examen'] },
@@ -58,6 +60,36 @@ export const ILES = {
 }
 
 const enTeteNorm = (t) => normalize(t).toLowerCase()
+
+// --------------------------------------------------------------------------
+// LECTURE D'UNE DATE DE NAISSANCE
+// --------------------------------------------------------------------------
+/**
+ * Comprend les écritures usuelles et renvoie une date au format « AAAA-MM-JJ » (sans heure,
+ * donc sans décalage de fuseau), ou null si ce n'est pas une vraie date.
+ *   « 15/03/2007 », « 15-03-2007 », « 15.03.2007 », « 15 03 2007 »  → JOUR d'abord (usage français)
+ *   « 2007-03-15 »                                                   → format international
+ *   un nombre (date « brute » d'Excel, ex. 39156)                    → converti
+ * Une date impossible (31/02/2007) est refusée.
+ */
+export function lireDate(brut) {
+  let j, m, a
+  if (typeof brut === 'number') {
+    if (!(brut > 1 && brut < 80000)) return null
+    const d = new Date(Date.UTC(1899, 11, 30) + Math.round(brut) * 86_400_000) // l'« origine » des dates Excel
+    ;[a, m, j] = [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()]
+  } else {
+    const t = String(brut ?? '').trim()
+    let r
+    if ((r = /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T ].*)?$/.exec(t))) [a, m, j] = [r[1], r[2], r[3]].map(Number)
+    else if ((r = /^(\d{1,2})[\s/.\-](\d{1,2})[\s/.\-](\d{4})$/.exec(t))) [j, m, a] = [r[1], r[2], r[3]].map(Number)
+    else return null
+  }
+  // On vérifie que la date existe vraiment (pas de 31 février).
+  const d = new Date(Date.UTC(a, m - 1, j))
+  if (d.getUTCFullYear() !== a || d.getUTCMonth() !== m - 1 || d.getUTCDate() !== j) return null
+  return `${String(a).padStart(4, '0')}-${String(m).padStart(2, '0')}-${String(j).padStart(2, '0')}`
+}
 
 // --------------------------------------------------------------------------
 // 2. LECTURE DU FICHIER  (xlsx ou csv)  ->  lignes brutes
@@ -214,6 +246,16 @@ export function transformer({ entete, lignes }, session, config) {
     if (nom && prenom && normalize(nom).split(' ').concat(normalize(prenom).split(' ')).every((m) => m.length < 2))
       err(numero, 'Nom', 'Nom et prénom trop courts pour être recherchés.')
 
+    // --- Date de naissance (obligatoire : elle permet de distinguer les homonymes)
+    const naissanceBrute = lire('birthDate')
+    let naissance = ''
+    if (String(naissanceBrute).trim() === '') err(numero, 'Date de naissance', 'Date de naissance manquante.')
+    else if (!(naissance = lireDate(naissanceBrute) ?? '')) err(numero, 'Date de naissance', `Date de naissance illisible : « ${naissanceBrute} » (écrivez JJ/MM/AAAA, par exemple 15/03/2007).`)
+    else if (session.year) {
+      const age = Number(session.year) - Number(naissance.slice(0, 4))
+      if (age < 10 || age > 60) err(numero, 'Date de naissance', `Date de naissance improbable : « ${naissanceBrute} » (${age} ans lors de la session ${session.year}). Vérifiez l'année.`)
+    }
+
     // --- Île
     const ileBrute = normalize(texte('island'))
     const ileId = Object.keys(ILES).find((id) => ILES[id].synonymes.some((s) => ileBrute === s || ileBrute.startsWith(s + ' ')))
@@ -268,6 +310,7 @@ export function transformer({ entete, lignes }, session, config) {
       tableNumber: table,
       lastName: nom.toLocaleUpperCase('fr'),
       firstName: prenom,
+      birthDate: naissance,
       birthPlace: texte('birthPlace'),
       series: serie,
       center: texte('center'),

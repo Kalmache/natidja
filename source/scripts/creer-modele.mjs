@@ -37,7 +37,7 @@ feuille.views = [{ state: 'frozen', ySplit: 1 }]
 
 // Ligne d'exemple (grisée) : ignorée à l'import car elle commence par « (exemple) ».
 const exemple = {
-  tableNumber: `(exemple) ${session.examType}-26-00001`, lastName: 'EXEMPLE', firstName: 'Prénom', birthPlace: 'Moroni',
+  tableNumber: `(exemple) ${session.examType}-26-00001`, lastName: 'EXEMPLE', firstName: 'Prénom', birthDate: '15/03/2007', birthPlace: 'Moroni',
   series: session.series[0] ?? '', center: 'Centre Lycée de Moroni', school: 'Lycée de Moroni',
   island: 'Ngazidja', status: 'Admis', mention: 'Bien', average: 13.5,
 }
@@ -48,6 +48,7 @@ ligneExemple.font = { italic: true, color: { argb: 'FF8A8A8A' } }
 colonnes.forEach((c, i) => {
   const col = feuille.getColumn(i + 1)
   if (c.champ === 'tableNumber') col.numFmt = '@' // texte : garde les zéros du début
+  if (c.champ === 'birthDate') col.numFmt = '@' // texte JJ/MM/AAAA : Excel ne l'interprète pas selon la langue de l'ordinateur
   if (c.champ === 'average') col.numFmt = '0.00'
   if (listes[c.champ]?.length) {
     for (let r = 2; r <= LIGNES; r++) {
@@ -75,11 +76,12 @@ const lignes = [
   ['', false],
   ['1. Remplissez la feuille « Résultats » : UNE LIGNE PAR CANDIDAT, sans changer les titres des colonnes.', false],
   ['2. La ligne grise « (exemple) » sert d\'illustration : elle est ignorée, vous pouvez la supprimer.', false],
-  ['3. Colonnes obligatoires : N° de table, Nom, Prénom, Île, Résultat, Moyenne' + (session.series.length ? ', Série.' : '.'), false],
+  ['3. Colonnes obligatoires : N° de table, Nom, Prénom, Date de naissance, Île, Résultat, Moyenne' + (session.series.length ? ', Série.' : '.'), false],
   ['4. Île, Résultat, Mention' + (session.series.length ? ' et Série' : '') + ' : choisissez dans la liste déroulante (ne tapez pas à la main).', false],
   ['5. Mention : seulement pour les candidats « Admis ». Laissez vide pour les autres.', false],
   ['6. Moyenne : un nombre entre 0 et 20 (la virgule est acceptée, ex. 13,5).', false],
   ['7. Le N° de table doit être UNIQUE (ex. ' + `${session.examType}-26-00142` + '). Il doit se terminer par au moins 3 chiffres.', false],
+  ['   Date de naissance : JJ/MM/AAAA, le JOUR en premier (ex. 15/03/2007). Elle sert à distinguer les homonymes et apparaît sur l\'attestation.', false],
   ['8. Facultatif — notes par matière : ajoutez des colonnes intitulées « Mathématiques (coef 4) », « Français (coef 3) »… avec la note sur 20.', false],
   ['9. Enregistrez le fichier au format .xlsx (ou .csv), puis transmettez-le à la personne chargée de la publication.', false],
   ['', false],
