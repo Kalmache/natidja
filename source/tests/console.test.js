@@ -446,6 +446,50 @@ describe('mise en ligne vers le site public', () => {
   })
 })
 
+// ======================================================================= SESSIONS
+describe('sessions : créer celle d’une nouvelle année', () => {
+  const lireConfig = () => JSON.parse(readFileSync(join(dossierDonnees, 'exams.json'), 'utf8'))
+
+  it('un compte connecté crée une session en BROUILLON (rien n’est publié)', async () => {
+    const { cl } = await connecter('amina')
+    const avant = lireConfig()
+    const r = await cl.appel('POST', '/api/sessions', { examType: 'BAC', year: 2027, libelle: 'Juin 2027' })
+    expect(r.statut).toBe(201)
+    expect(r.json).toMatchObject({ id: 'bac-2027', statut: 'DRAFT', libelle: 'Juin 2027' })
+    const apres = lireConfig()
+    expect(apres.sessions.find((s) => s.id === 'bac-2027').status).toBe('DRAFT')
+    expect(apres.updatedAt).toBe(avant.updatedAt) // les propositions en cours restent valables
+    expect(apres.defaultSessionId).toBe(avant.defaultSessionId)
+    // elle est proposée au dépôt, marquée comme brouillon
+    const liste = (await cl.appel('GET', '/api/examens')).json
+    expect(liste.find((s) => s.id === 'bac-2027')).toMatchObject({ statut: 'DRAFT', genre: 'PRINCIPALE' })
+  })
+
+  it('refuse un doublon, une année invalide, et une personne non connectée', async () => {
+    const { cl } = await connecter('moussa')
+    expect((await cl.appel('POST', '/api/sessions', { examType: 'BAC', year: 2027 })).statut).toBe(409)
+    expect((await cl.appel('POST', '/api/sessions', { examType: 'BAC', year: 1800 })).statut).toBe(400)
+    expect((await new Client(url).appel('POST', '/api/sessions', { examType: 'BAC', year: 2028 })).statut).toBe(401)
+  })
+
+  it('un résultat publié sur la session devient PUBLIC et session par défaut', async () => {
+    const { cl } = await connecter('amina')
+    const r = await cl.televerser(csvModifie(), 'bac2027.csv', 'bac-2027')
+    expect(r.statut).toBe(201)
+    const { cl: appro } = await connecter('moussa')
+    const a = await appro.appel('POST', `/api/propositions/${r.json.id}/approuver`, {})
+    expect(a.statut).toBe(200)
+    const apres = lireConfig()
+    const s = apres.sessions.find((x) => x.id === 'bac-2027')
+    expect(s.status).toBe('PUBLISHED')
+    expect(s.stats.total).toBe(300)
+    expect(apres.defaultSessionId).toBe('bac-2027')
+    expect(existsSync(join(dossierDonnees, 'bac-2027', 'stats.json'))).toBe(true)
+    // et la mise en ligne envoie bien CETTE session
+    expect(synchroFausse.appels.at(-1).sessionId).toBe('bac-2027')
+  })
+})
+
 // ======================================================================= AUDIT
 describe('journal d’audit', () => {
   it('seul un administrateur le consulte ; la chaîne est intacte ; les actions sensibles y figurent', async () => {
@@ -456,7 +500,7 @@ describe('journal d’audit', () => {
     expect(r.statut).toBe(200)
     expect(r.json.verification.ok).toBe(true)
     const actions = new Set(r.json.entrees.map((e) => e.action))
-    for (const a of ['connexion_echec', 'connexion_ok', 'proposition_creee', 'proposition_rejetee', 'approbation', 'approbation_refusee_auteur', 'publication_ok', 'mise_en_ligne_ok', 'mise_en_ligne_echec', 'refus', 'acces_refuse']) expect(actions).toContain(a)
+    for (const a of ['connexion_echec', 'connexion_ok', 'proposition_creee', 'proposition_rejetee', 'approbation', 'approbation_refusee_auteur', 'publication_ok', 'mise_en_ligne_ok', 'mise_en_ligne_echec', 'session_creee', 'refus', 'acces_refuse']) expect(actions).toContain(a)
   })
 
   it('les mots de passe et les secrets n’apparaissent JAMAIS dans le journal', () => {

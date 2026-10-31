@@ -138,3 +138,16 @@ La version qu'on remplace est elle-même sauvegardée : on peut toujours annuler
 | Lancer les tests | `npm test` |
 
 *Cet outil en ligne de commande est la première brique. Un espace de publication web sécurisé (connexion, double authentification, validation à deux personnes) pourra s'appuyer dessus.*
+
+
+## 8. Chaque année : créer la session suivante (Bac 2027, rattrapage, BEPC…)
+
+Une **session** = un examen + une année + une édition (**session principale** ou **rattrapage**). Aucune modification de code n'est nécessaire.
+
+**Avec la console** (recommandé) : onglet **Sessions** → *Créer la session d'une nouvelle année* → choisir l'examen, l'année, l'édition, un libellé facultatif (ex. « Juin 2027 ») et, pour le Bac, les séries.
+- La session est créée en **brouillon** : **rien n'est publié** et le public ne la voit pas.
+- Elle reprend l'intitulé, les îles et les séries de l'examen précédent ; on peut modifier les séries à la création.
+- Déposez ensuite le fichier Excel dans **Nouvelle proposition** en choisissant cette session ; après approbation par une seconde personne, **à la première publication**, la session devient publique **et devient celle que les visiteurs voient en arrivant**.
+- Les années précédentes restent consultables : l'application propose alors trois listes — *Examen*, *Année*, *Session* — au lieu des onglets.
+
+**Identifiants** : `bac-2027` (session principale), `bac-2027-rattrapage` (rattrapage), `bepc-2027`… Une session ne peut pas être créée deux fois.
