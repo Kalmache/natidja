@@ -81,6 +81,12 @@ Options -Indexes
   RewriteCond %{HTTP:X-Forwarded-Proto} !https
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+  # Le code source, les documents internes et le dépôt Git ne doivent JAMAIS être servis au public
+  # (OVH publie tout le dépôt : sans cette règle, /source/... serait téléchargeable).
+  RewriteRule ^source(/|$) - [R=404,L]
+  RewriteRule (^|/)\.git(/|$) - [R=404,L]
+  RewriteRule ^(README\.md|package(-lock)?\.json)$ - [R=404,L]
+
   # Un fichier existant est servi tel quel.
   RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule ^ - [L]
