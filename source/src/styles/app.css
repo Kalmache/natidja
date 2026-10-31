@@ -460,3 +460,55 @@ a.btn { text-decoration: none; }
 /* Glisser entre les pages : le navigateur ne prend que le défilement vertical,
    donc un geste horizontal n'est plus « annulé » par lui. */
 html, body { touch-action: pan-y pinch-zoom; }
+
+/* ==========================================================================
+   Cartes de chiffres : elles FLOTTENT comme sur l'eau et se touchent
+   --------------------------------------------------------------------------
+   - « flotte » : léger va-et-vient vertical + très faible roulis, jamais en
+     même temps pour les 4 cartes (durées et décalages différents) ;
+   - « onde » : un reflet de lumière glisse lentement sur la surface.
+   Tout s'arrête si l'appareil demande « moins d'animations ».
+   ========================================================================== */
+.stat { position: relative; overflow: hidden; isolation: isolate; animation: flotte 7s ease-in-out infinite; will-change: transform; }
+.stat::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.10) 50%, transparent 65%); background-size: 260% 100%; animation: onde 8s ease-in-out infinite; }
+.kpis > :nth-child(1) { animation-duration: 6.4s; animation-delay: 0s; }
+.kpis > :nth-child(2) { animation-duration: 7.3s; animation-delay: -1.8s; }
+.kpis > :nth-child(3) { animation-duration: 6.8s; animation-delay: -3.5s; }
+.kpis > :nth-child(4) { animation-duration: 7.7s; animation-delay: -5.2s; }
+.kpis > :nth-child(2)::before { animation-delay: -2s; } .kpis > :nth-child(3)::before { animation-delay: -4s; } .kpis > :nth-child(4)::before { animation-delay: -6s; }
+@keyframes flotte {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(0.45deg); }
+  50% { transform: translateY(1px) rotate(-0.3deg); }
+  75% { transform: translateY(-3px) rotate(0.25deg); }
+}
+@keyframes onde { 0% { background-position: 130% 0; } 55%, 100% { background-position: -60% 0; } }
+
+/* Carte cliquable : c'est un <button>, on neutralise son style par défaut */
+button.stat { width: 100%; font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: box-shadow 0.25s var(--ease), border-color 0.25s var(--ease), filter 0.2s; }
+.stat--click:hover { border-color: var(--p-500); box-shadow: var(--shadow-lg); }
+.stat--click:active { filter: brightness(1.18); }
+.stat--click:focus-visible { outline: 3px solid var(--p-500); outline-offset: 3px; }
+
+/* Éléments de graphiques cliquables (légendes, barres, histogramme) */
+.is-click { cursor: pointer; border-radius: 10px; transition: background 0.2s, transform 0.2s; -webkit-tap-highlight-color: transparent; }
+.is-click:hover { background: color-mix(in srgb, var(--p-500) 9%, transparent); }
+.is-click:active { background: color-mix(in srgb, var(--p-500) 16%, transparent); }
+.is-click:focus-visible { outline: 3px solid var(--p-500); outline-offset: 2px; }
+.legend li.is-click, .bars li.is-click { padding: 6px 8px; margin: -6px -8px; }
+.columns li.is-click { padding: 4px 6px; animation: flotteDouce 6.5s ease-in-out infinite; }
+.columns li:nth-child(2) { animation-delay: -1.6s; } .columns li:nth-child(3) { animation-delay: -3.2s; } .columns li:nth-child(4) { animation-delay: -4.8s; }
+@keyframes flotteDouce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+/* Arrivée par défilement automatique : on laisse la place de l'en-tête fixe */
+.results { scroll-margin-top: calc(var(--safe-top) + 92px); }
+
+/* Filtres actifs sous forme de pastilles qu'on retire d'un toucher */
+.filtre-puces { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.filtre-puce { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--p-500); background: color-mix(in srgb, var(--p-500) 14%, transparent); color: var(--text); font: inherit; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
+.filtre-puce:hover { background: color-mix(in srgb, var(--p-500) 24%, transparent); }
+.filtre-puce--clear { border-color: var(--border); background: transparent; color: var(--text-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .stat, .stat::before, .columns li.is-click { animation: none !important; }
+}

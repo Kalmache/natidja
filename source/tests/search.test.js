@@ -67,4 +67,10 @@ describe('matchesFilters', () => {
     expect(matchesFilters(zainaba, { series: 'G', status: 'ADMIS' })).toBe(true)
     expect(matchesFilters(zainaba, { status: 'AJOURNE' })).toBe(false)
   })
+  it('filtre par mention (et laisse passer sans filtre)', () => {
+    const bien = { ...zainaba, mention: 'BIEN' }
+    expect(matchesFilters(bien, { mention: 'BIEN' })).toBe(true)
+    expect(matchesFilters(bien, { mention: 'TRES_BIEN' })).toBe(false)
+    expect(matchesFilters(bien, { mention: 'ALL' })).toBe(true)
+  })
 })

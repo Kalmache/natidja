@@ -25,7 +25,7 @@ for (const session of config.sessions) {
   const candidats = readdirSync(dossier)
     .filter((f) => f.endsWith('.json'))
     .flatMap((f) => JSON.parse(readFileSync(join(dossier, f), 'utf8')))
-  const stats = calculerStats(candidats, session)
+  const stats = calculerStats(candidats, session, config.shardKeys?.numberDigits ?? 3)
   writeFileSync(join(DATA, session.id, 'stats.json'), JSON.stringify(stats))
   console.log(`✔ ${session.id} : ${stats.total} candidats → stats.json (${Object.keys(stats.parIle).length} îles)`)
 }

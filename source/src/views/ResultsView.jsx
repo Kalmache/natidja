@@ -7,7 +7,7 @@
 //   2. Un « shard » (≈ 30 Ko) téléchargé dès que la saisie est assez longue,
 //      choisi par buildQuery() (voir src/lib/search.js).
 // ============================================================================
-import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { surRetour } from '../lib/retour.js'
 import Icon from '../components/Icon.jsx'
 import Stat from '../components/Stat.jsx'
@@ -15,10 +15,14 @@ import CandidateCard from '../components/CandidateCard.jsx'
 import CandidateModal from '../components/CandidateModal.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { buildQuery, matchesFilters } from '../lib/search.js'
-import { loadInitial, loadShard } from '../lib/data.js'
+import { loadInitial, loadShard, loadStats } from '../lib/data.js'
+import { consommerFiltre } from '../lib/demande.js'
+import { navigate, prefersReducedMotion } from '../hooks.js'
 
 const PAGE = 60 // nombre de cartes affichées avant « Afficher plus »
 const STATUTS = ['ALL', 'ADMIS', 'SECOND_GROUPE', 'AJOURNE']
+const MENTIONS = ['ALL', 'PASSABLE', 'ASSEZ_BIEN', 'BIEN', 'TRES_BIEN']
+const PARCOURS_VIDE = (session) => ({ session, items: [], suivant: 0, fini: false, charge: false, erreur: false })
 
 export default function ResultsView({ config, session, onSession, island, onIsland, islands }) {
   const { t } = useI18n()
@@ -28,8 +32,9 @@ export default function ResultsView({ config, session, onSession, island, onIsla
   const requete = useDeferredValue(saisie) // garde la frappe fluide
   const [serie, setSerie] = useState('ALL')
   const [statut, setStatut] = useState('ALL')
+  const [mention, setMention] = useState('ALL')
+  const refResultats = useRef(null) // début de la liste : cible du défilement automatique
   const [selection, setSelection] = useState(null) // candidat ouvert dans la fenêtre
-  const [visibles, setVisibles] = useState(PAGE)
 
   // ---------- Fiche d'un candidat et bouton RETOUR ----------
   // Problème : la fiche n'était qu'un état de l'écran, sans trace dans
@@ -111,20 +116,59 @@ export default function ResultsView({ config, session, onSession, island, onIsla
   }, [url, tentative])
 
   // ---------- 3. Liste finale à afficher ----------
-  const filtres = { island, series: serie, status: statut }
+  const filtres = { island, series: serie, status: statut, mention }
   // « recherche » = une vraie recherche est lancée (saisie assez longue).
   // Tant que la saisie est trop courte, on garde l'aperçu des candidats.
   const recherche = plan.etat === 'pret'
+
+  // ---------- 3 bis. PARCOURS : filtrer sans rien taper ----------
+  // L'aperçu ne contient que 120 candidats. Quand on touche « Admis », « Bien »,
+  // une île... sans taper de nom, il faut parcourir TOUS les résultats. On le
+  // fait par petits fichiers (≈ 4 Ko chacun), dans l'ordre des numéros de table,
+  // et seulement autant qu'il en faut pour remplir l'écran : « Afficher plus »
+  // en charge d'autres. Rien n'est téléchargé tant qu'aucun filtre n'est actif.
+  const filtreActif = island !== 'all' || serie !== 'ALL' || statut !== 'ALL' || mention !== 'ALL'
+  const parcoursActif = filtreActif && !recherche
+  const [parcoursBrut, setParcours] = useState(() => PARCOURS_VIDE(session.id))
+  const parcours = parcoursBrut.session === session.id ? parcoursBrut : PARCOURS_VIDE(session.id)
+
   const liste = useMemo(() => {
+    if (parcoursActif) return parcours.items.filter((c) => matchesFilters(c, filtres))
     if (!recherche) return apercu.filter((c) => matchesFilters(c, filtres))
     if (shard?.url !== plan.url) return []
     return shard.candidats.filter((c) => matchesFilters(c, filtres) && plan.filtre(c))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recherche, apercu, shard, plan, island, serie, statut])
+  }, [parcoursActif, parcours.items, recherche, apercu, shard, plan, island, serie, statut, mention])
 
-  const pret = recherche ? !chargement && !erreur && shard?.url === plan.url : apercuCharge
+  const [visibles, setVisibles] = useState(PAGE)
+  const manque = parcoursActif && !parcours.fini && !parcours.erreur && liste.length < visibles
+  useEffect(() => {
+    if (!manque || parcours.charge) return
+    const session_ = session.id
+    const rang = parcours.suivant
+    setParcours((p) => ({ ...(p.session === session_ ? p : PARCOURS_VIDE(session_)), charge: true }))
+    loadStats(session_)
+      .then(async (st) => {
+        const cle = st?.fichiersNumeros?.[rang]
+        const candidats = cle === undefined ? null : await loadShard(`./data/${session_}/numeros/${cle}.json`)
+        setParcours((p) => {
+          if (p.session !== session_ || p.suivant !== rang) return p // la situation a changé entre-temps
+          return candidats === null
+            ? { ...p, fini: true, charge: false }
+            : { ...p, items: [...p.items, ...candidats], suivant: rang + 1, charge: false }
+        })
+      })
+      .catch(() => setParcours((p) => (p.session === session_ ? { ...p, charge: false, erreur: true } : p)))
+  }, [manque, parcours.charge, parcours.suivant, session.id])
 
-  useEffect(() => setVisibles(PAGE), [requete, island, serie, statut, session.id])
+  const pret = parcoursActif
+    ? liste.length > 0 || parcours.fini || parcours.erreur
+    : recherche
+      ? !chargement && !erreur && shard?.url === plan.url
+      : apercuCharge
+  const erreurAffichee = parcoursActif ? parcours.erreur : erreur
+
+  useEffect(() => setVisibles(PAGE), [requete, island, serie, statut, mention, session.id])
 
   // ---------- Raccourcis clavier : ← → pour changer d'île ----------
   const changerIle = useCallback(
@@ -149,8 +193,34 @@ export default function ResultsView({ config, session, onSession, island, onIsla
     setSaisie('')
     setSerie('ALL')
     setStatut('ALL')
+    setMention('ALL')
     onIsland('all')
   }
+
+  // ---------- Aller directement aux résultats concernés ----------
+  // Appelé quand on touche une carte de chiffres (ici ou sur la page Statistiques) :
+  // on applique le filtre demandé, puis on fait glisser l'écran jusqu'à la liste.
+  const allerAuxResultats = useCallback(() => {
+    refResultats.current?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' })
+  }, [])
+  const appliquerFiltre = useCallback(
+    (f = {}) => {
+      setSaisie('')
+      setSerie(f.serie ?? 'ALL')
+      setStatut(f.statut ?? 'ALL')
+      setMention(f.mention ?? 'ALL')
+      onIsland(f.island ?? 'all')
+      // Petit délai : on laisse d'abord l'écran se mettre à jour (et l'éventuel
+      // changement de page finir de remonter en haut) avant de glisser vers la liste.
+      setTimeout(allerAuxResultats, 160)
+    },
+    [onIsland, allerAuxResultats],
+  )
+  // Arrivée depuis la page Statistiques : une demande de filtre peut nous attendre.
+  useEffect(() => {
+    const demande = consommerFiltre()
+    if (demande) appliquerFiltre(demande)
+  }, [appliquerFiltre])
 
   // ---------- Chiffres clés ----------
   const stats = session.stats
@@ -186,6 +256,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
                     onSession(s.id)
                     setSaisie('')
                     setStatut('ALL')
+                    setMention('ALL')
                   }}
                 >
                   {s.examType} {s.year}
@@ -231,10 +302,10 @@ export default function ResultsView({ config, session, onSession, island, onIsla
 
       {/* ================= CHIFFRES CLÉS ================= */}
       <section className="kpis" aria-label="Chiffres clés">
-        <Stat value={stats.total} label={t('kpi.candidates')} />
-        <Stat value={stats.admitted} label={t('kpi.admitted')} tone="ok" />
-        <Stat value={stats.oralSecondGroup} label={t('kpi.second')} tone="warn" />
-        <Stat value={taux} decimals={1} suffix=" %" label={t('kpi.rate')} tone="accent" />
+        <Stat value={stats.total} label={t('kpi.candidates')} onClick={() => appliquerFiltre({})} />
+        <Stat value={stats.admitted} label={t('kpi.admitted')} tone="ok" onClick={() => appliquerFiltre({ statut: 'ADMIS' })} />
+        <Stat value={stats.oralSecondGroup} label={t('kpi.second')} tone="warn" onClick={() => appliquerFiltre({ statut: 'SECOND_GROUPE' })} />
+        <Stat value={taux} decimals={1} suffix=" %" label={t('kpi.rate')} tone="accent" onClick={() => navigate('/stats')} />
       </section>
 
       {/* ================= FILTRES ================= */}
@@ -282,6 +353,22 @@ export default function ResultsView({ config, session, onSession, island, onIsla
             </div>
           )}
           <div className="filters__group">
+            <span className="filters__label">{t('filter.mention')}</span>
+            <div className="pills">
+              {MENTIONS.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  className={`pill pill--sm ${m === mention ? 'is-active' : ''}`}
+                  aria-pressed={m === mention}
+                  onClick={() => setMention(m)}
+                >
+                  {m === 'ALL' ? t('filter.allMentions') : t(`mention.${m}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="filters__group">
             <span className="filters__label">{t('filter.status')}</span>
             <div className="pills">
               {STATUTS.map((s) => (
@@ -301,11 +388,44 @@ export default function ResultsView({ config, session, onSession, island, onIsla
       </section>
 
       {/* ================= RÉSULTATS ================= */}
-      <section className="results" aria-live="polite" aria-busy={!pret}>
-        {erreur ? (
+      <section className="results" ref={refResultats} aria-live="polite" aria-busy={!pret}>
+        {filtreActif && (
+          <div className="filtre-puces" aria-label={t('results.active')}>
+            {statut !== 'ALL' && (
+              <button type="button" className="filtre-puce" onClick={() => setStatut('ALL')}>
+                {t(`status.${statut}`)} <Icon name="close" size={12} />
+              </button>
+            )}
+            {mention !== 'ALL' && (
+              <button type="button" className="filtre-puce" onClick={() => setMention('ALL')}>
+                {t(`mention.${mention}`)} <Icon name="close" size={12} />
+              </button>
+            )}
+            {serie !== 'ALL' && (
+              <button type="button" className="filtre-puce" onClick={() => setSerie('ALL')}>
+                {t('filter.series')} {serie} <Icon name="close" size={12} />
+              </button>
+            )}
+            {island !== 'all' && (
+              <button type="button" className="filtre-puce" onClick={() => onIsland('all')}>
+                {(islands.find((i) => i.id === island)?.name ?? island).split(' (')[0]} <Icon name="close" size={12} />
+              </button>
+            )}
+            <button type="button" className="filtre-puce filtre-puce--clear" onClick={reinitialiser}>
+              {t('results.reset')}
+            </button>
+          </div>
+        )}
+        {erreurAffichee ? (
           <div className="notice notice--error">
             <Icon name="alert" /> <span>{t('results.error')}</span>
-            <button type="button" className="btn btn--sm" onClick={() => setTentative((n) => n + 1)}>
+            <button
+              type="button"
+              className="btn btn--sm"
+              onClick={() =>
+                parcoursActif ? setParcours((p) => ({ ...p, erreur: false })) : setTentative((n) => n + 1)
+              }
+            >
               <Icon name="refresh" size={14} /> {t('results.retry')}
             </button>
           </div>
@@ -327,19 +447,24 @@ export default function ResultsView({ config, session, onSession, island, onIsla
         ) : (
           <>
             <p className="results__count">
-              {recherche
-                ? t('results.count', { n: liste.length })
-                : t('results.preview', { total: stats.total.toLocaleString('fr-FR') })}
+              {parcoursActif
+                ? parcours.fini
+                  ? t('results.count', { n: liste.length })
+                  : t('results.countPartial', { n: liste.length })
+                : recherche
+                  ? t('results.count', { n: liste.length })
+                  : t('results.preview', { total: stats.total.toLocaleString('fr-FR') })}
             </p>
             <div className="grid">
               {liste.slice(0, visibles).map((c, i) => (
                 <CandidateCard key={c.id} candidat={c} index={i} onOpen={ouvrirFiche} />
               ))}
             </div>
-            {liste.length > visibles && (
+            {(liste.length > visibles || (parcoursActif && !parcours.fini)) && (
               <div className="results__more">
                 <button type="button" className="btn" onClick={() => setVisibles((v) => v + PAGE)}>
-                  {t('results.more')} ({liste.length - visibles})
+                  {t('results.more')}
+                  {liste.length > visibles ? ` (${liste.length - visibles})` : parcours.charge ? ` · ${t('results.loadingMore')}` : ''}
                 </button>
               </div>
             )}
