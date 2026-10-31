@@ -35,6 +35,28 @@ export function usePersistedState(cle, defaut, valide = () => true) {
   return [valeur, setValeur]
 }
 
+/**
+ * Repère l'ouverture du clavier du téléphone : dès qu'un champ de saisie a le
+ * focus, on ajoute la classe « clavier » sur la page. Le CSS s'en sert pour
+ * CACHER la barre de navigation du bas, qui sinon se colle au clavier et
+ * recouvre la moitié du champ qu'on essaie de remplir.
+ */
+export function useClavier() {
+  useEffect(() => {
+    const racine = document.documentElement
+    const estChamp = (el) => el?.matches?.('input:not([type=checkbox]):not([type=radio]), textarea, select')
+    const entree = (e) => estChamp(e.target) && racine.classList.add('clavier')
+    const sortie = (e) => estChamp(e.target) && racine.classList.remove('clavier')
+    document.addEventListener('focusin', entree)
+    document.addEventListener('focusout', sortie)
+    return () => {
+      document.removeEventListener('focusin', entree)
+      document.removeEventListener('focusout', sortie)
+      racine.classList.remove('clavier')
+    }
+  }, [])
+}
+
 /** Lit l'adresse après le # (ex. "#/stats") et se met à jour quand elle change. */
 export function useHashRoute() {
   const lire = () => window.location.hash.replace(/^#\/?/, '').split('/').filter(Boolean)
