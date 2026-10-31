@@ -1,0 +1,48 @@
+# ============================================================================
+# Fabrication automatique de l'application Android (fichier APK)
+# ----------------------------------------------------------------------------
+# Quand ? À chaque envoi sur « main » qui modifie le code (source/) ou les
+# données (data/), ou à la demande : onglet Actions > « Application Android »
+# > « Run workflow ».
+# Résultat : un fichier « ndeze-natidja-android » téléchargeable en bas de la
+# page de l'exécution (conservé 30 jours). C'est un APK « debug » : il
+# s'installe directement sur un téléphone Android (autoriser les sources
+# inconnues). Pour Google Play, il faudra un APK/AAB signé (voir README).
+# ============================================================================
+name: Application Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['source/**', 'data/**', '.github/workflows/android.yml']
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: source
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm test
+      - run: npm run build:app
+      - run: npx cap sync android
+      - name: Construire l'APK
+        working-directory: source/android
+        run: ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ndeze-natidja-android
+          path: source/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
