@@ -5,3 +5,6 @@ dist
 backups/
 exports/
 console-data/
+
+# Secrets de la console déployée : jamais sur GitHub
+source/console/deploiement/.env

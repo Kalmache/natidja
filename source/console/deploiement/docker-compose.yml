@@ -1,0 +1,49 @@
+# ============================================================================
+# Console de publication : console (programme) + caddy (HTTPS automatique)
+# ----------------------------------------------------------------------------
+# Lancer :  docker compose up -d --build        (depuis ce dossier)
+# Arrêter : docker compose down                 (les données restent dans les volumes)
+# Journaux : docker compose logs -f console
+#
+# Seul « caddy » est joignable depuis Internet (ports 80 et 443). La console elle-même
+# n'ouvre AUCUN port vers l'extérieur : on ne peut l'atteindre qu'à travers caddy.
+# ============================================================================
+services:
+  console:
+    build:
+      context: ../..            # le dossier « source/ »
+      dockerfile: console/deploiement/Dockerfile
+    restart: unless-stopped
+    env_file: .env              # contient le jeton GitHub (secret) : voir .env.exemple
+    volumes:
+      - console-data:/console-data   # comptes, propositions, journal d'audit, sauvegardes
+      - donnees:/donnees             # copie de travail des résultats publiés
+    # Durcissement : système de fichiers en lecture seule, aucun privilège supplémentaire.
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [interne]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"      # nécessaire pour obtenir le certificat HTTPS
+      - "443:443"
+    environment:
+      CONSOLE_DOMAINE: ${CONSOLE_DOMAINE:?Renseignez CONSOLE_DOMAINE dans le fichier .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data         # certificats HTTPS
+    depends_on: [console]
+    networks: [interne]
+
+volumes:
+  console-data:
+  donnees:
+  caddy-data:
+
+networks:
+  interne:

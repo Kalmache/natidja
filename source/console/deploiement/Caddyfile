@@ -1,0 +1,13 @@
+# Caddy : serveur web qui obtient et renouvelle SEUL le certificat HTTPS (Let's Encrypt).
+# Le nom de domaine vient du fichier .env (CONSOLE_DOMAINE, ex. console.mmbt.fr).
+{$CONSOLE_DOMAINE} {
+	encode zstd gzip
+
+	# Tout passe par ici ; la console n'est joignable que par ce biais.
+	reverse_proxy console:8787
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+}

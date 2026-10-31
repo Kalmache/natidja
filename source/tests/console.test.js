@@ -61,6 +61,17 @@ class Client {
   }
 }
 
+// ------------------------------------------------- faux envoi vers le site public
+// Les tests décident s'il réussit ou échoue ; on note ce qu'il reçoit.
+const synchroFausse = {
+  echec: false, appels: [],
+  async synchroniser(args) {
+    this.appels.push(args)
+    if (this.echec) throw new Error('GitHub 503 : service indisponible')
+    return { commit: 'abcdef1234567', url: 'https://github.com/x/y/commit/abcdef1', fichiers: 7, supprimes: 0 }
+  },
+}
+
 // --------------------------------------------------------------------- mise en place
 let c, url, dossierDonnees, dossierConsole
 const secrets = {}
@@ -95,7 +106,7 @@ beforeAll(async () => {
   fichiers.set('stats.json', JSON.stringify(calculerStats(base, session)))
   for (const [chemin, contenu] of fichiers) { mkdirSync(join(dossierDonnees, 'bac-2026', chemin, '..'), { recursive: true }); writeFileSync(join(dossierDonnees, 'bac-2026', chemin), contenu) }
   writeFileSync(join(dossierDonnees, 'exams.json'), JSON.stringify(majConfig(configReelle, 'bac-2026', base, new Date(maintenant))))
-  c = creerConsole({ dossierConsole, dossierDonnees, dev: true, horloge: () => maintenant, sansPlanificateur: true, tailleFichierMax: 400_000, echecsMax: 5 })
+  c = creerConsole({ dossierConsole, dossierDonnees, dev: true, horloge: () => maintenant, sansPlanificateur: true, tailleFichierMax: 400_000, echecsMax: 5, synchro: synchroFausse })
   await new Promise((ok) => c.serveur.listen(0, '127.0.0.1', ok))
   url = `http://127.0.0.1:${c.serveur.address().port}`
   await creerPret('amina', ['preparateur'])
@@ -372,6 +383,69 @@ describe('approbation et publication', () => {
   })
 })
 
+// ======================================================================= MISE EN LIGNE
+describe('mise en ligne vers le site public', () => {
+  const publier = async (opts = {}) => {
+    const { cl } = await connecter('amina')
+    const r = await cl.televerser(csvModifie())
+    const { cl: appro } = await connecter('moussa')
+    const a = await appro.appel('POST', `/api/propositions/${r.json.id}/approuver`, { confirmerEcrasement: true, ...opts })
+    return { appro, cl, id: r.json.id, rep: a }
+  }
+
+  it('après une publication réussie, les fichiers sont envoyés et l’état est « ok »', async () => {
+    synchroFausse.echec = false
+    synchroFausse.appels.length = 0
+    const { rep } = await publier()
+    expect(rep.json.statut).toBe('publiee')
+    expect(rep.json.miseEnLigne.etat).toBe('ok')
+    expect(rep.json.miseEnLigne.commit).toBe('abcdef1')
+    expect(synchroFausse.appels).toHaveLength(1)
+    expect(synchroFausse.appels[0].sessionId).toBe('bac-2026')
+    expect(synchroFausse.appels[0].dossierDonnees).toBe(dossierDonnees)
+  })
+
+  it('si l’envoi échoue, la publication locale reste valide, l’échec est noté, et on peut réessayer', async () => {
+    synchroFausse.echec = true
+    const { appro, id, rep } = await publier()
+    expect(rep.statut).toBe(200) // la publication elle-même n'est PAS annulée
+    expect(rep.json.statut).toBe('publiee')
+    expect(rep.json.miseEnLigne.etat).toBe('echec')
+    expect(rep.json.miseEnLigne.erreur).toMatch(/503/)
+
+    // un préparateur ne peut pas relancer
+    const { cl: prep } = await connecter('amina')
+    expect((await prep.appel('POST', `/api/propositions/${id}/mise-en-ligne`, {})).statut).toBe(403)
+
+    // on réessaie alors que le service est rétabli
+    synchroFausse.echec = false
+    const nouvelle = await appro.appel('POST', `/api/propositions/${id}/mise-en-ligne`, {})
+    expect(nouvelle.statut).toBe(200)
+    expect(nouvelle.json.miseEnLigne.etat).toBe('ok')
+    // une fois en ligne, on ne renvoie pas une seconde fois
+    expect((await appro.appel('POST', `/api/propositions/${id}/mise-en-ligne`, {})).statut).toBe(409)
+  })
+
+  it('refuse de renvoyer une ancienne publication quand une plus récente existe (elle écraserait la récente)', async () => {
+    synchroFausse.echec = true
+    const premiere = await publier()
+    synchroFausse.echec = false
+    avancer(2000)
+    await publier() // une publication plus récente, elle, réussit
+    const r = await premiere.appro.appel('POST', `/api/propositions/${premiere.id}/mise-en-ligne`, {})
+    expect(r.statut).toBe(409)
+    expect(r.json.erreur).toMatch(/plus récente/)
+  })
+
+  it('on ne peut mettre en ligne qu’une proposition publiée', async () => {
+    const { cl } = await connecter('amina')
+    const r = await cl.televerser(csvModifie())
+    const { cl: appro } = await connecter('moussa')
+    expect((await appro.appel('POST', `/api/propositions/${r.json.id}/mise-en-ligne`, {})).statut).toBe(409)
+    await cl.appel('POST', `/api/propositions/${r.json.id}/annuler`, {})
+  })
+})
+
 // ======================================================================= AUDIT
 describe('journal d’audit', () => {
   it('seul un administrateur le consulte ; la chaîne est intacte ; les actions sensibles y figurent', async () => {
@@ -382,7 +456,7 @@ describe('journal d’audit', () => {
     expect(r.statut).toBe(200)
     expect(r.json.verification.ok).toBe(true)
     const actions = new Set(r.json.entrees.map((e) => e.action))
-    for (const a of ['connexion_echec', 'connexion_ok', 'proposition_creee', 'proposition_rejetee', 'approbation', 'approbation_refusee_auteur', 'publication_ok', 'refus', 'acces_refuse']) expect(actions).toContain(a)
+    for (const a of ['connexion_echec', 'connexion_ok', 'proposition_creee', 'proposition_rejetee', 'approbation', 'approbation_refusee_auteur', 'publication_ok', 'mise_en_ligne_ok', 'mise_en_ligne_echec', 'refus', 'acces_refuse']) expect(actions).toContain(a)
   })
 
   it('les mots de passe et les secrets n’apparaissent JAMAIS dans le journal', () => {

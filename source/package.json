@@ -1,6 +1,6 @@
 {
   "name": "ndeze-natidja",
-  "version": "2.5.4",
+  "version": "2.6.0",
   "private": true,
   "type": "module",
   "description": "Consultation des résultats d'examens (Bac, BEPC) – Union des Comores",
@@ -29,6 +29,7 @@
     "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.6.0",
     "@capacitor/share": "^8.0.3",
+    "exceljs": "^4.4.0",
     "qrcode-generator": "^2.0.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -36,7 +37,6 @@
   "devDependencies": {
     "@capacitor/cli": "^8.6.0",
     "@vitejs/plugin-react": "^4.7.0",
-    "exceljs": "^4.4.0",
     "vite": "^5.4.21",
     "vite-plugin-pwa": "^0.20.5",
     "vitest": "^2.1.9"
