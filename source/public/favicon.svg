@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="16" fill="#047857" />
+  <!-- Graduation Cap -->
+  <path d="M32 14L8 26L32 38L56 26L32 14Z" fill="#FBBF24" />
+  <path d="M20 33.5V45C20 45 25 50 32 50C39 50 44 45 44 45V33.5L32 39.5L20 33.5Z" fill="#F59E0B" />
+  <path d="M49 29.5V42L47 44V30.5L49 29.5Z" fill="#D97706" />
+  <circle cx="47" cy="44" r="2.5" fill="#FBBF24" />
+  <!-- Comoros Star & Crescent Small Badge -->
+  <circle cx="32" cy="26" r="3" fill="#047857" />
+</svg>

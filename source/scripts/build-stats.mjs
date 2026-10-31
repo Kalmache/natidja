@@ -2,7 +2,7 @@
 // scripts/build-stats.mjs
 // ----------------------------------------------------------------------------
 // But : calculer UNE FOIS les statistiques (taux de réussite par île, par
-// série, par mention...) et les écrire dans public/data/<session>/stats.json.
+// série, par mention...) et les écrire dans data/<session>/stats.json.
 //
 // Pourquoi ne pas les calculer dans le navigateur ? Parce que cela obligerait
 // chaque visiteur à télécharger les 3 500 candidats (plusieurs Mo). Ici, le
@@ -12,8 +12,11 @@
 // ============================================================================
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const DATA = join(process.cwd(), 'public', 'data')
+// Les données vivent à la RACINE du dépôt (dossier data/), car c'est la racine
+// que l'hébergeur OVH publie. Ce script est dans source/scripts/.
+const DATA = fileURLToPath(new URL('../../data', import.meta.url))
 
 // 1. On lit la liste des sessions d'examen (Bac, BEPC...).
 const config = JSON.parse(readFileSync(join(DATA, 'exams.json'), 'utf8'))
