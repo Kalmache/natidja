@@ -180,4 +180,5 @@ export default {
   'legal.certificate': 'Certificat d’auteur',
   'legal.rights': 'Tous droits réservés',
   'legal.protected': 'Œuvre protégée par le Code de la propriété intellectuelle',
+  'about.legalTitle': 'Informations légales',
 }

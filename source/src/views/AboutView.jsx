@@ -5,6 +5,7 @@
 import Icon from '../components/Icon.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { navigate } from '../hooks.js'
+import { PAGES_LEGALES } from './LegalView.jsx'
 
 export default function AboutView() {
   const { t } = useI18n()
@@ -51,6 +52,17 @@ export default function AboutView() {
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className="panel panel--wide">
+          <h2>{t('about.legalTitle')}</h2>
+          <div className="legal-links">
+            {PAGES_LEGALES.map((p) => (
+              <a key={p} href={`#/legal/${p}`} className="pill">
+                <Icon name={p === 'journal' ? 'list' : p === 'licence' ? 'shield' : 'info'} size={14} /> {t(`legal.${p}`)}
+              </a>
+            ))}
+          </div>
         </section>
 
         <section className="panel panel--wide">

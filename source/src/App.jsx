@@ -41,6 +41,13 @@ export default function App() {
     html.lang = lang
     html.dir = LANGS[lang].dir
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#052e24' : '#047857')
+    // Application Android : icônes de la barre d'état (heure, batterie...) claires sur
+    // fond sombre, foncées sur fond clair, pour rester lisibles quel que soit le thème choisi.
+    try {
+      window.Capacitor?.Plugins?.SystemBars?.setStyle?.({ style: theme === 'dark' ? 'DARK' : 'LIGHT' })
+    } catch {
+      /* hors application : sans effet */
+    }
   }, [theme, palette, lang])
 
   return (

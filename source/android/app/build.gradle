@@ -7,8 +7,10 @@ android {
         applicationId "fr.mmbt.natidja"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "2.3.0"
+        // versionCode augmente à chaque fabrication sur GitHub (-PversionCode=<n° d'exécution>),
+        // sinon Android refuse d'installer la nouvelle version par-dessus l'ancienne.
+        versionCode = (project.findProperty('versionCode') ?: '1').toInteger()
+        versionName "2.3.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,7 +18,22 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Clé de TEST fixe : toutes les fabrications « debug » sont signées pareil, donc une
+    // nouvelle version s'installe par-dessus l'ancienne. Cette clé est publique par nature
+    // (mot de passe « android ») : elle ne sert QU'aux versions de démonstration.
+    // Pour Google Play : créer sa propre clé secrète, jamais dans le dépôt.
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

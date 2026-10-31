@@ -5,6 +5,16 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.3.1',
+    date: '31/10/2026',
+    titre: 'Application Android : affichage et mises à jour',
+    points: [
+      'L’application respecte la barre d’état et la barre de gestes : plus aucun bouton masqué par les notifications',
+      'Icônes de la barre d’état adaptées au thème clair ou sombre',
+      'Les nouvelles versions de l’application s’installent par-dessus la précédente',
+    ],
+  },
+  {
     version: '2.3.0',
     date: '31/10/2026',
     titre: 'Import des résultats depuis Excel',
