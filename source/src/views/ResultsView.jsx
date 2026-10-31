@@ -30,6 +30,35 @@ export default function ResultsView({ config, session, onSession, island, onIsla
   const [selection, setSelection] = useState(null) // candidat ouvert dans la fenêtre
   const [visibles, setVisibles] = useState(PAGE)
 
+  // ---------- Fiche d'un candidat et bouton RETOUR ----------
+  // Problème : la fiche n'était qu'un état de l'écran, sans trace dans
+  // l'historique du navigateur. Sur Android, le bouton retour ne trouvait rien
+  // à « défaire » et FERMAIT L'APPLICATION.
+  // Solution : à l'ouverture, on ajoute une entrée à l'historique
+  // (history.pushState). Le bouton retour retire alors cette entrée, et on
+  // écoute cet événement (« popstate ») pour fermer la fiche.
+  const ouvrirFiche = useCallback((candidat) => {
+    window.history.pushState({ fiche: true }, '') // l'adresse ne change pas
+    setSelection(candidat)
+  }, [])
+
+  const fermerFiche = useCallback(() => {
+    // Fermeture par la croix ou Échap : on « recule » nous-mêmes d'une entrée,
+    // ce qui déclenche popstate ci-dessous et ferme la fiche proprement.
+    if (window.history.state?.fiche) window.history.back()
+    else setSelection(null)
+  }, [])
+
+  useEffect(() => {
+    // Appelé quand l'utilisateur recule : si l'entrée « fiche » a disparu,
+    // on ferme la fiche.
+    const surRetour = () => {
+      if (!window.history.state?.fiche) setSelection(null)
+    }
+    window.addEventListener('popstate', surRetour)
+    return () => window.removeEventListener('popstate', surRetour)
+  }, [])
+
   // ---------- 1. Candidats affichés au démarrage ----------
   const [apercu, setApercu] = useState([])
   const [apercuCharge, setApercuCharge] = useState(false)
@@ -294,7 +323,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
             </p>
             <div className="grid">
               {liste.slice(0, visibles).map((c, i) => (
-                <CandidateCard key={c.id} candidat={c} index={i} onOpen={setSelection} />
+                <CandidateCard key={c.id} candidat={c} index={i} onOpen={ouvrirFiche} />
               ))}
             </div>
             {liste.length > visibles && (
@@ -309,7 +338,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
       </section>
 
       {selection && (
-        <CandidateModal candidat={selection} session={session} onClose={() => setSelection(null)} />
+        <CandidateModal candidat={selection} session={session} onClose={fermerFiche} />
       )}
     </>
   )
