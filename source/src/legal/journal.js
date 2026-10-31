@@ -5,6 +5,16 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.5.2',
+    date: '31/10/2026',
+    titre: 'Navigation au bouton retour et glissement plus fluide',
+    points: [
+      'Le bouton retour du téléphone ferme la fiche ouverte, ramène à l’accueil depuis toute autre page, et ne quitte l’application que depuis l’accueil',
+      'Glisser d’une page à l’autre est plus facile : geste plus court accepté et coup de doigt rapide reconnu',
+      'Drapeau : quatre vraies étoiles alignées sur le croissant ; adresse mmbt.fr cliquable à côté de la signature à l’ouverture',
+    ],
+  },
+  {
     version: '2.5.1',
     date: '31/10/2026',
     titre: 'Bouton retour et nouvelle icône',

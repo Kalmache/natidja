@@ -365,6 +365,8 @@ button { cursor: pointer; }
 .signature--lg .signature__by { font-size: 0.4em; letter-spacing: 0.3em; text-transform: uppercase; }
 .signature--lg .signature__name { letter-spacing: 0.18em; }
 
+.splash__site { display: inline-block; margin-top: 4px; padding: 8px 14px; font-size: 0.82rem; letter-spacing: 0.12em; color: var(--flag-yellow); text-decoration: underline; text-underline-offset: 4px; opacity: 0.95; }
+.splash__site:hover, .splash__site:focus-visible { color: #fff; }
 .splash__credit { position: absolute; bottom: calc(96px + var(--safe-bottom)); inset-inline: 0; text-align: center; font-size: 0.8rem; color: rgb(255 255 255 / 0.75); animation: rise 0.8s 1.9s both; }
 
 /* Pied de page : filet animé + blocs centrés */
@@ -454,3 +456,7 @@ a.btn { text-decoration: none; }
 [dir='rtl'] .view--prev { animation-name: viewNext; }
 @keyframes viewNext { from { opacity: 0; transform: translateX(40px); } }
 @keyframes viewPrev { from { opacity: 0; transform: translateX(-40px); } }
+
+/* Glisser entre les pages : le navigateur ne prend que le défilement vertical,
+   donc un geste horizontal n'est plus « annulé » par lui. */
+html, body { touch-action: pan-y pinch-zoom; }

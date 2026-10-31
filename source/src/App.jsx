@@ -9,6 +9,8 @@
 // ============================================================================
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { I18nProvider, LANGS, useI18n } from './i18n/index.jsx'
+import { brancherRetourNatif } from './lib/retour.js'
+import { isNativeApp } from './lib/verify.js'
 import { navigate, useHashRoute, usePersistedState, useSwipe } from './hooks.js'
 import { loadConfig, loadInitial } from './lib/data.js'
 import Splash from './components/Splash.jsx'
@@ -105,6 +107,15 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [route.join('/')])
+
+  // Bouton Retour du téléphone (application Android uniquement) : voir lib/retour.js.
+  useEffect(() => {
+    if (!isNativeApp()) return undefined
+    return brancherRetourNatif({
+      estAccueil: () => window.location.hash.replace(/^#\/?/, '') === '',
+      versAccueil: () => navigate('/'),
+    })
+  }, [])
 
   const onSplashDone = useCallback(() => {}, [])
 
