@@ -444,3 +444,12 @@ a.pill { display: inline-flex; align-items: center; gap: 6px; text-decoration: n
 .manager p { color: var(--text-2); margin-bottom: 14px; }
 .manager__actions { display: flex; flex-wrap: wrap; gap: 10px; }
 a.btn { text-decoration: none; }
+
+/* Glisser entre les pages : la nouvelle page arrive du côté vers lequel on va. */
+.app { overflow-x: clip; }
+.view--next { animation: viewNext 0.34s var(--ease) both; }
+.view--prev { animation: viewPrev 0.34s var(--ease) both; }
+[dir='rtl'] .view--next { animation-name: viewPrev; }
+[dir='rtl'] .view--prev { animation-name: viewNext; }
+@keyframes viewNext { from { opacity: 0; transform: translateX(40px); } }
+@keyframes viewPrev { from { opacity: 0; transform: translateX(-40px); } }
