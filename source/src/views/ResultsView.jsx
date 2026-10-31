@@ -8,6 +8,7 @@
 //      choisi par buildQuery() (voir src/lib/search.js).
 // ============================================================================
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { surRetour } from '../lib/retour.js'
 import Icon from '../components/Icon.jsx'
 import Stat from '../components/Stat.jsx'
 import CandidateCard from '../components/CandidateCard.jsx'
@@ -48,6 +49,15 @@ export default function ResultsView({ config, session, onSession, island, onIsla
     if (window.history.state?.fiche) window.history.back()
     else setSelection(null)
   }, [])
+
+  // Bouton Retour d'Android : tant qu'une fiche est ouverte, il la referme.
+  useEffect(() => {
+    if (!selection) return undefined
+    return surRetour(() => {
+      fermerFiche()
+      return true
+    })
+  }, [selection, fermerFiche])
 
   useEffect(() => {
     // Appelé quand l'utilisateur recule : si l'entrée « fiche » a disparu,
