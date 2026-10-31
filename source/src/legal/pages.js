@@ -115,14 +115,6 @@ export const TERMS = [
   { p: `Toute question : ${EDITOR.email}.` },
 ]
 
-// Composants libres embarqués dans le site (tous sous licence MIT).
-export const COMPOSANTS = [
-  { nom: 'React', role: 'Construction de l’interface', licence: 'MIT' },
-  { nom: 'Vite', role: 'Outil de fabrication du site', licence: 'MIT' },
-  { nom: 'Workbox / vite-plugin-pwa', role: 'Mode hors-ligne et installation', licence: 'MIT' },
-  { nom: 'qrcode-generator', role: 'Génération des QR codes', licence: 'MIT' },
-]
-
 // ----------------------------------------------------------------- LICENCE
 export const LICENCE_REGLES = [
   maj,
@@ -153,7 +145,7 @@ export const LICENCE_REGLES = [
   { h: 'Article 6 – Sanctions' },
   { p: 'Toute reproduction ou représentation intégrale ou partielle faite sans le consentement de l’auteur est illicite (article L122-4 du Code de la propriété intellectuelle). Elle constitue le délit de contrefaçon, notamment sanctionné par les articles L335-2 et L335-3 du même code (jusqu’à trois ans d’emprisonnement et 300 000 euros d’amende, hors circonstances aggravantes), sans préjudice de dommages et intérêts devant les juridictions civiles.' },
   { h: 'Article 7 – Composants libres' },
-  { p: 'Le site s’appuie sur les logiciels libres listés en fin de page, utilisés conformément aux termes de leur licence MIT, qui autorise leur réutilisation à condition de conserver la mention de copyright de leurs auteurs. Ils demeurent la propriété de leurs auteurs respectifs et ne sont pas concernés par les articles 3 à 5.' },
+  { p: 'Le site intègre des composants logiciels libres, utilisés conformément aux termes de leurs licences. Leurs mentions de droits d’auteur et leurs licences sont reproduites dans le fichier « licences-tierces.txt », fourni avec le site. Ces composants demeurent la propriété de leurs auteurs respectifs et ne sont pas concernés par les articles 3 à 5.' },
   { h: 'Article 8 – Données de démonstration' },
   { p: 'Les candidats, numéros et résultats sont entièrement fictifs. Ils ne peuvent être présentés comme réels, ni réutilisés à des fins de tromperie.' },
   { h: 'Article 9 – Droit applicable et demandes d’autorisation' },

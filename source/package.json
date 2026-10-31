@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "node scripts/build-stats.mjs && vite",
     "stats": "node scripts/build-stats.mjs",
-    "build": "node scripts/build-stats.mjs && vite build",
+    "build": "node scripts/build-stats.mjs && node scripts/licences-tierces.mjs && vite build",
+    "licences": "node scripts/licences-tierces.mjs",
     "publish-site": "node scripts/publish.mjs",
     "build:app": "node scripts/build-app.mjs",
     "import": "node scripts/import-resultats.mjs",
