@@ -30,8 +30,14 @@ entete.font = { bold: true, color: { argb: 'FFFFFFFF' } }
 entete.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF047857' } }
 feuille.views = [{ state: 'frozen', ySplit: 1 }]
 feuille.getColumn('tableNumber').numFmt = '@'
+feuille.getColumn('birthDate').numFmt = '@' // texte : Excel ne la transforme pas
 for (const c of candidats) {
-  const ligne = { ...c, status: LIBELLES_STATUT[c.status], mention: c.mention ? LIBELLES_MENTION[c.mention] : '' }
+  const ligne = {
+    ...c,
+    status: LIBELLES_STATUT[c.status],
+    mention: c.mention ? LIBELLES_MENTION[c.mention] : '',
+    birthDate: c.birthDate ? c.birthDate.split('-').reverse().join('/') : '', // AAAA-MM-JJ → JJ/MM/AAAA
+  }
   for (const g of c.grades ?? []) ligne[`note:${g.subject}`] = g.score
   feuille.addRow(ligne)
 }

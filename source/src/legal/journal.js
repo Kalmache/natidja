@@ -5,6 +5,17 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.7.0',
+    date: '01/11/2026',
+    titre: 'Date de naissance',
+    points: [
+      'La date de naissance complète figure sur la fiche du candidat, sur l’attestation et sur la page de vérification : elle permet de distinguer les homonymes',
+      'Elle est obligatoire dans le fichier Excel de publication, avec contrôle (date réelle, âge vraisemblable) et numéro de ligne en cas d’erreur ; le modèle Excel a été mis à jour',
+      'Elle fait partie de ce que garantit le code de vérification de l’attestation',
+      '90 tests automatiques',
+    ],
+  },
+  {
     version: '2.6.0',
     date: '31/10/2026',
     titre: 'Console de publication prête à être mise en ligne',

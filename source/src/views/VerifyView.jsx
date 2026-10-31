@@ -9,6 +9,7 @@ import { useI18n } from '../i18n/index.jsx'
 import { buildQuery, normalize } from '../lib/search.js'
 import { loadShard } from '../lib/data.js'
 import { verificationCode } from '../lib/verify.js'
+import { dateNaissance } from '../lib/format.js'
 import { navigate } from '../hooks.js'
 
 export default function VerifyView({ config, session, params }) {
@@ -90,7 +91,7 @@ export default function VerifyView({ config, session, params }) {
             {etat === 'ko' && <p>{t('verify.koSub')}</p>}
             {candidat && etat === 'ok' && (
               <p className="verify-result__who">
-                {candidat.lastName} {candidat.firstName} · {candidat.tableNumber} · {t(`status.${candidat.status}`)}
+                {candidat.lastName} {candidat.firstName}{dateNaissance(candidat.birthDate) ? ` · ${t('card.born', { date: dateNaissance(candidat.birthDate) })}` : ''} · {candidat.tableNumber} · {t(`status.${candidat.status}`)}
               </p>
             )}
           </div>

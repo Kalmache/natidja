@@ -39,8 +39,9 @@ Il contient trois feuilles :
 
 ## 2. Remplir le tableau
 
-Une ligne par candidat. Colonnes obligatoires : **N° de table, Nom, Prénom, Île, Résultat, Moyenne** (et **Série** pour le Bac).
+Une ligne par candidat. Colonnes obligatoires : **N° de table, Nom, Prénom, Date de naissance, Île, Résultat, Moyenne** (et **Série** pour le Bac).
 - Le **N° de table** est unique et se termine par au moins 3 chiffres (ex. `BAC-26-00142`).
+- La **Date de naissance** s'écrit **JJ/MM/AAAA, le jour en premier** (ex. `15/03/2007`). Elle sert à distinguer les homonymes et figure sur l'attestation. Une date impossible (31/02/2007) ou invraisemblable (âge inférieur à 10 ans ou supérieur à 60 ans à la date de la session) est refusée avec le numéro de ligne.
 - La **Mention** ne concerne que les *Admis*.
 - La **Moyenne** est comprise entre 0 et 20 (la virgule est acceptée).
 - *(Facultatif)* Notes par matière : ajouter des colonnes nommées `Mathématiques (coef 4)`, `Français (coef 3)`…
