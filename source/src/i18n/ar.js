@@ -178,4 +178,5 @@ export default {
   'legal.certificate': 'شهادة المؤلف',
   'legal.rights': 'جميع الحقوق محفوظة',
   'legal.protected': 'عمل محمي بموجب قانون الملكية الفكرية الفرنسي',
+  'about.legalTitle': 'معلومات قانونية',
 }
