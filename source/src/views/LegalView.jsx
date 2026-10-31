@@ -8,7 +8,7 @@ import Signature from '../components/Signature.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { EDITOR, VERSION } from '../legal/config.js'
 import { JOURNAL } from '../legal/journal.js'
-import { COMPOSANTS, LICENCE_REGLES, MENTIONS, PRIVACY, TERMS } from '../legal/pages.js'
+import { LICENCE_REGLES, MENTIONS, PRIVACY, TERMS } from '../legal/pages.js'
 
 export const PAGES_LEGALES = ['mentions', 'privacy', 'terms', 'licence', 'journal']
 const BLOCS = { mentions: MENTIONS, privacy: PRIVACY, terms: TERMS }
@@ -37,14 +37,9 @@ function Licence() {
         <p className="certificate__version">v{VERSION}</p>
       </div>
       <div className="legal__text" lang="fr"><Blocs blocs={LICENCE_REGLES} /></div>
-      <table className="licences" lang="fr">
-        <thead><tr><th>Composant</th><th>Rôle</th><th>Licence</th></tr></thead>
-        <tbody>
-          {COMPOSANTS.map((c) => (
-            <tr key={c.nom}><td>{c.nom}</td><td>{c.role}</td><td><span className="chip chip--accent">{c.licence}</span></td></tr>
-          ))}
-        </tbody>
-      </table>
+      <p className="legal__text legal__notice" lang="fr">
+        <a href="./licences-tierces.txt" target="_blank" rel="noopener noreferrer">licences-tierces.txt</a>
+      </p>
     </>
   )
 }
@@ -57,7 +52,7 @@ function Journal() {
         <li key={v.version} style={{ '--delay': `${i * 70}ms` }}>
           <span className="timeline__dot" aria-hidden="true" />
           <div className="timeline__head">
-            <span className="chip chip--mono">v{v.version}</span>
+            <span className="chip chip--mono">{/^\d/.test(v.version) ? `v${v.version}` : v.version}</span>
             <time>{v.date}</time>
           </div>
           <h3>{v.titre}</h3>
