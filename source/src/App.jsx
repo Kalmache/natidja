@@ -14,6 +14,7 @@ import { isNativeApp } from './lib/verify.js'
 import { navigate, useClavier, useHashRoute, usePersistedState, useSwipe } from './hooks.js'
 import { loadConfig, loadInitial } from './lib/data.js'
 import Splash from './components/Splash.jsx'
+import { libelleSession } from './components/SessionPicker.jsx'
 import Icon from './components/Icon.jsx'
 import { BottomNav, Footer, Header, PALETTES } from './components/Header.jsx'
 import ResultsView from './views/ResultsView.jsx'
@@ -162,7 +163,7 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
         onPalette={onPalette}
         lang={lang}
         onLang={onLang}
-        sessionLabel={session ? `${session.examType} ${session.year}` : t('app.tagline')}
+        sessionLabel={session ? libelleSession(session, t) : t('app.tagline')}
       />
 
       {config?.demo && (

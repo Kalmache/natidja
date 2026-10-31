@@ -11,6 +11,7 @@ import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } f
 import { surRetour } from '../lib/retour.js'
 import Icon from '../components/Icon.jsx'
 import Stat from '../components/Stat.jsx'
+import SessionPicker from '../components/SessionPicker.jsx'
 import CandidateCard from '../components/CandidateCard.jsx'
 import CandidateModal from '../components/CandidateModal.jsx'
 import { useI18n } from '../i18n/index.jsx'
@@ -242,28 +243,17 @@ export default function ResultsView({ config, session, onSession, island, onIsla
         </div>
 
         <div className="hero__inner">
-          {/* Sélecteur d'examen (Bac / BEPC) */}
-          {config.sessions.length > 1 && (
-            <div className="segmented" role="tablist" aria-label={t('hero.eyebrow', { session: '' })}>
-              {config.sessions.map((s) => (
-                <button
-                  key={s.id}
-                  role="tab"
-                  type="button"
-                  aria-selected={s.id === session.id}
-                  className={s.id === session.id ? 'is-active' : ''}
-                  onClick={() => {
-                    onSession(s.id)
-                    setSaisie('')
-                    setStatut('ALL')
-                    setMention('ALL')
-                  }}
-                >
-                  {s.examType} {s.year}
-                </button>
-              ))}
-            </div>
-          )}
+          {/* Choix de l'examen, de l'année et de l'édition (onglets, ou 3 listes s'il y a plusieurs années) */}
+          <SessionPicker
+            sessions={config.sessions}
+            session={session}
+            onChange={(id) => {
+              onSession(id)
+              setSaisie('')
+              setStatut('ALL')
+              setMention('ALL')
+            }}
+          />
 
           <p className="hero__eyebrow">{t('hero.eyebrow', { session: `${session.sessionDate}` })}</p>
           <h1 className="hero__title">{t('hero.title')}</h1>

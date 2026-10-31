@@ -5,6 +5,16 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.8.0',
+    date: '01/11/2026',
+    titre: 'Choisir l’année et la session',
+    points: [
+      'Le visiteur choisit l’examen, l’année et la session (principale ou rattrapage) ; les années précédentes restent consultables',
+      'La console permet de créer la session d’une nouvelle année : elle reste cachée du public jusqu’à la première publication de résultats, puis devient la session affichée par défaut',
+      '109 tests automatiques',
+    ],
+  },
+  {
     version: '2.7.0',
     date: '01/11/2026',
     titre: 'Date de naissance',
