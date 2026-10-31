@@ -138,3 +138,66 @@ export function useCountUp(cible, duree = 1400) {
 
   return [valeur, ref]
 }
+
+// ----------------------------------------------------------------------------
+// GLISSEMENT (swipe) : passer d'une page à la suivante en glissant le doigt
+// ----------------------------------------------------------------------------
+/** Vrai si le geste a commencé dans une zone où un glissement a un autre sens. */
+function geste_reserve(element) {
+  if (!element?.closest) return false
+  // champs de saisie, fenêtres (attestation), écran d'ouverture, zones marquées data-no-swipe
+  if (element.closest('input, textarea, select, [contenteditable], [data-no-swipe], .modal, .splash')) return true
+  // une zone qui défile elle-même horizontalement (ex. barre des pages légales sur téléphone)
+  for (let n = element; n && n !== document.body; n = n.parentElement) {
+    const s = getComputedStyle(n)
+    if ((s.overflowX === 'auto' || s.overflowX === 'scroll') && n.scrollWidth > n.clientWidth + 2) return true
+  }
+  return false
+}
+
+/**
+ * Appelle onNext / onPrev quand l'utilisateur glisse horizontalement.
+ * LTR : glisser vers la GAUCHE = page suivante. RTL (arabe) : c'est l'inverse.
+ * Garde-fous : geste franchement horizontal (pas un défilement vertical), assez long et
+ * assez rapide, pas depuis le bord de l'écran (réservé au geste « retour » d'Android).
+ */
+export function useSwipe({ onNext, onPrev, dir = 'ltr', actif = true }) {
+  // On garde toujours les dernières valeurs sans réinstaller les écouteurs à chaque rendu.
+  const dernier = useRef({})
+  dernier.current = { onNext, onPrev, dir, actif }
+
+  useEffect(() => {
+    let depart = null
+    const debut = (e) => {
+      if (e.touches.length !== 1) return (depart = null) // pincement à deux doigts : on ignore
+      const t = e.touches[0]
+      // timeStamp = l'heure RÉELLE du geste (insensible aux ralentissements de la page)
+      depart = { x: t.clientX, y: t.clientY, temps: e.timeStamp, cible: e.target }
+    }
+    const fin = (e) => {
+      const d = depart
+      depart = null
+      const { onNext, onPrev, dir, actif } = dernier.current
+      if (!d || !actif || document.body.classList.contains('no-scroll')) return
+      const t = e.changedTouches[0]
+      const dx = t.clientX - d.x
+      const dy = t.clientY - d.y
+      if (e.timeStamp - d.temps > 1200) return // trop lent : ce n'est plus un geste de glissement
+      if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8) return // trop court ou trop vertical
+      if (d.x < 24 || d.x > window.innerWidth - 24) return // bord d'écran
+      if (geste_reserve(d.cible) || window.getSelection?.().toString()) return
+      const versSuivant = dir === 'rtl' ? dx > 0 : dx < 0
+      if (versSuivant) onNext?.()
+      else onPrev?.()
+    }
+    const annule = () => (depart = null)
+    document.addEventListener('touchstart', debut, { passive: true })
+    document.addEventListener('touchend', fin, { passive: true })
+    document.addEventListener('touchcancel', annule, { passive: true })
+    return () => {
+      document.removeEventListener('touchstart', debut)
+      document.removeEventListener('touchend', fin)
+      document.removeEventListener('touchcancel', annule)
+    }
+  }, [])
+}

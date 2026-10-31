@@ -3,6 +3,7 @@
 // Licence (page « certificat ») et Journal de bord (frise des versions).
 // Les textes juridiques sont en français ; seuls les titres sont traduits.
 // ============================================================================
+import { useEffect } from 'react'
 import Icon from '../components/Icon.jsx'
 import Signature from '../components/Signature.jsx'
 import { useI18n } from '../i18n/index.jsx'
@@ -66,6 +67,11 @@ function Journal() {
 export default function LegalView({ page }) {
   const { t } = useI18n()
   const actif = PAGES_LEGALES.includes(page) ? page : 'mentions'
+  // Sur téléphone la barre des pages légales défile : on garde la page active visible
+  // (utile quand on change de page en glissant).
+  useEffect(() => {
+    document.querySelector('.legal__nav a.is-active')?.scrollIntoView({ inline: 'center', block: 'nearest' })
+  }, [actif])
   return (
     <div className="page legal">
       <header className="page__head">
