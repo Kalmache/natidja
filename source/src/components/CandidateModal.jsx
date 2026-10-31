@@ -13,7 +13,7 @@ import Confetti from './Confetti.jsx'
 import QrCode from './QrCode.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { MENTIONS, note, titleCase } from '../lib/format.js'
-import { verificationCode, verificationUrl } from '../lib/verify.js'
+import { isNativeApp, verificationCode, verificationUrl } from '../lib/verify.js'
 
 export default function CandidateModal({ candidat, session, onClose }) {
   const { t } = useI18n()
@@ -91,9 +91,12 @@ export default function CandidateModal({ candidat, session, onClose }) {
 
       <div className="modal__panel">
         <div className="modal__bar no-print">
-          <button type="button" className="btn btn--ghost" onClick={() => window.print()}>
-            <Icon name="print" size={16} /> {t('att.print')}
-          </button>
+          {/* L'impression n'existe pas dans l'application Android : bouton masqué. */}
+          {!isNativeApp() && (
+            <button type="button" className="btn btn--ghost" onClick={() => window.print()}>
+              <Icon name="print" size={16} /> {t('att.print')}
+            </button>
+          )}
           <button type="button" className="btn btn--ghost" onClick={partager} disabled={!lien}>
             <Icon name={copie ? 'check' : 'share'} size={16} />
             {copie ? t('att.copied') : t('att.share')}

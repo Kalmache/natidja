@@ -1,0 +1,12 @@
+{
+  "appId": "fr.mmbt.natidja",
+  "appName": "Ndeze Natidja",
+  "webDir": "dist",
+  "backgroundColor": "#052e24",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
