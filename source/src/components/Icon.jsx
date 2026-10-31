@@ -21,6 +21,8 @@ const CHEMINS = {
   refresh: <path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5" />,
   school: <path d="M3 10l9-6 9 6-9 6-9-6zM7 12.5V17c0 1.5 2.2 3 5 3s5-1.5 5-3v-4.5" />,
   pin: <><path d="M12 22s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z" /><circle cx="12" cy="10" r="2.5" /></>,
+  sliders: <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />,
+  lock: <><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /></>,
   qr: <path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM20 14v3M14 20h3M20 20h1" />,
 }
 

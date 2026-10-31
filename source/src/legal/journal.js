@@ -11,6 +11,7 @@ export const JOURNAL = [
     points: [
       'L’application respecte la barre d’état et la barre de gestes : plus aucun bouton masqué par les notifications',
       'Icônes de la barre d’état adaptées au thème clair ou sombre',
+      'Nouvelle page Réglages : thème, couleur, langue, état de la connexion, version, effacement des données de l’appareil',
       'Les nouvelles versions de l’application s’installent par-dessus la précédente',
     ],
   },
