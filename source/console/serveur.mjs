@@ -28,6 +28,7 @@ import {
   verifierForceMotDePasse, verifierLeurre, verifierMotDePasse, verifierTotp,
 } from './lib/securite.mjs'
 import { analyserFichier, comparer, erreurHttp, publier } from './lib/publication.mjs'
+import { synchroDepuisEnvironnement } from './lib/synchro.mjs'
 
 const ICI = dirname(fileURLToPath(import.meta.url))
 const PUBLIC = join(ICI, 'public')
@@ -278,7 +279,7 @@ export function creerConsole(options = {}) {
   )
 
   // ---- Propositions
-  const vue = (m) => ({ id: m.id, session: m.session, statut: m.statut, auteur: m.auteur, creeLe: m.creeLe, resume: m.resume, approbation: m.approbation, refus: m.refus, annulation: m.annulation, publieLe: m.publieLe, erreurPublication: m.erreurPublication })
+  const vue = (m) => ({ id: m.id, session: m.session, statut: m.statut, auteur: m.auteur, creeLe: m.creeLe, resume: m.resume, approbation: m.approbation, refus: m.refus, annulation: m.annulation, publieLe: m.publieLe, erreurPublication: m.erreurPublication, miseEnLigne: m.miseEnLigne })
 
   route('POST', '/api/propositions', 'ok', ['preparateur'], async ({ req, session, url }) => {
     const cfg = config()
@@ -317,9 +318,28 @@ export function creerConsole(options = {}) {
     return { ...vue(m), avertissements: m.avertissements, fichier: m.fichier, baseObsolete: config().updatedAt !== m.baseMajLe, echantillon, donneesPurgees: c === null }
   })
 
+  /**
+   * Envoie les fichiers publiés vers le site public (voir lib/synchro.mjs).
+   * Ne lève JAMAIS d'erreur : la publication locale est faite quoi qu'il arrive ; un échec
+   * est noté dans la proposition (avec un bouton « Réessayer ») et dans le journal d'audit.
+   */
+  async function mettreEnLigne(m, session) {
+    const le = new Date(horloge()).toISOString()
+    if (!opt.synchro) return { etat: 'non_configuree', le }
+    try {
+      const r = await opt.synchro.synchroniser({ sessionId: m.session, dossierDonnees, message: `Résultats ${m.session} : publication ${m.id}` })
+      journal('mise_en_ligne_ok', { utilisateur: session?.nom ?? 'planificateur', roles: session?.roles, details: { id: m.id, commit: r.commit.slice(0, 7), fichiers: r.fichiers, supprimes: r.supprimes } })
+      return { etat: 'ok', le, commit: r.commit.slice(0, 7), url: r.url, fichiers: r.fichiers }
+    } catch (e) {
+      const erreur = String(e.message).replace(/\/[^\s:'"]+/g, '[chemin]').slice(0, 300)
+      journal('mise_en_ligne_echec', { utilisateur: session?.nom ?? 'planificateur', roles: session?.roles, details: { id: m.id, erreur } })
+      return { etat: 'echec', le, erreur }
+    }
+  }
+
   /** Exécute la publication (une à la fois) et met à jour la proposition. */
   function lancerPublication(meta, session) {
-    const tache = verrouPublication.then(() => {
+    const tache = verrouPublication.then(async () => {
       const m = stockage.proposition(meta.id)
       const cfg = config()
       try {
@@ -332,6 +352,9 @@ export function creerConsole(options = {}) {
         m.publieLe = new Date(horloge()).toISOString()
         stockage.majProposition(m)
         journal('publication_ok', { utilisateur: session?.nom ?? 'planificateur', roles: session?.roles, ip: session?.ip, details: { id: m.id, session: m.session, candidats: candidats.length } })
+        // Étape suivante : envoyer vers le site public. Son échec n'annule pas la publication locale.
+        m.miseEnLigne = await mettreEnLigne(m, session)
+        stockage.majProposition(m)
         return m
       } catch (e) {
         // On masque les chemins de disque éventuels dans le message (il est visible dans l'interface).
@@ -373,6 +396,24 @@ export function creerConsole(options = {}) {
     stockage.majProposition(m)
     journal('approbation', { session, details: { id: m.id, publierA: 'immediate' } })
     return vue(await lancerPublication(m, session))
+  })
+
+  // Réessayer l'envoi vers le site public (après un échec réseau, un jeton expiré...).
+  route('POST', '/api/propositions/:id/mise-en-ligne', 'ok', ['approbateur', 'admin'], async ({ params, session }) => {
+    const m = stockage.proposition(params.id)
+    if (!m) throw erreurHttp(404, 'Proposition introuvable.')
+    if (m.statut !== 'publiee') throw erreurHttp(409, 'Seule une proposition publiée peut être mise en ligne.')
+    if (m.miseEnLigne?.etat === 'ok') throw erreurHttp(409, 'Cette publication est déjà en ligne.')
+    // Une publication plus récente est passée entre-temps : renvoyer celle-ci écraserait la plus récente.
+    const plusRecente = stockage.propositions().some((p) => p.session === m.session && p.statut === 'publiee' && p.publieLe > m.publieLe)
+    if (plusRecente) throw erreurHttp(409, 'Une publication plus récente existe pour cette session : utilisez celle-là.')
+    const tache = verrouPublication.then(async () => {
+      m.miseEnLigne = await mettreEnLigne(m, session)
+      stockage.majProposition(m)
+      return m
+    })
+    verrouPublication = tache.catch(() => {})
+    return vue(await tache)
   })
 
   route('POST', '/api/propositions/:id/refuser', 'ok', ['approbateur'], ({ corps, params, session }) => {
@@ -492,14 +533,18 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const racine = join(ICI, '..', '..')
   const port = Number(process.env.CONSOLE_PORT ?? 8787)
   const dev = process.env.CONSOLE_DEV === '1'
+  const synchro = synchroDepuisEnvironnement()
   const c = creerConsole({
     dossierConsole: process.env.CONSOLE_DATA ?? join(ICI, '..', 'console-data'),
     dossierDonnees: process.env.PUBLISH_DATA ?? join(racine, 'data'),
+    // Mise en ligne vers le site public : active si GITHUB_TOKEN_PUBLICATION et GITHUB_REPO sont définis.
+    synchro,
     dev,
     faireConfianceProxy: process.env.CONSOLE_TRUST_PROXY === '1',
   })
   c.serveur.listen(port, process.env.CONSOLE_HOST ?? '127.0.0.1', () => {
     console.log(`\n✔ Console de publication sur http://${process.env.CONSOLE_HOST ?? '127.0.0.1'}:${port}`)
+    console.log(synchro ? `  Mise en ligne automatique : ${synchro.depot} (branche ${synchro.branche})` : '  Mise en ligne automatique : désactivée (voir docs/DEPLOIEMENT-CONSOLE.md)')
     console.log(dev ? '  ⚠ MODE DÉVELOPPEMENT : cookies non sécurisés (jamais en production)' : '  Mode production : les cookies exigent HTTPS (placez la console derrière un serveur HTTPS).')
     console.log('  Ctrl+C pour arrêter.\n')
   })

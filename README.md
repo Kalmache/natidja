@@ -82,6 +82,8 @@ sauvegarde automatique, journal d'audit. Installation, sécurité et **limites c
 npm run console:utilisateur -- creer --nom amina --roles preparateur   # crée un compte (dans source/)
 npm run console                                                        # lance la console (derrière HTTPS en production)
 ```
+**Mise en ligne sur un serveur** (HTTPS automatique, envoi des résultats vers GitHub puis déploiement OVH automatique) :
+[`source/docs/DEPLOIEMENT-CONSOLE.md`](source/docs/DEPLOIEMENT-CONSOLE.md) et le kit [`source/console/deploiement/`](source/console/deploiement/).
 
 ## Dossier de présentation
 Document de 10 pages pour les autorités organisatrices (besoin, démonstration, charge, sécurité, exploitation, feuille de route,
