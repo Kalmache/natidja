@@ -7,9 +7,9 @@
 //  3. choisir quelle « vue » afficher selon l'adresse (#/stats, #/about...) ;
 //  4. afficher l'écran d'ouverture animé (Splash) pendant le chargement.
 // ============================================================================
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { I18nProvider, LANGS, useI18n } from './i18n/index.jsx'
-import { usePersistedState, useHashRoute } from './hooks.js'
+import { navigate, useHashRoute, usePersistedState, useSwipe } from './hooks.js'
 import { loadConfig, loadInitial } from './lib/data.js'
 import Splash from './components/Splash.jsx'
 import Icon from './components/Icon.jsx'
@@ -18,7 +18,7 @@ import ResultsView from './views/ResultsView.jsx'
 import StatsView from './views/StatsView.jsx'
 import AboutView from './views/AboutView.jsx'
 import VerifyView from './views/VerifyView.jsx'
-import LegalView from './views/LegalView.jsx'
+import LegalView, { PAGES_LEGALES } from './views/LegalView.jsx'
 import SettingsView from './views/SettingsView.jsx'
 
 // Démarre le téléchargement des données TOUT DE SUITE (avant même que React
@@ -66,6 +66,14 @@ export default function App() {
   )
 }
 
+// Ordre des onglets : c'est aussi l'ordre dans lequel on passe de l'un à l'autre en glissant.
+const ONGLETS_ORDRE = [
+  ['results', '/'],
+  ['stats', '/stats'],
+  ['about', '/about'],
+  ['settings', '/settings'],
+]
+
 function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang }) {
   const { t } = useI18n()
   const [config, setConfig] = useState(null)
@@ -102,6 +110,30 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
 
   const session = config?.sessions.find((s) => s.id === sessionId)
   const vue = route[0] === 'stats' ? 'stats' : route[0] === 'about' ? 'about' : route[0] === 'verif' ? 'verif' : route[0] === 'legal' ? 'legal' : route[0] === 'settings' ? 'settings' : 'results'
+
+  // ----- Glisser pour changer de page -----
+  // Sur une page légale : on circule entre les pages légales. Sinon : entre les 4 onglets.
+  const pagesOrdre =
+    vue === 'legal'
+      ? PAGES_LEGALES.map((p) => [`legal/${p}`, `/legal/${p}`])
+      : vue === 'verif'
+        ? []
+        : ONGLETS_ORDRE
+  const cle = vue === 'legal' ? `legal/${PAGES_LEGALES.includes(route[1]) ? route[1] : 'mentions'}` : vue
+  const indice = pagesOrdre.findIndex(([id]) => id === cle)
+  const allerA = (decalage) => {
+    const cible = pagesOrdre[indice + decalage]
+    if (cible) navigate(cible[1]) // aux extrémités : rien ne se passe
+  }
+  useSwipe({ onNext: () => allerA(1), onPrev: () => allerA(-1), dir: LANGS[lang].dir, actif: indice >= 0 })
+
+  // Sens de l'animation d'arrivée de la page (+1 = on avance, -1 = on recule).
+  const precedente = useRef({ cle, indice })
+  const sens = precedente.current.cle === cle ? 0 : indice > precedente.current.indice ? 1 : -1
+  useEffect(() => {
+    precedente.current = { cle, indice }
+  }, [cle, indice])
+
   const iles = session
     ? [{ id: 'all', name: 'all' }, ...session.islands.map((i) => ({ id: i.id, name: i.name }))]
     : []
@@ -128,6 +160,7 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
       )}
 
       <main className="main">
+        <div key={cle} className={`view ${sens > 0 ? 'view--next' : sens < 0 ? 'view--prev' : ''}`}>
         {erreur ? (
           <div className="notice notice--error page">
             <Icon name="alert" /> <span>{t('results.error')}</span>
@@ -160,6 +193,7 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
             islands={iles}
           />
         )}
+        </div>
       </main>
 
       <Footer />
