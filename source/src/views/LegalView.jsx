@@ -52,7 +52,7 @@ function Journal() {
         <li key={v.version} style={{ '--delay': `${i * 70}ms` }}>
           <span className="timeline__dot" aria-hidden="true" />
           <div className="timeline__head">
-            <span className="chip chip--mono">v{v.version}</span>
+            <span className="chip chip--mono">{/^\d/.test(v.version) ? `v${v.version}` : v.version}</span>
             <time>{v.date}</time>
           </div>
           <h3>{v.titre}</h3>
