@@ -96,7 +96,10 @@ export default function Splash({ onDone }) {
       </div>
       <p className="splash__credit">
         <Signature />
-        <span className="splash__site">{EDITOR.websiteLabel}</span>
+        {/* Lien cliquable : s'ouvre dans le navigateur du téléphone */}
+        <a className="splash__site" href={EDITOR.website} target="_blank" rel="noopener noreferrer">
+          {EDITOR.websiteLabel}
+        </a>
       </p>
       <button type="button" className="splash__skip" onClick={terminer}>
         {t('splash.skip')}

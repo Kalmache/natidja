@@ -11,7 +11,7 @@ export const JOURNAL = [
     points: [
       'Le bouton retour du téléphone ferme la fiche ouverte, ramène à l’accueil depuis toute autre page, et ne quitte l’application que depuis l’accueil',
       'Glisser d’une page à l’autre est plus facile : geste plus court accepté et coup de doigt rapide reconnu',
-      'Drapeau : quatre vraies étoiles alignées sur le croissant ; adresse mmbt.fr affichée à côté de la signature à l’ouverture',
+      'Drapeau : quatre vraies étoiles alignées sur le croissant ; adresse mmbt.fr cliquable à côté de la signature à l’ouverture',
     ],
   },
   {
