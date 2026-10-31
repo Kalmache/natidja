@@ -62,9 +62,17 @@ cd android && ./gradlew assembleDebug
 Cet APK est signé avec une clé de **test** : il suffit pour une démonstration. Pour **Google Play**, il faudra
 un compte développeur, une clé de signature personnelle (à ne jamais publier) et un bundle signé (`bundleRelease`).
 
-## Mettre à jour les résultats
-Remplacer les fichiers de `data/<examen>/`, puis `npm run publish-site` (recalcule les statistiques),
-puis commit et push. Les téléphones récupèrent les corrections en quelques minutes (cache de 5 min).
+## Mettre à jour les résultats (Excel / CSV)
+Les résultats se préparent dans un tableau Excel, **vérifié automatiquement** avant publication.
+Guide complet pas à pas : [`source/docs/GUIDE-PUBLICATION.md`](source/docs/GUIDE-PUBLICATION.md). En bref, dans `source/` :
+```bash
+npm run modele -- --session bac-2026                                   # crée le modèle Excel à remplir
+npm run import -- fichier.xlsx --session bac-2026 --dry-run            # vérifie, sans rien modifier
+npm run import -- fichier.xlsx --session bac-2026                      # publie (ancienne version sauvegardée)
+npm run restaurer -- --session bac-2026                                # liste les sauvegardes / revient en arrière
+npm run publish-site                                                   # reconstruit le site à la racine
+```
+⚠️ Avec de **vraies** données de candidats, ne pas passer par un dépôt public : voir la section 8 du guide.
 
 ## Sécurité — ce qui est fait, et ses limites
 **En place :** HTTPS forcé + HSTS, politique CSP stricte (aucun code externe), anti-clickjacking,
