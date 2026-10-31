@@ -1,10 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="16" fill="#047857" />
-  <!-- Graduation Cap -->
-  <path d="M32 14L8 26L32 38L56 26L32 14Z" fill="#FBBF24" />
-  <path d="M20 33.5V45C20 45 25 50 32 50C39 50 44 45 44 45V33.5L32 39.5L20 33.5Z" fill="#F59E0B" />
-  <path d="M49 29.5V42L47 44V30.5L49 29.5Z" fill="#D97706" />
-  <circle cx="47" cy="44" r="2.5" fill="#FBBF24" />
-  <!-- Comoros Star & Crescent Small Badge -->
-  <circle cx="32" cy="26" r="3" fill="#047857" />
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs>
+  <linearGradient id="or" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FDE68A"/><stop offset="1" stop-color="#F59E0B"/></linearGradient>
+  <radialGradient id="fond" cx="30%" cy="25%" r="90%"><stop offset="0" stop-color="#059669"/><stop offset="1" stop-color="#064e3b"/></radialGradient>
+</defs><rect width="512" height="512" rx="112" fill="url(#fond)"/>
+<g transform="translate(256 256) scale(1) translate(-256 -256)">
+  <mask id="m"><rect width="512" height="512" fill="#fff"/><circle cx="305" cy="256" r="122" fill="#000"/></mask>
+  <circle cx="256" cy="256" r="150" fill="url(#or)" mask="url(#m)"/>
+  <polygon points="305.0,169.0 310.2,182.9 325.0,183.5 313.4,192.7 317.3,207.0 305.0,198.8 292.7,207.0 296.6,192.7 285.0,183.5 299.8,182.9" fill="url(#or)"/>
+  <polygon points="305.0,213.0 310.2,226.9 325.0,227.5 313.4,236.7 317.3,251.0 305.0,242.8 292.7,251.0 296.6,236.7 285.0,227.5 299.8,226.9" fill="url(#or)"/>
+  <polygon points="305.0,257.0 310.2,270.9 325.0,271.5 313.4,280.7 317.3,295.0 305.0,286.8 292.7,295.0 296.6,280.7 285.0,271.5 299.8,270.9" fill="url(#or)"/>
+  <polygon points="305.0,301.0 310.2,314.9 325.0,315.5 313.4,324.7 317.3,339.0 305.0,330.8 292.7,339.0 296.6,324.7 285.0,315.5 299.8,314.9" fill="url(#or)"/>
+</g></svg>
