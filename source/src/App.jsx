@@ -19,6 +19,7 @@ import StatsView from './views/StatsView.jsx'
 import AboutView from './views/AboutView.jsx'
 import VerifyView from './views/VerifyView.jsx'
 import LegalView from './views/LegalView.jsx'
+import SettingsView from './views/SettingsView.jsx'
 
 // Démarre le téléchargement des données TOUT DE SUITE (avant même que React
 // n'ait fini d'afficher la page) : pendant que le Splash s'anime, les
@@ -41,6 +42,13 @@ export default function App() {
     html.lang = lang
     html.dir = LANGS[lang].dir
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#052e24' : '#047857')
+    // Application Android : icônes de la barre d'état (heure, batterie...) claires sur
+    // fond sombre, foncées sur fond clair, pour rester lisibles quel que soit le thème choisi.
+    try {
+      window.Capacitor?.Plugins?.SystemBars?.setStyle?.({ style: theme === 'dark' ? 'DARK' : 'LIGHT' })
+    } catch {
+      /* hors application : sans effet */
+    }
   }, [theme, palette, lang])
 
   return (
@@ -48,6 +56,7 @@ export default function App() {
       <Shell
         theme={theme}
         onTheme={() => setTheme((v) => (v === 'dark' ? 'light' : 'dark'))}
+        onSetTheme={setTheme}
         palette={palette}
         onPalette={setPalette}
         lang={lang}
@@ -57,7 +66,7 @@ export default function App() {
   )
 }
 
-function Shell({ theme, onTheme, palette, onPalette, lang, onLang }) {
+function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang }) {
   const { t } = useI18n()
   const [config, setConfig] = useState(null)
   const [erreur, setErreur] = useState(false)
@@ -92,7 +101,7 @@ function Shell({ theme, onTheme, palette, onPalette, lang, onLang }) {
   const onSplashDone = useCallback(() => {}, [])
 
   const session = config?.sessions.find((s) => s.id === sessionId)
-  const vue = route[0] === 'stats' ? 'stats' : route[0] === 'about' ? 'about' : route[0] === 'verif' ? 'verif' : route[0] === 'legal' ? 'legal' : 'results'
+  const vue = route[0] === 'stats' ? 'stats' : route[0] === 'about' ? 'about' : route[0] === 'verif' ? 'verif' : route[0] === 'legal' ? 'legal' : route[0] === 'settings' ? 'settings' : 'results'
   const iles = session
     ? [{ id: 'all', name: 'all' }, ...session.islands.map((i) => ({ id: i.id, name: i.name }))]
     : []
@@ -132,6 +141,8 @@ function Shell({ theme, onTheme, palette, onPalette, lang, onLang }) {
           <StatsView session={session} onIsland={setIle} />
         ) : vue === 'about' ? (
           <AboutView />
+        ) : vue === 'settings' ? (
+          <SettingsView theme={theme} onSetTheme={onSetTheme} palette={palette} onPalette={onPalette} lang={lang} onLang={onLang} />
         ) : vue === 'legal' ? (
           <LegalView page={route[1]} />
         ) : vue === 'verif' ? (

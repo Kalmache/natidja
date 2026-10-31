@@ -40,7 +40,7 @@ jobs:
       - run: npx cap sync android
       - name: Construire l'APK
         working-directory: source/android
-        run: ./gradlew assembleDebug --no-daemon
+        run: ./gradlew assembleDebug --no-daemon -PversionCode=${{ github.run_number }}
       - uses: actions/upload-artifact@v4
         with:
           name: ndeze-natidja-android
