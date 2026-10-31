@@ -86,8 +86,29 @@ export const JOURNAL = [
   },
   {
     version: '1.0.0',
-    date: '31/10/2026',
-    titre: 'Première version',
-    points: ['Mise en ligne initiale de Ndeze Natidja sur OVH'],
+    date: 'Fin octobre 2026',
+    titre: 'Première mise en ligne',
+    points: [
+      'Mise en place de l’hébergement OVH et du dépôt de code Git',
+      'Première version publique de Ndeze Natidja, issue du travail de conception et de développement mené en amont',
+    ],
+  },
+  {
+    version: 'Genèse',
+    date: '2025 – 2026',
+    titre: 'Conception et développement',
+    points: [
+      'Conception et développement de l’application, hors dépôt de code, jusqu’à sa première mise en ligne',
+      'Priorités : retrouver un candidat en quelques secondes, tenir la charge le jour des résultats, fonctionner même avec un réseau fragile',
+    ],
+  },
+  {
+    version: 'Origine',
+    date: '2025',
+    titre: 'Le point de départ',
+    points: [
+      'Un dysfonctionnement de l’outil officiel de consultation empêche des élèves de retrouver leur résultat',
+      'Ce constat est à l’origine du projet : créer un service simple, rapide et fiable pour que chaque élève retrouve le sien',
+    ],
   },
 ]
