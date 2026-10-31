@@ -7,6 +7,26 @@ import { useEffect, useState } from 'react'
 import { useI18n } from '../i18n/index.jsx'
 import { pct } from '../lib/format.js'
 
+/**
+ * Rend un élément de liste cliquable ET utilisable au clavier (Entrée / Espace)
+ * quand `action` est fourni ; sinon ne change rien.
+ */
+function cliquable(action) {
+  if (!action) return {}
+  return {
+    role: 'button',
+    tabIndex: 0,
+    className: 'is-click',
+    onClick: action,
+    onKeyDown: (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        action()
+      }
+    },
+  }
+}
+
 /** Renvoie false au 1er affichage puis true : sert à déclencher les transitions CSS. */
 function useMounted() {
   const [monte, setMonte] = useState(false)
@@ -54,11 +74,11 @@ export function Donut({ parts, total, centerValue, centerLabel }) {
   )
 }
 
-export function Legend({ parts, total }) {
+export function Legend({ parts, total, onSelect }) {
   return (
     <ul className="legend">
       {parts.map((p) => (
-        <li key={p.key}>
+        <li key={p.key} {...cliquable(onSelect && (() => onSelect(p)))}>
           <i className={`dot dot--${p.key}`} />
           <span>{p.label}</span>
           <strong>{p.value.toLocaleString('fr-FR')}</strong>
@@ -73,7 +93,7 @@ export function Legend({ parts, total }) {
  * Barres empilées horizontales : une ligne par île/série, avec la part
  * d'admis / second groupe / ajournés. Le taux de réussite est écrit à droite.
  */
-export function StackedBars({ rows }) {
+export function StackedBars({ rows, onSelect }) {
   const { t } = useI18n()
   const monte = useMounted()
   return (
@@ -84,7 +104,7 @@ export function StackedBars({ rows }) {
         const ajourne = r.AJOURNE ?? 0
         const w = (n) => (monte ? (n / r.total) * 100 : 0)
         return (
-          <li key={r.key}>
+          <li key={r.key} {...cliquable(onSelect && (() => onSelect(r)))}>
             <div className="bars__head">
               <span>{r.label}</span>
               <strong>{pct(admis, r.total)}</strong>
@@ -106,13 +126,13 @@ export function StackedBars({ rows }) {
 }
 
 /** Histogramme vertical simple (mentions). */
-export function Columns({ items }) {
+export function Columns({ items, onSelect }) {
   const monte = useMounted()
   const max = Math.max(...items.map((i) => i.value), 1)
   return (
     <ul className="columns">
       {items.map((i) => (
-        <li key={i.key}>
+        <li key={i.key} {...cliquable(onSelect && (() => onSelect(i)))}>
           <strong>{i.value}</strong>
           <div className="columns__bar">
             <i style={{ height: monte ? `${(i.value / max) * 100}%` : '0%' }} />
