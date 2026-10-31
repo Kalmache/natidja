@@ -1,0 +1,6 @@
+node_modules
+dist
+.DS_Store
+*.log
+# fichiers calculés automatiquement par « npm run stats »
+public/data/*/stats.json
