@@ -46,6 +46,16 @@
   --maxw: 1240px;
   --header-h: 64px;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* ZONES SÛRES : l'espace occupé par la barre d'état (heure, notifications), le
+     « notch » de la caméra et la barre de gestes de l'écran. Dans l'application
+     Android, Capacitor fournit --safe-area-inset-* ; dans un navigateur c'est
+     env(safe-area-inset-*). On garde la plus grande des deux (jamais de doublon :
+     ce n'est pas une addition). Vaut 0 sur ordinateur. */
+  --safe-top: max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px));
+  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
+  --safe-left: max(env(safe-area-inset-left, 0px), var(--safe-area-inset-left, 0px));
+  --safe-right: max(env(safe-area-inset-right, 0px), var(--safe-area-inset-right, 0px));
 }
 
 /* ---------- 3. Thème clair ---------- */
