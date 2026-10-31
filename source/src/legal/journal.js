@@ -5,6 +5,15 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.4.1',
+    date: '31/10/2026',
+    titre: 'Écran d’ouverture plus lisible',
+    points: [
+      'L’écran d’ouverture reste affiché plus longtemps (environ 6 secondes) pour laisser le temps de lire',
+      'Le bouton « Passer », plus visible, permet d’aller directement à l’accueil ; un simple toucher ailleurs ne le coupe plus',
+    ],
+  },
+  {
     version: '2.4.0',
     date: '31/10/2026',
     titre: 'Navigation par glissement',
