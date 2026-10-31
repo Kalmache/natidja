@@ -179,4 +179,5 @@ export default {
   'legal.journal': 'Journal de bord',
   'legal.certificate': 'Certificat d’auteur',
   'legal.rights': 'Tous droits réservés',
+  'legal.protected': 'Œuvre protégée par le Code de la propriété intellectuelle',
 }

@@ -177,4 +177,5 @@ export default {
   'legal.journal': 'سجل التحديثات',
   'legal.certificate': 'شهادة المؤلف',
   'legal.rights': 'جميع الحقوق محفوظة',
+  'legal.protected': 'عمل محمي بموجب قانون الملكية الفكرية الفرنسي',
 }
