@@ -17,32 +17,35 @@ Quand on tape une recherche, le navigateur télécharge **uniquement le bon fich
 Le calcul du bon fichier est dans `src/lib/search.js`.
 
 ## Organisation des fichiers
+**La racine du dépôt EST le site publié** : OVH copie tel quel ce qui s'y trouve.
+Le code source est rangé à part dans `source/`.
+
 | Dossier / fichier | Rôle |
 |---|---|
-| `src/` | Le code source (React) : `components/` (briques d'écran), `views/` (pages), `lib/` (logique), `i18n/` (textes FR/AR), `styles/` |
-| `public/data/` | Les résultats (JSON) et `exams.json` (liste des examens) |
-| `public/.htaccess` | Sécurité et cache pour l'hébergement Apache (OVH) |
-| `scripts/build-stats.mjs` | Calcule `stats.json` (statistiques) avant chaque build |
-| `tests/` | Tests automatiques du moteur de recherche |
-| `vite.config.js` | Configuration du build et de l'application installable (PWA) |
+| `index.html`, `assets/`, `sw.js`, `icons/`, `.htaccess`... | **Le site fini, publié par OVH.** Fichiers générés : ne pas les modifier à la main |
+| `data/` | Les résultats (JSON) et `exams.json` (liste des examens). Publiés tels quels |
+| `source/src/` | Le code source (React) : `components/`, `views/`, `lib/`, `i18n/` (textes FR/AR), `styles/` |
+| `source/public/` | Icônes et `.htaccess` (sécurité/cache Apache) copiés dans le site |
+| `source/scripts/` | `build-stats.mjs` (calcule les statistiques) et `publish.mjs` (reconstruit le site à la racine) |
+| `source/tests/` | Tests automatiques du moteur de recherche |
 
-## Commandes (à lancer dans un terminal, dans ce dossier)
+## Commandes (terminal, dans le dossier `source/`)
 ```bash
-npm install      # une seule fois : télécharge les outils
-npm run dev      # lance le site en local (http://localhost:5173) pour travailler
-npm test         # lance les tests automatiques
-npm run build    # fabrique le dossier dist/ prêt à publier
+npm install          # une seule fois : télécharge les outils
+npm run dev          # lance le site en local (http://localhost:5173) pour travailler
+npm test             # lance les tests automatiques
+npm run publish-site # reconstruit le site À LA RACINE du dépôt
 ```
 
-## Publier sur OVH
-1. `npm run build`
-2. Envoyer **tout le contenu du dossier `dist/`** (y compris le fichier caché `.htaccess`)
-   à la racine de l'hébergement, par FTP.
-3. Le site doit être en **HTTPS** (indispensable pour l'installation et le mode hors-ligne).
+## Mettre le site en ligne (OVH est relié à Git)
+1. Dans `source/` : `npm run publish-site`
+2. À la racine : `git add -A`, `git commit`, `git push` sur la branche suivie par OVH (`main`).
+3. OVH met à jour le site. Ne jamais pousser sans avoir lancé `publish-site` après un changement
+   du code : sinon le site publié ne reflète pas le code source.
 
 ## Mettre à jour les résultats
-Remplacer les fichiers dans `public/data/<examen>/`, puis `npm run build` et renvoyer `dist/`.
-Les téléphones récupèrent les corrections en quelques minutes (cache de 5 min sur les JSON).
+Remplacer les fichiers de `data/<examen>/`, puis `npm run publish-site` (recalcule les statistiques),
+puis commit et push. Les téléphones récupèrent les corrections en quelques minutes (cache de 5 min).
 
 ## Sécurité — ce qui est fait, et ses limites
 **En place :** HTTPS forcé + HSTS, politique CSP stricte (aucun code externe), anti-clickjacking,

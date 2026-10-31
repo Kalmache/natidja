@@ -9,6 +9,37 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { createReadStream, existsSync, statSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { join, resolve, sep } from 'node:path'
+
+// Les données (data/) sont à la racine du dépôt, pas dans source/. Pour que
+// « npm run dev » les trouve, ce petit plugin les sert à l'adresse /data/...
+const DOSSIER_DATA = fileURLToPath(new URL('../data', import.meta.url))
+function servirData() {
+  const middleware = (req, res, next) => {
+    const chemin = resolve(join(DOSSIER_DATA, decodeURIComponent(req.url.split('?')[0])))
+    // Sécurité : on refuse tout chemin qui sortirait du dossier data/ ("../").
+    const autorise = chemin.startsWith(DOSSIER_DATA + sep)
+    if (autorise && existsSync(chemin) && statSync(chemin).isFile()) {
+      res.setHeader('Content-Type', 'application/json')
+      createReadStream(chemin).pipe(res)
+    } else {
+      res.statusCode = 404
+      res.end()
+    }
+  }
+  return {
+    name: 'servir-data',
+    // Attention : ces fonctions ne doivent RIEN renvoyer (d'où les accolades).
+    configureServer(server) {
+      server.middlewares.use('/data', middleware)
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use('/data', middleware)
+    },
+  }
+}
 
 export default defineConfig({
   // "./" = chemins relatifs : le site fonctionne à la racine d'un domaine
@@ -17,6 +48,7 @@ export default defineConfig({
 
   plugins: [
     react(),
+    servirData(),
     VitePWA({
       // L'appli se met à jour toute seule quand une nouvelle version existe.
       registerType: 'autoUpdate',
@@ -54,9 +86,6 @@ export default defineConfig({
       workbox: {
         // On met en cache le "squelette" de l'appli dès la première visite.
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
-        // Les fichiers de données ne sont PAS préchargés (6,5 Mo) : on les
-        // garde au fur et à mesure des recherches, voir ci-dessous.
-        globIgnores: ['data/**'],
         navigateFallback: 'index.html',
         navigateFallbackDenylist: [/\/data\//],
         cleanupOutdatedCaches: true,

@@ -8,6 +8,7 @@
     "dev": "node scripts/build-stats.mjs && vite",
     "stats": "node scripts/build-stats.mjs",
     "build": "node scripts/build-stats.mjs && vite build",
+    "publish-site": "node scripts/publish.mjs",
     "preview": "vite preview",
     "test": "vitest run"
   },
