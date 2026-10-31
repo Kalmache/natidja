@@ -9,7 +9,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
-import { createReadStream, existsSync, statSync } from 'node:fs'
+import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { join, resolve, sep } from 'node:path'
 
@@ -41,7 +41,11 @@ function servirData() {
   }
 }
 
+const VERSION = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version
+
 export default defineConfig({
+  // __APP_VERSION__ est remplacé par la version de package.json (affichée au pied de page)
+  define: { __APP_VERSION__: JSON.stringify(VERSION) },
   // "./" = chemins relatifs : le site fonctionne à la racine d'un domaine
   // comme dans un sous-dossier (utile aussi pour l'appli mobile Capacitor).
   base: './',

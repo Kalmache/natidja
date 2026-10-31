@@ -300,7 +300,7 @@ button { cursor: pointer; }
 .splash__title { font-size: clamp(2.2rem, 8vw, 4rem); font-weight: 900; letter-spacing: -0.03em; margin-top: 14px; display: flex; justify-content: center; flex-wrap: wrap; }
 .splash__title span { display: inline-block; opacity: 0; transform: translateY(26px) rotateX(-60deg); animation: letterIn 0.6s var(--d) var(--ease) forwards; text-shadow: 0 6px 24px rgb(0 0 0 / 0.35); }
 @keyframes letterIn { to { opacity: 1; transform: none; } }
-.splash__tagline { color: var(--flag-yellow); font-weight: 800; letter-spacing: 0.08em; font-size: clamp(0.78rem, 2.2vw, 0.95rem); text-transform: uppercase; opacity: 0; animation: rise 0.7s 1.7s both; }
+.splash__tagline { color: var(--flag-yellow); font-weight: 800; letter-spacing: 0.08em; font-size: clamp(0.78rem, 2.2vw, 0.95rem); text-transform: uppercase; animation: rise 0.7s 1.7s both; }
 .splash__bar { width: min(240px, 60vw); height: 4px; border-radius: 4px; background: rgb(255 255 255 / 0.18); overflow: hidden; margin-top: 10px; }
 .splash__bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--flag-yellow), #fff, var(--flag-yellow)); transform-origin: left; transform: scaleX(0); animation: fillBar 2.4s 0.2s linear forwards; }
 [dir='rtl'] .splash__bar i { transform-origin: right; }
@@ -352,3 +352,72 @@ button { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* ---------- 12. SIGNATURE, PIED DE PAGE SIGNÉ, PAGES LÉGALES ---------- */
+/* Signature « Conçu par M.M.B.T » : le nom scintille aux couleurs du drapeau. */
+.signature { display: inline-flex; align-items: baseline; gap: 0.35em; }
+.signature__by { opacity: 0.8; font-weight: 600; }
+.signature a { text-decoration: none; }
+.signature__name { font-weight: 900; letter-spacing: 0.06em; background: linear-gradient(100deg, var(--flag-yellow) 0%, #fff 30%, var(--flag-red) 55%, var(--flag-blue) 80%, var(--flag-yellow) 100%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: sheen 6s linear infinite; }
+[data-theme='light'] .footer .signature__name { background-image: linear-gradient(100deg, #b8860b 0%, var(--flag-red) 40%, var(--flag-blue) 75%, #b8860b 100%); }
+@keyframes sheen { to { background-position: -250% 0; } }
+.signature--lg { font-size: clamp(1.6rem, 5vw, 2.6rem); flex-direction: column; align-items: center; gap: 0; line-height: 1.1; }
+.signature--lg .signature__by { font-size: 0.4em; letter-spacing: 0.3em; text-transform: uppercase; }
+.signature--lg .signature__name { letter-spacing: 0.18em; }
+
+.splash__credit { position: absolute; bottom: calc(30px + env(safe-area-inset-bottom)); inset-inline: 0; text-align: center; font-size: 0.8rem; color: rgb(255 255 255 / 0.75); animation: rise 0.8s 1.9s both; }
+
+/* Pied de page : filet animé + blocs centrés */
+.footer { position: relative; padding: 0; gap: 0; text-align: center; }
+.footer__flagline { height: 4px; background: linear-gradient(90deg, var(--flag-yellow), #fff, var(--flag-red), var(--flag-blue), var(--flag-green), var(--flag-yellow)); background-size: 200% 100%; animation: sheen 9s linear infinite; }
+.footer__inner { max-width: var(--maxw); margin: 0 auto; padding: 28px 20px 30px; display: grid; gap: 10px; justify-items: center; }
+.footer__org { display: grid; gap: 2px; }
+.footer__org span { font-size: 0.75rem; }
+.footer__made { font-size: 0.95rem; color: var(--text-2); }
+.footer a { color: var(--accent-text); text-decoration: none; font-weight: 700; }
+.footer a:hover { text-decoration: underline; }
+.footer__legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin-top: 4px; font-size: 0.82rem; }
+.footer__small { font-size: 0.72rem; opacity: 0.8; }
+
+/* Pages légales */
+.legal__layout { display: grid; grid-template-columns: 230px 1fr; gap: 20px; align-items: start; }
+.legal__nav { position: sticky; top: calc(var(--header-h) + 16px); display: grid; gap: 4px; padding: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.legal__nav a { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px; text-decoration: none; color: var(--text-2); font-weight: 700; font-size: 0.88rem; }
+.legal__nav a:hover { background: var(--surface-2); }
+.legal__nav a.is-active { background: color-mix(in srgb, var(--p-500) 15%, transparent); color: var(--accent-text); }
+.legal__content { padding: clamp(18px, 4vw, 32px); animation: rise 0.5s var(--ease) both; }
+.legal__text h2 { font-size: 1.05rem; font-weight: 900; margin: 22px 0 8px; } .legal__text h2:first-child { margin-top: 0; }
+.legal__text p { color: var(--text-2); margin-bottom: 8px; } .legal__text a { color: var(--accent-text); }
+.legal__text ul { list-style: disc; padding-inline-start: 22px; color: var(--text-2); display: grid; gap: 4px; margin-bottom: 8px; }
+
+/* Page Licence : le « certificat » */
+.certificate { position: relative; overflow: hidden; text-align: center; padding: clamp(28px, 6vw, 52px) 20px; margin-bottom: 26px; border-radius: var(--radius-lg); color: #fff; isolation: isolate; background: linear-gradient(135deg, var(--p-950), var(--p-800)); box-shadow: var(--shadow-lg); border: 1px solid rgb(255 255 255 / 0.18); outline: 1px solid rgb(252 209 22 / 0.5); outline-offset: -10px; }
+.certificate__shine { position: absolute; inset: 0; z-index: -1; background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.16) 45%, transparent 60%); background-size: 250% 100%; animation: sheen 5s linear infinite; }
+.certificate__eyebrow { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: var(--flag-yellow); }
+.panel .certificate__title { display: block; text-align: center; font-size: clamp(1.8rem, 6vw, 3rem); font-weight: 900; letter-spacing: -0.02em; margin: 6px 0 18px; }
+.certificate__sign { margin: 8px 0 18px; }
+.certificate .signature__name, .splash .signature__name { background-image: linear-gradient(100deg, var(--flag-yellow) 0%, #fff 25%, var(--flag-yellow) 50%, #fff 75%, var(--flag-yellow) 100%) !important; filter: drop-shadow(0 2px 10px rgb(0 0 0 / 0.35)); }
+.certificate__rights { font-weight: 700; opacity: 0.9; } .certificate__version { margin-top: 4px; font-size: 0.75rem; opacity: 0.6; }
+.licences { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.88rem; }
+.licences th, .licences td { text-align: start; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.licences th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-3); }
+
+/* Journal de bord : frise verticale */
+.timeline { position: relative; display: grid; gap: 22px; padding-inline-start: 28px; }
+.timeline::before { content: ''; position: absolute; inset-block: 6px; inset-inline-start: 7px; width: 2px; background: linear-gradient(to bottom, var(--p-500), var(--border)); }
+.timeline li { position: relative; animation: rise 0.5s var(--delay, 0ms) var(--ease) both; }
+.timeline__dot { position: absolute; inset-inline-start: -28px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--surface); border: 3px solid var(--p-500); box-shadow: 0 0 0 4px color-mix(in srgb, var(--p-500) 20%, transparent); }
+.timeline li:first-child .timeline__dot { background: var(--p-500); }
+.timeline__head { display: flex; align-items: center; gap: 10px; } .timeline time { font-size: 0.8rem; color: var(--text-3); font-weight: 700; }
+.timeline h3 { margin: 6px 0 4px; font-size: 1.02rem; }
+.timeline ul { list-style: disc; padding-inline-start: 20px; color: var(--text-2); font-size: 0.9rem; display: grid; gap: 2px; }
+
+@media (max-width: 820px) {
+  .legal__layout { grid-template-columns: 1fr; }
+  .legal__nav { position: static; display: flex; overflow-x: auto; gap: 4px; }
+  .legal__nav a { white-space: nowrap; }
+}
+@media print { .footer { display: none !important; } }
+
+.legal__text .legal__meta { font-size: 0.8rem; font-weight: 700; color: var(--text-3); margin-bottom: 14px; }
+.certificate__protected { font-size: 0.8rem; opacity: 0.8; margin-bottom: 6px; }

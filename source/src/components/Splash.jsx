@@ -13,6 +13,7 @@
 // ============================================================================
 import { useEffect, useState } from 'react'
 import Flag from './Flag.jsx'
+import Signature from './Signature.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { prefersReducedMotion } from '../hooks.js'
 
@@ -86,6 +87,7 @@ export default function Splash({ onDone }) {
         </div>
         <p className="splash__loading">{t('splash.loading')}</p>
       </div>
+      <p className="splash__credit"><Signature /></p>
       <button type="button" className="splash__skip" onClick={terminer}>
         {t('splash.skip')}
       </button>

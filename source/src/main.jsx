@@ -11,3 +11,6 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 )
+
+// Petite signature pour les curieux qui ouvrent la console du navigateur.
+console.log('%cConçu par M.M.B.T · mmbt.fr', 'font:700 14px system-ui;color:#fcd116;background:#052e24;padding:6px 12px;border-radius:6px')

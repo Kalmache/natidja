@@ -166,4 +166,16 @@ export default {
 
   'splash.skip': 'تخطّي',
   'splash.loading': 'جارٍ تحميل النتائج…',
+
+  'signature.by': 'من تصميم',
+  'footer.contact': 'للتواصل',
+  'demo.short': 'نسخة تجريبية · بيانات وهمية',
+  'legal.mentions': 'الإشعارات القانونية',
+  'legal.privacy': 'الخصوصية',
+  'legal.terms': 'شروط الاستخدام',
+  'legal.licence': 'الترخيص',
+  'legal.journal': 'سجل التحديثات',
+  'legal.certificate': 'شهادة المؤلف',
+  'legal.rights': 'جميع الحقوق محفوظة',
+  'legal.protected': 'عمل محمي بموجب قانون الملكية الفكرية الفرنسي',
 }
