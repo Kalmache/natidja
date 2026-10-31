@@ -20,6 +20,7 @@ export async function verificationCode(candidat) {
     candidat.tableNumber,
     candidat.lastName,
     candidat.firstName,
+    candidat.birthDate ?? '', // la date de naissance fait partie de ce que le code garantit
     candidat.status,
     candidat.average ?? '',
   ].join('|')

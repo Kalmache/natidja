@@ -19,3 +19,6 @@ export const note = (n) =>
 /** Pourcentage arrondi à 1 décimale : (47, 100) → "47,0 %" */
 export const pct = (partie, total) =>
   total ? `${((partie / total) * 100).toFixed(1).replace('.', ',')} %` : '—'
+
+/** "2006-02-25" (ainsi stockée dans les fichiers) → "25/02/2006" (affichage français). Vide si absente ou illisible. */
+export const dateNaissance = (iso) => (/^\d{4}-\d{2}-\d{2}$/.test(iso ?? '') ? iso.split('-').reverse().join('/') : '')
