@@ -524,3 +524,22 @@ html { scroll-padding-top: calc(var(--header-h) + var(--safe-top) + 16px); }
 .search { scroll-margin-top: calc(var(--header-h) + var(--safe-top) + 14px); }
 html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-events: none; visibility: hidden; }
 .bottomnav { transition: transform 0.25s var(--ease), opacity 0.2s, visibility 0.25s; }
+
+/* ==========================================================================
+   Demande d'autorisation (page Licence) : formulaire + e-mail rédigé en direct
+   ========================================================================== */
+.autorisation { margin-top: 28px; padding: 22px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.autorisation h2 { margin-bottom: 8px; }
+.autorisation h3 { margin: 22px 0 10px; font-size: 1rem; }
+.autorisation > p { color: var(--text-2); }
+.autorisation__champs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+.autorisation__champs label { display: grid; gap: 6px; font-size: 0.82rem; font-weight: 800; color: var(--text-2); }
+.autorisation__large { grid-column: 1 / -1; }
+.autorisation input, .autorisation select, .autorisation textarea { width: 100%; font: inherit; font-size: 1rem; font-weight: 500; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 11px 13px; }
+.autorisation textarea { resize: vertical; min-height: 96px; }
+.autorisation input:focus-visible, .autorisation select:focus-visible, .autorisation textarea:focus-visible { outline: 3px solid var(--p-500); outline-offset: 1px; }
+.autorisation__apercu { background: var(--surface-2); border: 1px dashed var(--border); border-radius: 14px; padding: 16px 18px; }
+.autorisation__objet { margin: 0 0 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+.autorisation__corps { margin: 0; white-space: pre-wrap; font-size: 0.92rem; line-height: 1.6; }
+.autorisation__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+@media (max-width: 640px) { .autorisation__champs { grid-template-columns: 1fr; } .autorisation { padding: 16px; } }
