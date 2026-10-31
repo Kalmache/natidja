@@ -15,6 +15,9 @@
     "export:resultats": "node scripts/export-resultats.mjs",
     "modele": "node scripts/creer-modele.mjs",
     "restaurer": "node scripts/restaurer-resultats.mjs",
+    "serveur": "node scripts/serveur-local.mjs",
+    "charge": "node scripts/test-charge.mjs",
+    "capacite": "node scripts/capacite.mjs",
     "android:sync": "npm run build:app && cap sync android",
     "preview": "vite preview",
     "test": "vitest run"
