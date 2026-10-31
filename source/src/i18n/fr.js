@@ -168,4 +168,15 @@ export default {
 
   'splash.skip': 'Passer',
   'splash.loading': 'Chargement des résultats…',
+
+  'signature.by': 'Conçu par',
+  'footer.contact': 'Contact',
+  'demo.short': 'Version de démonstration · données fictives',
+  'legal.mentions': 'Mentions légales',
+  'legal.privacy': 'Confidentialité',
+  'legal.terms': 'Conditions d’utilisation',
+  'legal.licence': 'Licence',
+  'legal.journal': 'Journal de bord',
+  'legal.certificate': 'Certificat d’auteur',
+  'legal.rights': 'Tous droits réservés',
 }
