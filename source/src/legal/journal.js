@@ -5,6 +5,16 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.2.0',
+    date: '31/10/2026',
+    titre: 'Application Android',
+    points: [
+      'Application Android (fichier APK) emballant le site avec toutes les données : fonctionne sans connexion',
+      'Les QR codes générés dans l’application pointent vers le site public natidja.mmbt.fr',
+      'Licence : l’adoption par une institution ne vaut jamais cession des droits d’auteur',
+    ],
+  },
+  {
     version: '2.1.0',
     date: '31/10/2026',
     titre: 'Signature, licence et pages légales',

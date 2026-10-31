@@ -25,6 +25,10 @@ export const EDITOR = {
   publisher: 'Maabadi Ben Tamou', // directeur de la publication
 }
 
+// Adresse publique du site : utilisée dans les QR codes quand l'appli tourne
+// dans un téléphone (où l'adresse interne serait « https://localhost »).
+export const SITE_URL = 'https://natidja.mmbt.fr/'
+
 export const HOST = {
   name: 'OVH SAS',
   address: '2 rue Kellermann, 59100 Roubaix, France',
