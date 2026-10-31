@@ -279,6 +279,19 @@ export default function ResultsView({ config, session, onSession, island, onIsla
               spellCheck="false"
               value={saisie}
               onChange={(e) => setSaisie(e.target.value)}
+              onFocus={(e) => {
+                // Le clavier met un instant à apparaître et à réduire l'écran : on attend
+                // la fin de son animation, puis on place la barre de recherche JUSTE SOUS
+                // l'en-tête (et non cachée dessous, ni derrière le clavier).
+                // (On mémorise le champ AVANT d'attendre : React vide e.currentTarget
+                // dès que l'événement est terminé.)
+                const champ = e.currentTarget
+                const formulaire = champ.closest('form')
+                setTimeout(() => {
+                  if (document.activeElement === champ)
+                    formulaire?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' })
+                }, 350)
+              }}
               placeholder={t('search.placeholder')}
               aria-label={t('search.label')}
               maxLength={60}

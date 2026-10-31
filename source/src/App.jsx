@@ -11,7 +11,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { I18nProvider, LANGS, useI18n } from './i18n/index.jsx'
 import { brancherRetourNatif } from './lib/retour.js'
 import { isNativeApp } from './lib/verify.js'
-import { navigate, useHashRoute, usePersistedState, useSwipe } from './hooks.js'
+import { navigate, useClavier, useHashRoute, usePersistedState, useSwipe } from './hooks.js'
 import { loadConfig, loadInitial } from './lib/data.js'
 import Splash from './components/Splash.jsx'
 import Icon from './components/Icon.jsx'
@@ -136,6 +136,7 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
     const cible = pagesOrdre[indice + decalage]
     if (cible) navigate(cible[1]) // aux extrémités : rien ne se passe
   }
+  useClavier() // cache la barre du bas quand le clavier est ouvert
   useSwipe({ onNext: () => allerA(1), onPrev: () => allerA(-1), dir: LANGS[lang].dir, actif: indice >= 0 })
 
   // Sens de l'animation d'arrivée de la page (+1 = on avance, -1 = on recule).
