@@ -5,6 +5,17 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.5.3',
+    date: '31/10/2026',
+    titre: 'Cartes cliquables et chiffres qui flottent',
+    points: [
+      'Toucher une carte de chiffres (Admis, Second groupe…) ou un élément des statistiques (mention, île, série, légende) mène directement à la liste des résultats concernés, déjà filtrée',
+      'Nouveau filtre par mention ; les filtres actifs s’affichent en pastilles qu’on retire d’un toucher',
+      'La liste filtrée parcourt tous les résultats, par petits fichiers, et ne se limite plus aux 120 premiers candidats',
+      'Les cartes de chiffres flottent doucement, comme sur l’eau (désactivé si l’appareil demande moins d’animations)',
+    ],
+  },
+  {
     version: '2.5.2',
     date: '31/10/2026',
     titre: 'Navigation au bouton retour et glissement plus fluide',

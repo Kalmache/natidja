@@ -5,7 +5,7 @@ const inc = (obj, key) => {
   obj[key] = (obj[key] ?? 0) + 1
 }
 
-export function calculerStats(candidats, session) {
+export function calculerStats(candidats, session, chiffresNumero = 3) {
   const stats = {
     session: session.id,
     total: candidats.length,
@@ -14,10 +14,17 @@ export function calculerStats(candidats, session) {
     parIle: {}, // { ngazidja: { nom, total, ADMIS, ... } }
     parSerie: {}, // { A1: { total, ADMIS, ... } }
     moyenneGenerale: 0,
+    // Liste ordonnée des fichiers « numeros/<clé>.json » : l'application s'en sert
+    // pour PARCOURIR les résultats quand on filtre sans rien taper (ex. « Admis »).
+    fichiersNumeros: [],
   }
+  const cles = new Set()
   let sommeMoyennes = 0
   let avecMoyenne = 0
   for (const c of candidats) {
+    // Même règle que construireFichiers : début de la dernière partie numérique du n° de table.
+    const cle = String(c.tableNumber).match(/\d+/g)?.at(-1)?.slice(0, chiffresNumero)
+    if (cle) cles.add(cle)
     inc(stats.parStatut, c.status)
     if (c.mention && c.mention !== 'SANS') inc(stats.parMention, c.mention)
     stats.parIle[c.islandId] ??= { nom: c.island, total: 0 }
@@ -33,6 +40,7 @@ export function calculerStats(candidats, session) {
       avecMoyenne++
     }
   }
+  stats.fichiersNumeros = [...cles].sort()
   stats.moyenneGenerale = avecMoyenne ? Math.round((sommeMoyennes / avecMoyenne) * 100) / 100 : 0
   return stats
 }
