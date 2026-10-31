@@ -83,6 +83,10 @@ npm run console:utilisateur -- creer --nom amina --roles preparateur   # crée u
 npm run console                                                        # lance la console (derrière HTTPS en production)
 ```
 
+## Dossier de présentation
+Document de 10 pages pour les autorités organisatrices (besoin, démonstration, charge, sécurité, exploitation, feuille de route,
+déroulé de démonstration de 10 minutes) : [`source/docs/dossier-presentation/dossier-presentation.pdf`](source/docs/dossier-presentation/dossier-presentation.pdf).
+
 ## Charge et hébergement du jour J
 Poids mesurés, modèle de capacité, résultats du test de charge, comparaison des hébergements :
 [`source/docs/CHARGE-ET-HEBERGEMENT.md`](source/docs/CHARGE-ET-HEBERGEMENT.md).
