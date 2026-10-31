@@ -5,6 +5,17 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.3.0',
+    date: '31/10/2026',
+    titre: 'Import des résultats depuis Excel',
+    points: [
+      'Modèle Excel à remplir (listes déroulantes, mode d’emploi) pour le Bac et le BEPC',
+      'Vérification automatique du fichier : doublons, champs manquants, moyennes impossibles, avec numéro de ligne',
+      'Publication sécurisée avec sauvegarde automatique et retour en arrière en une commande',
+      'Guide de publication pas à pas et check-list du jour des résultats',
+    ],
+  },
+  {
     version: '2.2.0',
     date: '31/10/2026',
     titre: 'Application Android',
