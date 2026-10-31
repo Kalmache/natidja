@@ -15,7 +15,7 @@ main { max-width: 1000px; margin: 0 auto; padding: 24px 20px 60px; }
 .carte { background: var(--carte); border: 1px solid var(--bord); border-radius: 14px; padding: 20px; margin-bottom: 18px; }
 .connexion { max-width: 420px; margin: 60px auto; }
 label { display: block; font-weight: 700; margin: 14px 0 6px; font-size: 0.9rem; }
-input[type='text'], input[type='password'], input[type='datetime-local'], select { width: 100%; padding: 11px 12px; border: 1.5px solid var(--bord); border-radius: 10px; background: #fff; }
+input[type='text'], input[type='password'], input[type='datetime-local'], input[type='number'], select { width: 100%; padding: 11px 12px; border: 1.5px solid var(--bord); border-radius: 10px; background: #fff; }
 input:focus-visible, button:focus-visible, select:focus-visible { outline: 3px solid #34d399; outline-offset: 1px; }
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 10px; border: 1.5px solid var(--bord); background: #fff; cursor: pointer; font-weight: 700; margin: 4px 6px 4px 0; }
 .btn.primaire { background: var(--vert); border-color: var(--vert); color: #fff; }

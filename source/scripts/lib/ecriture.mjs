@@ -51,3 +51,14 @@ export function ecrireSession(sessionId, fichiers, nouvelleConfig, opts = {}) {
   writeFileSync(join(dossierData, 'exams.json'), JSON.stringify(nouvelleConfig), 'utf8')
   return { sauvegarde: existsSync(sauvegarde) ? sauvegarde : null }
 }
+
+/**
+ * Réécrit exams.json sans jamais le laisser à moitié écrit : on écrit un fichier voisin,
+ * puis on le renomme (une opération « tout ou rien »).
+ */
+export function ecrireConfig(dossierData, config) {
+  const cible = join(dossierData, 'exams.json')
+  const tmp = `${cible}.${randomBytes(4).toString('hex')}.tmp`
+  writeFileSync(tmp, JSON.stringify(config), 'utf8')
+  renameSync(tmp, cible)
+}

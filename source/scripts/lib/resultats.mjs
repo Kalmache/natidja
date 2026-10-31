@@ -386,6 +386,12 @@ export function majConfig(config, sessionId, candidats, maintenant = new Date())
   const s = copie.sessions.find((x) => x.id === sessionId)
   s.islands = s.islands.map((i) => ({ ...i, candidatesCount: r.parIle[i.id] ?? 0 }))
   s.stats = { total: r.total, admitted: r.admis, oralSecondGroup: r.second, successRate: r.taux }
+  // Première publication d'une session créée en brouillon : elle devient publique ET c'est elle
+  // que les visiteurs voient en arrivant (la plus récente publiée).
+  if (s.status && s.status !== 'PUBLISHED') {
+    s.status = 'PUBLISHED'
+    copie.defaultSessionId = s.id
+  }
   copie.updatedAt = maintenant.toISOString()
   return copie
 }

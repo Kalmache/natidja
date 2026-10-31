@@ -115,7 +115,7 @@ function enTete() {
       h('button', { class: 'btn', onclick: async () => { await api('POST', '/api/deconnexion', {}); etat = { etape: 'aucune', csrf: null, utilisateur: null }; message = null; afficher() } }, 'Se déconnecter')))
 }
 function onglets() {
-  const liste = [['propositions', 'Propositions'], roles().includes('preparateur') && ['nouvelle', 'Nouvelle proposition'], roles().includes('admin') && ['journal', 'Journal d’audit'], ['compte', 'Mon compte']].filter(Boolean)
+  const liste = [['propositions', 'Propositions'], roles().includes('preparateur') && ['nouvelle', 'Nouvelle proposition'], ['sessions', 'Sessions'], roles().includes('admin') && ['journal', 'Journal d’audit'], ['compte', 'Mon compte']].filter(Boolean)
   return h('nav', { class: 'onglets' }, liste.map(([id, texte]) => h('button', { class: vue.onglet === id ? 'actif' : '', onclick: () => { vue = { onglet: id, id: null }; message = null; afficher() } }, texte)))
 }
 const bandeau = () => message && h('div', { class: `message ${message.type}`, role: 'alert' }, message.texte)
@@ -137,7 +137,7 @@ function ecranNouvelle() {
   const choix = h('select', { id: 'session' })
   const fichier = h('input', { type: 'file', id: 'fichier', accept: '.xlsx,.csv', required: true })
   const sortie = h('div')
-  api('GET', '/api/examens').then((r) => (r.json ?? []).forEach((s) => choix.append(h('option', { value: s.id }, `${s.titre} (${s.annee}) — actuellement ${s.stats.total} candidats`))))
+  api('GET', '/api/examens').then((r) => (r.json ?? []).forEach((s) => choix.append(h('option', { value: s.id }, `${s.titre} (${s.libelle})${s.statut === 'DRAFT' ? ' — nouvelle session, en attente de sa première publication' : ` — actuellement ${s.stats.total} candidats`}`))))
   const envoyer = async (e) => {
     e.preventDefault()
     const f = fichier.files[0]
@@ -159,6 +159,41 @@ function ecranNouvelle() {
       h('label', { for: 'fichier' }, 'Fichier de résultats'), fichier,
       h('p', null, h('button', { class: 'btn primaire', type: 'submit' }, 'Vérifier et proposer'))),
     sortie)
+}
+
+/** Les sessions (examen + année + édition) et la création de celle d'une nouvelle année. */
+async function ecranSessions() {
+  const r = await api('GET', '/api/examens')
+  const liste = r.json ?? []
+  const type = h('select', { id: 'type' }, h('option', { value: 'BAC' }, 'Baccalauréat (BAC)'), h('option', { value: 'BEPC' }, 'BEPC'))
+  const annee = h('input', { type: 'number', id: 'annee', min: '2000', max: '2100', value: String(liste.length ? Math.max(...liste.map((s) => s.annee)) + 1 : new Date().getFullYear()), required: true })
+  const genre = h('select', { id: 'genre' }, h('option', { value: 'PRINCIPALE' }, 'Session principale'), h('option', { value: 'RATTRAPAGE' }, 'Rattrapage'))
+  const libelle = h('input', { type: 'text', id: 'libelle', maxlength: '40', placeholder: 'Ex. Juin 2027 (facultatif)' })
+  const series = h('input', { type: 'text', id: 'series', value: (liste.find((s) => s.series?.length)?.series ?? ['A1', 'A4', 'C', 'D', 'G']).join(', ') })
+  const zoneSeries = h('div', null, h('label', { for: 'series' }, 'Séries du Bac (séparées par des virgules)'), series)
+  type.onchange = () => { zoneSeries.style.display = type.value === 'BAC' ? '' : 'none' }
+  const erreur = h('div')
+  const creer = async (e) => {
+    e.preventDefault()
+    const rep = await api('POST', '/api/sessions', { examType: type.value, year: Number(annee.value), genre: genre.value, libelle: libelle.value, ...(type.value === 'BAC' ? { series: series.value } : {}) })
+    if (rep.statut === 201) return dire('succes', `Session « ${rep.json.id} » créée. Elle apparaîtra sur le site à la première publication de résultats.`)
+    erreur.replaceChildren(h('div', { class: 'message erreur', role: 'alert' }, rep.json?.erreur ?? 'Création impossible.'))
+  }
+  const statut = (s) => (s.statut === 'DRAFT' ? 'Brouillon (pas encore publique)' : 'Publiée')
+  return h('div', null, h('h2', null, 'Sessions d’examen'), bandeau(),
+    h('div', { class: 'carte' }, h('table', null,
+      h('thead', null, h('tr', null, ['Identifiant', 'Examen', 'Année', 'Édition', 'Statut', 'Candidats'].map((t) => h('th', null, t)))),
+      h('tbody', null, liste.map((s) => h('tr', null, h('td', null, s.id), h('td', null, s.titre), h('td', null, s.annee), h('td', null, `${s.genre === 'RATTRAPAGE' ? 'Rattrapage' : 'Principale'} — ${s.libelle}`), h('td', null, statut(s)), h('td', null, s.stats.total)))))),
+    h('form', { class: 'carte', onsubmit: creer },
+      h('h3', null, 'Créer la session d’une nouvelle année'),
+      h('p', { class: 'doux' }, 'La session est créée en brouillon : rien n’est publié et le public ne la voit pas. Elle apparaît sur le site, et devient la session affichée par défaut, à la première publication de résultats.'),
+      erreur,
+      h('label', { for: 'type' }, 'Examen'), type,
+      h('label', { for: 'annee' }, 'Année'), annee,
+      h('label', { for: 'genre' }, 'Édition'), genre,
+      h('label', { for: 'libelle' }, 'Libellé affiché (facultatif)'), libelle,
+      zoneSeries,
+      h('p', null, h('button', { class: 'btn primaire', type: 'submit' }, 'Créer la session'))))
 }
 
 const ligneChiffre = (titre, valeur) => h('div', { class: 'chiffre' }, h('strong', null, valeur), h('span', null, titre))
@@ -270,7 +305,7 @@ async function afficher() {
   else if (etat.etape === 'totp') contenu = ecranTotp()
   else if (etat.etape === 'mdp') contenu = formulaireMotDePasse({ force: true })
   else {
-    const corps = vue.onglet === 'detail' ? await ecranDetail() : vue.onglet === 'nouvelle' ? ecranNouvelle() : vue.onglet === 'journal' ? await ecranJournal() : vue.onglet === 'compte' ? ecranCompte() : await ecranPropositions()
+    const corps = vue.onglet === 'detail' ? await ecranDetail() : vue.onglet === 'nouvelle' ? ecranNouvelle() : vue.onglet === 'sessions' ? await ecranSessions() : vue.onglet === 'journal' ? await ecranJournal() : vue.onglet === 'compte' ? ecranCompte() : await ecranPropositions()
     if (mien !== compteur) return // un affichage plus récent a pris le relais
     if (etat.etape !== 'ok') return afficher()
     contenu = h('div', null, enTete(), onglets(), h('main', null, corps))

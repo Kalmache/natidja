@@ -543,3 +543,14 @@ html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-event
 .autorisation__corps { margin: 0; white-space: pre-wrap; font-size: 0.92rem; line-height: 1.6; }
 .autorisation__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 @media (max-width: 640px) { .autorisation__champs { grid-template-columns: 1fr; } .autorisation { padding: 16px; } }
+
+/* ==========================================================================
+   Choix de l'examen / de l'année / de l'édition (quand il y a plusieurs années)
+   ========================================================================== */
+.session-picker { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 520px; margin: 0 auto 18px; }
+.session-picker label { display: grid; gap: 4px; text-align: start; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: rgb(255 255 255 / 0.8); }
+.session-picker select { width: 100%; font: inherit; font-size: 0.95rem; font-weight: 700; letter-spacing: 0; text-transform: none; color: #fff; background: rgb(255 255 255 / 0.16); border: 1px solid rgb(255 255 255 / 0.35); border-radius: 12px; padding: 10px 8px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.session-picker select:disabled { opacity: 0.55; }
+.session-picker select:focus-visible { outline: 3px solid var(--flag-yellow); outline-offset: 2px; }
+.session-picker option { color: #111; }
+@media (max-width: 420px) { .session-picker { gap: 6px; } .session-picker select { padding: 9px 4px; font-size: 0.88rem; } }
