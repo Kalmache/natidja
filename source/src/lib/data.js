@@ -9,6 +9,8 @@
 //   vite.config.js) : il garde une copie de chaque fichier consulté.
 // ============================================================================
 
+import { configPublique } from './sessions.js'
+
 const memoire = new Map() // url → Promise (cache en mémoire)
 
 const attendre = (ms) => new Promise((ok) => setTimeout(ok, ms))
@@ -46,7 +48,7 @@ export function getJson(url) {
 export const loadConfig = async () => {
   const config = await getJson('./data/exams.json')
   if (!config) throw new Error('Configuration des examens introuvable.')
-  return config
+  return configPublique(config) // sessions en brouillon masquées, session par défaut valide
 }
 export const loadInitial = async (sessionId) =>
   (await getJson(`./data/${sessionId}/initial.json`)) ?? []

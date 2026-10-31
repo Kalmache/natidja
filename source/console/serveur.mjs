@@ -29,6 +29,8 @@ import {
 } from './lib/securite.mjs'
 import { analyserFichier, comparer, erreurHttp, publier } from './lib/publication.mjs'
 import { synchroDepuisEnvironnement } from './lib/synchro.mjs'
+import { creerSession } from '../scripts/lib/sessions.mjs'
+import { ecrireConfig } from '../scripts/lib/ecriture.mjs'
 
 const ICI = dirname(fileURLToPath(import.meta.url))
 const PUBLIC = join(ICI, 'public')
@@ -275,8 +277,22 @@ export function creerConsole(options = {}) {
 
   // ---- Sessions d'examen et situation actuelle
   route('GET', '/api/examens', 'ok', null, () =>
-    config().sessions.map((s) => ({ id: s.id, titre: s.title, annee: s.year, stats: s.stats, maj: config().updatedAt })),
+    config().sessions.map((s) => ({ id: s.id, titre: s.title, annee: s.year, genre: s.sessionKind ?? 'PRINCIPALE', libelle: s.sessionDate, statut: s.status ?? 'PUBLISHED', series: s.series, stats: s.stats, maj: config().updatedAt })),
   )
+
+  // Créer la session d'une nouvelle année (ex. Bac 2027). Aucune publication : la session est un BROUILLON,
+  // invisible du public jusqu'à la première publication de résultats.
+  route('POST', '/api/sessions', 'ok', ['preparateur', 'approbateur', 'admin'], async ({ corps, session }) => {
+    const tache = verrouPublication.then(() => {
+      const { config: nouvelle, session: creee } = creerSession(config(), corps)
+      ecrireConfig(dossierDonnees, nouvelle)
+      journal('session_creee', { session, details: { id: creee.id, series: creee.series } })
+      return creee
+    })
+    verrouPublication = tache.catch(() => {})
+    const creee = await tache
+    return { statut: 201, corps: { id: creee.id, titre: creee.title, annee: creee.year, genre: creee.sessionKind, libelle: creee.sessionDate, statut: creee.status, series: creee.series } }
+  })
 
   // ---- Propositions
   const vue = (m) => ({ id: m.id, session: m.session, statut: m.statut, auteur: m.auteur, creeLe: m.creeLe, resume: m.resume, approbation: m.approbation, refus: m.refus, annulation: m.annulation, publieLe: m.publieLe, erreurPublication: m.erreurPublication, miseEnLigne: m.miseEnLigne })
