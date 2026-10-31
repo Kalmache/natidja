@@ -18,6 +18,7 @@ import ResultsView from './views/ResultsView.jsx'
 import StatsView from './views/StatsView.jsx'
 import AboutView from './views/AboutView.jsx'
 import VerifyView from './views/VerifyView.jsx'
+import LegalView from './views/LegalView.jsx'
 
 // Démarre le téléchargement des données TOUT DE SUITE (avant même que React
 // n'ait fini d'afficher la page) : pendant que le Splash s'anime, les
@@ -86,12 +87,12 @@ function Shell({ theme, onTheme, palette, onPalette, lang, onLang }) {
   // Quand on change d'onglet, on repart du haut de la page.
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [route[0]])
+  }, [route.join('/')])
 
   const onSplashDone = useCallback(() => {}, [])
 
   const session = config?.sessions.find((s) => s.id === sessionId)
-  const vue = route[0] === 'stats' ? 'stats' : route[0] === 'about' ? 'about' : route[0] === 'verif' ? 'verif' : 'results'
+  const vue = route[0] === 'stats' ? 'stats' : route[0] === 'about' ? 'about' : route[0] === 'verif' ? 'verif' : route[0] === 'legal' ? 'legal' : 'results'
   const iles = session
     ? [{ id: 'all', name: 'all' }, ...session.islands.map((i) => ({ id: i.id, name: i.name }))]
     : []
@@ -101,7 +102,7 @@ function Shell({ theme, onTheme, palette, onPalette, lang, onLang }) {
       <Splash onDone={onSplashDone} />
 
       <Header
-        view={vue === 'verif' ? 'about' : vue}
+        view={vue === 'verif' || vue === 'legal' ? 'about' : vue}
         theme={theme}
         onTheme={onTheme}
         palette={palette}
@@ -131,6 +132,8 @@ function Shell({ theme, onTheme, palette, onPalette, lang, onLang }) {
           <StatsView session={session} onIsland={setIle} />
         ) : vue === 'about' ? (
           <AboutView />
+        ) : vue === 'legal' ? (
+          <LegalView page={route[1]} />
         ) : vue === 'verif' ? (
           <VerifyView config={config} session={session} params={route.slice(1)} />
         ) : (
@@ -149,7 +152,7 @@ function Shell({ theme, onTheme, palette, onPalette, lang, onLang }) {
       </main>
 
       <Footer />
-      <BottomNav view={vue === 'verif' ? 'about' : vue} />
+      <BottomNav view={vue === 'verif' || vue === 'legal' ? 'about' : vue} />
     </div>
   )
 }
