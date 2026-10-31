@@ -1,0 +1,99 @@
+/* ============================================================================
+   tokens.css – les « variables de design » (couleurs, ombres, arrondis...)
+   ----------------------------------------------------------------------------
+   Une variable CSS se déclare  --nom: valeur;  et s'utilise  var(--nom).
+   Changer une variable ici change l'aspect de TOUT le site.
+
+   Le site a deux réglages indépendants, posés sur la balise <html> :
+     data-theme   = "light" | "dark"                       (clair / sombre)
+     data-palette = "emerald" | "sapphire" | "amber" | "ruby"  (couleur)
+   ========================================================================== */
+
+/* ---------- 1. Les 4 palettes (p-50 = très clair … p-950 = très foncé) ---------- */
+:root,
+:root[data-palette='emerald'] {
+  --p-50: #ecfdf5; --p-100: #d1fae5; --p-200: #a7f3d0; --p-400: #34d399;
+  --p-500: #10b981; --p-600: #059669; --p-700: #047857; --p-800: #065f46;
+  --p-900: #064e3b; --p-950: #052e24;
+}
+:root[data-palette='sapphire'] {
+  --p-50: #eff6ff; --p-100: #dbeafe; --p-200: #bfdbfe; --p-400: #60a5fa;
+  --p-500: #3b82f6; --p-600: #2563eb; --p-700: #1d4ed8; --p-800: #1e40af;
+  --p-900: #1e3a8a; --p-950: #0f1f4d;
+}
+:root[data-palette='amber'] {
+  --p-50: #fffbeb; --p-100: #fef3c7; --p-200: #fde68a; --p-400: #fbbf24;
+  --p-500: #f59e0b; --p-600: #d97706; --p-700: #b45309; --p-800: #92400e;
+  --p-900: #78350f; --p-950: #3b1a05;
+}
+:root[data-palette='ruby'] {
+  --p-50: #fff1f2; --p-100: #ffe4e6; --p-200: #fecdd3; --p-400: #fb7185;
+  --p-500: #f43f5e; --p-600: #e11d48; --p-700: #be123c; --p-800: #9f1239;
+  --p-900: #881337; --p-950: #470a1d;
+}
+
+/* ---------- 2. Couleurs communes aux deux thèmes ---------- */
+:root {
+  /* Couleurs de résultat (utilisées partout pour rester cohérent) */
+  --ok: #10b981;      --ok-strong: #047857;
+  --warn: #f59e0b;    --warn-strong: #b45309;
+  --bad: #f43f5e;     --bad-strong: #be123c;
+  /* Couleurs du drapeau comorien */
+  --flag-yellow: #fcd116; --flag-red: #ce1126; --flag-blue: #3d4fb3; --flag-green: #3a9d23;
+
+  --radius-sm: 10px; --radius: 16px; --radius-lg: 24px;
+  --font: 'Segoe UI', system-ui, -apple-system, 'Noto Sans', 'Noto Naskh Arabic', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --maxw: 1240px;
+  --header-h: 64px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ---------- 3. Thème clair ---------- */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f4f7f6;
+  --bg-grad: radial-gradient(1200px 500px at 10% -10%, color-mix(in srgb, var(--p-200) 55%, transparent), transparent 60%),
+             radial-gradient(900px 400px at 100% 0%, color-mix(in srgb, var(--flag-yellow) 14%, transparent), transparent 60%);
+  --surface: #ffffff;
+  --surface-2: #f1f5f4;
+  --border: #e2e8e6;
+  --border-strong: #cbd5d1;
+  --text: #0f1f1a;
+  --text-2: #3f524b;
+  --text-3: #64756f;
+  --shadow-sm: 0 1px 2px rgb(15 31 26 / 0.06), 0 1px 3px rgb(15 31 26 / 0.05);
+  --shadow: 0 8px 24px -8px rgb(15 31 26 / 0.16), 0 2px 6px rgb(15 31 26 / 0.06);
+  --shadow-lg: 0 24px 60px -16px rgb(15 31 26 / 0.3);
+  --glass: rgb(255 255 255 / 0.78);
+  --sea-1: #bfe3ee; --sea-2: #8ec9dc;
+  --island-base: #e9efe4;
+  --accent-text: var(--p-700);
+}
+
+/* ---------- 4. Thème sombre ---------- */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #07130f;
+  --bg-grad: radial-gradient(1000px 500px at 10% -10%, color-mix(in srgb, var(--p-700) 35%, transparent), transparent 60%),
+             radial-gradient(800px 400px at 100% 0%, color-mix(in srgb, var(--p-500) 12%, transparent), transparent 60%);
+  --surface: #0e1f19;
+  --surface-2: #132a22;
+  --border: #1d3a2f;
+  --border-strong: #2a5242;
+  --text: #ecf6f2;
+  --text-2: #b6cbc3;
+  --text-3: #8aa399;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow: 0 10px 28px -8px rgb(0 0 0 / 0.55);
+  --shadow-lg: 0 28px 70px -16px rgb(0 0 0 / 0.8);
+  --glass: rgb(14 31 25 / 0.78);
+  --sea-1: #0c3b4a; --sea-2: #082833;
+  --island-base: #1d3a2f;
+  --accent-text: var(--p-400);
+}
+
+/* Si l'utilisateur n'a rien choisi, on suit le réglage de son appareil. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) { color-scheme: dark; }
+}

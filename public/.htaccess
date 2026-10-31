@@ -1,0 +1,97 @@
+# ====================================================================
+# Configuration Apache / OVH Hébergement Mutualisé
+# Projet : Ndeze Natidja (Résultats des Examens Comores)
+# Ce fichier est copié automatiquement dans dist/ par « npm run build ».
+# ====================================================================
+
+# 1. Compression GZIP (fichiers 3 à 5 fois plus légers à télécharger)
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript text/javascript
+  AddOutputFilterByType DEFLATE application/json application/manifest+json
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+<IfModule mod_headers.c>
+  # ------------------------------------------------------------------
+  # 2. EN-TÊTES DE SÉCURITÉ (envoyés avec chaque page)
+  # ------------------------------------------------------------------
+  # HTTPS obligatoire pendant 1 an (le navigateur refusera le http://)
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  # Interdit au navigateur de « deviner » un type de fichier (anti-injection)
+  Header always set X-Content-Type-Options "nosniff"
+  # Interdit d'afficher le site dans un cadre d'un autre site (anti-« clickjacking »)
+  Header always set X-Frame-Options "DENY"
+  # Ne transmet pas l'adresse de la page aux autres sites
+  Header always set Referrer-Policy "no-referrer"
+  # Désactive des fonctions inutiles du téléphone (caméra, micro, position...)
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  # POLITIQUE DE CONTENU (CSP) : le navigateur n'exécute QUE le code venant
+  # de ce site. Même si un attaquant arrivait à injecter du code dans une
+  # page, il ne s'exécuterait pas. Aucune connexion vers un autre site.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+
+  # ------------------------------------------------------------------
+  # 3. CACHE
+  # ------------------------------------------------------------------
+  # Fichiers « hachés » dans /assets/ (leur nom change à chaque version) :
+  # cache d'un an, ils ne seront jamais périmés.
+  <FilesMatch "\.(css|png|jpg|jpeg|gif|ico|svg|woff2|woff)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "^(index|workbox-.*)\.js$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Fichiers qui doivent TOUJOURS être revérifiés, sinon les mises à jour de
+  # l'application n'arrivent jamais chez les utilisateurs.
+  # (Ce bloc est placé APRÈS les précédents pour avoir le dernier mot.)
+  <FilesMatch "^(sw\.js|registerSW\.js|index\.html|manifest\.webmanifest)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <Files "sw.js">
+    Header set Service-Worker-Allowed "/"
+  </Files>
+
+  # Résultats (JSON) : 5 minutes, puis copie servie pendant la revérification.
+  # Une correction du ministère devient donc visible en quelques minutes.
+  # NB : on n'ouvre PAS les données à tous les sites (pas de CORS « * »).
+  <FilesMatch "\.json$">
+    Header set Cache-Control "public, max-age=300, stale-while-revalidate=86400"
+  </FilesMatch>
+</IfModule>
+
+# 4. Types de fichiers
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType application/json .json
+  AddType image/svg+xml .svg
+</IfModule>
+
+# 5. Pas de listing de dossiers (on ne peut pas « naviguer » dans /data/)
+Options -Indexes
+
+# 6. HTTPS forcé + redirection vers index.html
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Un fichier existant est servi tel quel.
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
+
+  # Un fichier de résultats absent (ex : aucun nom en « ZZ ») répond 404,
+  # et non la page d'accueil.
+  RewriteRule \.json$ - [L]
+
+  # Dossiers (sauf la racine) interdits ; tout le reste → index.html
+  RewriteCond %{REQUEST_URI} !^/$
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [R=404,L]
+  RewriteRule ^ index.html [L]
+</IfModule>
