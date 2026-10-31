@@ -327,7 +327,7 @@ button { cursor: pointer; }
   .nav { display: none; }
   .status span { display: none; } .status { padding: 8px; }
   .main { padding-inline: max(14px, var(--safe-left)) max(14px, var(--safe-right)); padding-bottom: calc(96px + var(--safe-bottom)); }
-  .bottomnav { display: grid; grid-template-columns: repeat(3, 1fr); position: fixed; z-index: 70; inset-inline: 12px; bottom: calc(10px + var(--safe-bottom)); padding: 6px; background: var(--glass); backdrop-filter: blur(16px) saturate(1.6); -webkit-backdrop-filter: blur(16px) saturate(1.6); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow-lg); }
+  .bottomnav { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; z-index: 70; inset-inline: 12px; bottom: calc(10px + var(--safe-bottom)); padding: 6px; background: var(--glass); backdrop-filter: blur(16px) saturate(1.6); -webkit-backdrop-filter: blur(16px) saturate(1.6); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow-lg); }
   .bottomnav a { display: grid; justify-items: center; gap: 2px; padding: 8px 4px; border-radius: 16px; text-decoration: none; color: var(--text-3); font-size: 0.7rem; font-weight: 800; transition: all 0.2s; }
   .bottomnav a.is-active { color: #fff; background: linear-gradient(135deg, var(--p-600), var(--p-700)); }
   .hero__inner { padding: 30px 16px 70px; }
@@ -429,3 +429,18 @@ button { cursor: pointer; }
 /* Liens « Informations légales » de la page À propos */
 .legal-links { display: flex; flex-wrap: wrap; gap: 8px; }
 a.pill { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+
+/* Page Réglages */
+.field-label { margin: 18px 0 8px; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
+.field-label:first-of-type { margin-top: 0; }
+.palette-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.palette-btn { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface-2); font-weight: 700; font-size: 0.88rem; text-align: start; }
+.palette-btn i { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px var(--surface); }
+.palette-btn.is-active { border-color: var(--p-500); background: color-mix(in srgb, var(--p-500) 14%, var(--surface)); }
+.kv { display: grid; gap: 10px; margin-bottom: 12px; }
+.kv > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; background: var(--surface-2); border-radius: 12px; }
+.kv dt { font-weight: 700; color: var(--text-2); font-size: 0.88rem; } .kv dd { font-weight: 800; }
+.settings-reset { margin-top: 16px; display: grid; gap: 6px; justify-items: start; }
+.manager p { color: var(--text-2); margin-bottom: 14px; }
+.manager__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+a.btn { text-decoration: none; }

@@ -21,6 +21,7 @@ const ONGLETS = [
   { id: 'results', path: '/', icon: 'search', label: 'nav.results' },
   { id: 'stats', path: '/stats', icon: 'chart', label: 'nav.stats' },
   { id: 'about', path: '/about', icon: 'info', label: 'nav.about' },
+  { id: 'settings', path: '/settings', icon: 'sliders', label: 'nav.settings' },
 ]
 
 export function Header({ view, theme, onTheme, palette, onPalette, lang, onLang, sessionLabel }) {
