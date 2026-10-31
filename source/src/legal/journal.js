@@ -5,6 +5,16 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.5.1',
+    date: '31/10/2026',
+    titre: 'Bouton retour et nouvelle icône',
+    points: [
+      'Le bouton retour du téléphone referme maintenant la fiche d’un candidat au lieu de quitter l’application',
+      'Dans l’application, le bouton Partager ouvre la vraie boîte de partage du téléphone (WhatsApp, SMS…) et le bouton Imprimer / PDF est de retour',
+      'Nouvelle icône : croissant et quatre étoiles dorés sur fond vert, aux couleurs de l’archipel',
+    ],
+  },
+  {
     version: '2.5.0',
     date: '31/10/2026',
     titre: 'Console de publication et préparation du jour J',

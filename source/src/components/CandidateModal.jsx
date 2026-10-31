@@ -13,7 +13,13 @@ import Confetti from './Confetti.jsx'
 import QrCode from './QrCode.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { MENTIONS, note, titleCase } from '../lib/format.js'
+import { registerPlugin } from '@capacitor/core'
+import { Share } from '@capacitor/share'
 import { isNativeApp, verificationCode, verificationUrl } from '../lib/verify.js'
+
+// Module natif d'impression (voir android/.../ImpressionPlugin.java). Il n'existe
+// que dans l'application Android ; sur le web on utilise window.print().
+const ImpressionNative = registerPlugin('ImpressionNative')
 
 export default function CandidateModal({ candidat, session, onClose }) {
   const { t } = useI18n()
@@ -52,8 +58,13 @@ export default function CandidateModal({ candidat, session, onClose }) {
   const partager = async () => {
     const texte = t('att.shareText')
     try {
-      if (navigator.share) {
-        // Sur téléphone : ouvre le menu de partage natif (WhatsApp, SMS...).
+      if (isNativeApp()) {
+        // Application Android : le navigateur intégré n'a pas navigator.share.
+        // Le module officiel Capacitor ouvre la VRAIE boîte de partage d'Android
+        // (WhatsApp, SMS, e-mail, Telegram...).
+        await Share.share({ title: t('app.name'), text: texte, url: lien, dialogTitle: t('att.share') })
+      } else if (navigator.share) {
+        // Navigateur de téléphone : menu de partage du système.
         await navigator.share({ title: t('app.name'), text: texte, url: lien })
       } else {
         await navigator.clipboard.writeText(lien)
@@ -62,6 +73,15 @@ export default function CandidateModal({ candidat, session, onClose }) {
       }
     } catch {
       /* partage annulé par l'utilisateur : rien à faire */
+    }
+  }
+
+  const imprimer = async () => {
+    try {
+      if (isNativeApp()) await ImpressionNative.imprimer({ nom: `Attestation ${candidat.tableNumber}` })
+      else window.print()
+    } catch {
+      /* impression annulée ou indisponible : rien à faire */
     }
   }
 
@@ -91,12 +111,11 @@ export default function CandidateModal({ candidat, session, onClose }) {
 
       <div className="modal__panel">
         <div className="modal__bar no-print">
-          {/* L'impression n'existe pas dans l'application Android : bouton masqué. */}
-          {!isNativeApp() && (
-            <button type="button" className="btn btn--ghost" onClick={() => window.print()}>
-              <Icon name="print" size={16} /> {t('att.print')}
-            </button>
-          )}
+          {/* Application : impression Android (avec « Enregistrer en PDF »).
+              Web : fenêtre d'impression du navigateur. */}
+          <button type="button" className="btn btn--ghost" onClick={imprimer}>
+            <Icon name="print" size={16} /> {t('att.print')}
+          </button>
           <button type="button" className="btn btn--ghost" onClick={partager} disabled={!lien}>
             <Icon name={copie ? 'check' : 'share'} size={16} />
             {copie ? t('att.copied') : t('att.share')}
