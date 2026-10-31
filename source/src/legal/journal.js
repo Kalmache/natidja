@@ -5,6 +5,15 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.5.4',
+    date: '31/10/2026',
+    titre: 'Saisie plus confortable avec le clavier',
+    points: [
+      'Quand le clavier du téléphone s’ouvre, la barre de navigation du bas se cache au lieu de recouvrir le champ de saisie',
+      'La barre de recherche se place juste sous l’en-tête, bien visible, au lieu de disparaître derrière lui',
+    ],
+  },
+  {
     version: '2.5.3',
     date: '31/10/2026',
     titre: 'Cartes cliquables et chiffres qui flottent',

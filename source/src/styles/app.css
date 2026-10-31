@@ -512,3 +512,15 @@ button.stat { width: 100%; font: inherit; color: inherit; cursor: pointer; -webk
 @media (prefers-reduced-motion: reduce) {
   .stat, .stat::before, .columns li.is-click { animation: none !important; }
 }
+
+/* ==========================================================================
+   Clavier du téléphone ouvert
+   - la barre de navigation du bas disparaît (elle recouvrait le champ) ;
+   - quand le navigateur fait défiler pour montrer un champ, il laisse la place
+     de l'en-tête fixe (scroll-padding) ;
+   - la barre de recherche s'arrête juste sous l'en-tête (scroll-margin).
+   ========================================================================== */
+html { scroll-padding-top: calc(var(--header-h) + var(--safe-top) + 16px); }
+.search { scroll-margin-top: calc(var(--header-h) + var(--safe-top) + 14px); }
+html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-events: none; visibility: hidden; }
+.bottomnav { transition: transform 0.25s var(--ease), opacity 0.2s, visibility 0.25s; }
