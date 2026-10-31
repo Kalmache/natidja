@@ -11,6 +11,8 @@
 // de l'ONEC avec une clé privée qui ne quitte jamais le serveur.
 // ============================================================================
 
+import { SITE_URL } from '../legal/config.js'
+
 /** Renvoie un code lisible de type "7F3A-91BC". */
 export async function verificationCode(candidat) {
   const contenu = [
@@ -37,8 +39,12 @@ export async function verificationCode(candidat) {
   return `${code.slice(0, 4)}-${code.slice(4, 8)}`
 }
 
+/** Vrai quand le site tourne dans l'application Android (Capacitor). */
+export const isNativeApp = () => Boolean(window.Capacitor?.isNativePlatform?.())
+
 /** Construit le lien intégré au QR code (ouvre la page de vérification). */
 export function verificationUrl(sessionId, candidat, code) {
-  const base = window.location.href.split('#')[0]
+  // Dans l'appli, l'adresse interne n'est pas ouvrable par un tiers : on vise le site public.
+  const base = isNativeApp() ? SITE_URL : window.location.href.split('#')[0]
   return `${base}#/verif/${sessionId}/${encodeURIComponent(candidat.tableNumber)}/${code}`
 }

@@ -43,6 +43,25 @@ npm run publish-site # reconstruit le site À LA RACINE du dépôt
 3. OVH met à jour le site. Ne jamais pousser sans avoir lancé `publish-site` après un changement
    du code : sinon le site publié ne reflète pas le code source.
 
+## Application Android (APK)
+L'application emballe le même site avec **toutes les données** : elle fonctionne sans connexion.
+Projet Android dans `source/android/` (Capacitor, identifiant `fr.mmbt.natidja`).
+
+**Le plus simple : laisser GitHub la fabriquer.**
+1. Sur GitHub : onglet **Actions** > **Application Android** > **Run workflow**
+   (elle se lance aussi toute seule quand `source/` ou `data/` change sur `main`).
+2. À la fin (≈ 5 min), ouvrir l'exécution et télécharger **ndeze-natidja-android** (un zip contenant `app-debug.apk`).
+3. Envoyer l'APK sur le téléphone, l'ouvrir, autoriser « Installer des applications inconnues » si demandé.
+
+**Ou la fabriquer soi-même** (Android Studio ou SDK Android + Java 21), dans `source/` :
+```bash
+npm run android:sync                 # construit le site + données et les copie dans le projet Android
+cd android && ./gradlew assembleDebug
+# APK : source/android/app/build/outputs/apk/debug/app-debug.apk
+```
+Cet APK est signé avec une clé de **test** : il suffit pour une démonstration. Pour **Google Play**, il faudra
+un compte développeur, une clé de signature personnelle (à ne jamais publier) et un bundle signé (`bundleRelease`).
+
 ## Mettre à jour les résultats
 Remplacer les fichiers de `data/<examen>/`, puis `npm run publish-site` (recalcule les statistiques),
 puis commit et push. Les téléphones récupèrent les corrections en quelques minutes (cache de 5 min).
