@@ -22,6 +22,12 @@ export const TYPES_DEMANDE = {
 }
 
 const A_COMPLETER = (libelle) => `[${libelle} — à compléter]`
+
+/**
+ * Adresse « mailto: » complète. encodeURIComponent protège les caractères spéciaux (&, =, retours à la
+ * ligne...) : le texte saisi ne peut pas ajouter de destinataire caché (Cci:) ni modifier l'objet.
+ */
+const lienMail = (objet, corps) => `mailto:${EDITOR.email}?subject=${encodeURIComponent(objet)}&body=${encodeURIComponent(corps).replace(/%0A/g, '%0D%0A')}`
 const nettoyer = (texte, max) => String(texte ?? '').replace(/[\r\n\t]+/g, ' ').replace(/\s{2,}/g, ' ').trim().slice(0, max)
 
 /**
@@ -61,8 +67,36 @@ export function redigerDemandeAutorisation({ type = 'usage', organisme = '', nom
     `Fait le ${jour}`,
   ].join('\n')
 
-  // encodeURIComponent protège les caractères spéciaux (&, =, retours à la ligne...) : le texte saisi
-  // ne peut pas ajouter de destinataire caché (Cci:) ni modifier l'objet.
-  const lien = `mailto:${EDITOR.email}?subject=${encodeURIComponent(objet)}&body=${encodeURIComponent(corps).replace(/%0A/g, '%0D%0A')}`
-  return { objet, corps, lien }
+  return { objet, corps, lien: lienMail(objet, corps) }
+}
+
+/**
+ * E-mail « Demander des informations » de l'Espace responsable (console de publication) : s'ouvre
+ * DÉJÀ rédigé dans la messagerie. Il ne reste à la personne qu'à compléter son nom et son organisme.
+ */
+export function redigerDemandeInformations({ version = '', date = new Date() } = {}) {
+  const jour = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(date)
+  const objet = 'Demande d’informations – Espace responsable – Ndeze Natidja'
+  const corps = [
+    'Madame, Monsieur,',
+    '',
+    `Je souhaite obtenir des informations sur l’« Espace responsable » (console de publication des résultats) de l’application « Ndeze Natidja »${version ? ` (version ${nettoyer(version, 20)})` : ''}, œuvre de ${EDITOR.person} (${EDITOR.name}).`,
+    '',
+    `Organisme : ${A_COMPLETER('nom de l’organisme')}`,
+    `Demandeur : ${A_COMPLETER('vos nom, prénom et fonction')}`,
+    '',
+    'Je souhaiterais en particulier connaître :',
+    '- les modalités d’accès à l’espace et de création des comptes des responsables ;',
+    '- le fonctionnement de la publication des résultats (dépôt du fichier, validation par deux personnes, publication programmée) ;',
+    '- les mesures de sécurité et de protection des données personnelles des candidats ;',
+    '- l’hébergement, ainsi que les conditions d’une démonstration ou d’un déploiement.',
+    '',
+    'Précisions éventuelles : [à compléter]',
+    '',
+    'Je vous remercie par avance de votre réponse et vous prie d’agréer, Madame, Monsieur, l’expression de mes salutations distinguées.',
+    '',
+    A_COMPLETER('vos nom et prénom'),
+    `Fait le ${jour}`,
+  ].join('\n')
+  return { objet, corps, lien: lienMail(objet, corps) }
 }
