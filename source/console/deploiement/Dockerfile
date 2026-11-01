@@ -14,9 +14,9 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 COPY console ./console
 COPY scripts/lib ./scripts/lib
-# La règle de normalisation des noms (accents, majuscules) est la MÊME que celle du site :
-# l'import et la recherche doivent la partager, d'où ce fichier du site.
-COPY src/lib/search.js ./src/lib/search.js
+# La règle de normalisation des noms (accents, majuscules) et la lecture des dates sont les MÊMES que
+# celles du site : l'import et la recherche doivent les partager, d'où ces deux fichiers du site.
+COPY src/lib/search.js src/lib/dates.js ./src/lib/
 
 # Dossiers qui contiennent les vraies données (montés comme volumes, voir docker-compose.yml)
 RUN mkdir -p /donnees /console-data && chown -R node:node /donnees /console-data /app
