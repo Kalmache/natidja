@@ -44,3 +44,24 @@ export function ecart(taux, nationale) {
   const texte = Math.abs(d).toFixed(1).replace('.', ',')
   return d > 0 ? `+${texte}` : d < 0 ? `−${texte}` : '0,0'
 }
+
+/**
+ * Transforme une île de stats.parIle ({ nom, total, ADMIS, SECOND_GROUPE, AJOURNE, series })
+ * en « fiche » de la même forme qu'un établissement, pour réutiliser la fenêtre de détail.
+ */
+export function ficheIle(ile) {
+  const admis = ile.ADMIS ?? 0
+  const second = ile.SECOND_GROUPE ?? 0
+  return {
+    nom: ile.nom,
+    ile: ile.nom,
+    total: ile.total,
+    admis,
+    second,
+    ajournes: ile.total - admis - second,
+    taux: Math.round((admis / ile.total) * 1000) / 10,
+    series: Object.entries(ile.series ?? {})
+      .map(([serie, s]) => ({ serie, total: s.total, admis: s.ADMIS ?? 0, taux: Math.round(((s.ADMIS ?? 0) / s.total) * 1000) / 10 }))
+      .sort((a, b) => b.taux - a.taux || a.serie.localeCompare(b.serie)),
+  }
+}

@@ -29,6 +29,12 @@ export function calculerStats(candidats, session) {
     stats.parIle[c.islandId].total++
     inc(stats.parIle[c.islandId], c.status)
     if (c.series) {
+      // Réussite par série dans cette île (pour la fiche de l'île).
+      const si = ((stats.parIle[c.islandId].series ??= {})[c.series] ??= { total: 0 })
+      si.total++
+      inc(si, c.status)
+    }
+    if (c.series) {
       stats.parSerie[c.series] ??= { total: 0 }
       stats.parSerie[c.series].total++
       inc(stats.parSerie[c.series], c.status)

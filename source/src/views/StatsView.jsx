@@ -14,6 +14,7 @@ import { useI18n } from '../i18n/index.jsx'
 import { loadStats } from '../lib/data.js'
 import ClassementComparaison from '../components/ClassementComparaison.jsx'
 import MeilleursParIle from '../components/MeilleursParIle.jsx'
+import { ficheIle } from '../lib/classement.js'
 import RapportStatistiques from '../components/RapportStatistiques.jsx'
 import CentresExamen from '../components/CentresExamen.jsx'
 import EtablissementModal from '../components/EtablissementModal.jsx'
@@ -128,7 +129,7 @@ export default function StatsView({ session, classement: reglage }) {
 
         <section className="panel">
           <h2>{t('stats.map')}</h2>
-          <IslandMap islands={iles} />
+          <IslandMap islands={iles} onSelect={(id) => setEtabOuvert({ ...ficheIle(iles.find((i) => i.id === id)), _type: 'ile' })} />
         </section>
 
         <section className="panel" id="stats-ile">
@@ -158,7 +159,7 @@ export default function StatsView({ session, classement: reglage }) {
 
         {stats.centres?.length > 0 && (
           <section className="panel panel--wide" id="stats-centres">
-            <CentresExamen centres={stats.centres} onOuvrir={(c) => setEtabOuvert({ ...c, _centre: true })} />
+            <CentresExamen centres={stats.centres} onOuvrir={(c) => setEtabOuvert({ ...c, _type: 'centre' })} />
           </section>
         )}
 
@@ -173,9 +174,9 @@ export default function StatsView({ session, classement: reglage }) {
       {etabOuvert && (
         <EtablissementModal
           etablissement={etabOuvert}
-          etablissements={etabOuvert._centre ? stats.centres : stats.etablissements}
-          minCandidats={etabOuvert._centre ? 0 : rang.minCandidats}
-          centre={Boolean(etabOuvert._centre)}
+          etablissements={etabOuvert._type === 'ile' ? iles.map(ficheIle) : etabOuvert._type === 'centre' ? stats.centres : stats.etablissements}
+          minCandidats={etabOuvert._type ? 0 : rang.minCandidats}
+          type={etabOuvert._type}
           nationale={(admis / total) * 100}
           onClose={fermerEtab}
         />

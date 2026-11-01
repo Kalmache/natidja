@@ -14,7 +14,7 @@ import { classes, ecart } from '../lib/classement.js'
 const fr = (n) => Number(n).toFixed(1).replace('.', ',')
 const part = (n, total) => (total ? (n / total) * 100 : 0)
 
-export default function EtablissementModal({ etablissement: e, etablissements, minCandidats = 20, nationale, centre = false, onClose }) {
+export default function EtablissementModal({ etablissement: e, etablissements, minCandidats = 20, nationale, type = 'etablissement', onClose }) {
   const { t } = useI18n()
   const boutonFermer = useRef(null)
   const degrade = 'etab-degrade-' + useId().replace(/:/g, '') // identifiant UNIQUE du dégradé de l'anneau
@@ -74,7 +74,7 @@ export default function EtablissementModal({ etablissement: e, etablissements, m
             {rang > 0 && <span className={`medaille ${rang === 1 ? '' : rang === 2 ? 'medaille--2' : rang === 3 ? 'medaille--3' : 'medaille--n'} etab__medaille`}>{rang}</span>}
             <div>
               <h2>{e.nom}</h2>
-              <p>{[e.ile, t('rank.candidates', { n: e.total })].filter(Boolean).join(' · ')}</p>
+              <p>{[e.ile !== e.nom && e.ile, t('rank.candidates', { n: e.total })].filter(Boolean).join(' · ')}</p>
             </div>
           </header>
 
@@ -134,7 +134,7 @@ export default function EtablissementModal({ etablissement: e, etablissements, m
 
           {rang > 0 && (
             <section className="etab__bloc etab__places">
-              <p><Icon name="chart" size={16} /> {t(centre ? 'etab.rankCenter' : 'etab.rank', { n: rang, total: classes_.length })}</p>
+              <p><Icon name="chart" size={16} /> {t(type === 'centre' ? 'etab.rankCenter' : type === 'ile' ? 'etab.rankIsle' : 'etab.rank', { n: rang, total: classes_.length })}</p>
               {memeIle.length > 1 && <p><Icon name="pin" size={16} /> {t('etab.rankIsland', { n: rangIle, total: memeIle.length, ile: e.ile })}</p>}
             </section>
           )}
