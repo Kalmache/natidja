@@ -5,6 +5,16 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.7.0',
+    date: '01/11/2026',
+    titre: 'Des félicitations qui se voient',
+    points: [
+      'Quand une recherche ne donne qu’un seul résultat admis (typiquement : son propre numéro de table), la carte se dore et un 🎉 s’ajoute au badge « Admis » ; les listes de noms restent sobres',
+      'Dans l’attestation d’un admis : des ballons aux couleurs du drapeau montent en plus des confettis (plus nombreux pour une mention « Très bien »), et le liseré de la feuille passe du vert à l’or',
+      'Rien ne s’anime si l’appareil demande moins d’animations',
+    ],
+  },
+  {
     version: '3.6.0',
     date: '01/11/2026',
     titre: 'Service d’attestation : la protection réelle est prête',

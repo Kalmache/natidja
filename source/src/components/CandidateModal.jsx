@@ -10,6 +10,7 @@ import { createPortal } from 'react-dom'
 import Icon from './Icon.jsx'
 import Flag from './Flag.jsx'
 import Confetti from './Confetti.jsx'
+import Ballons from './Ballons.jsx'
 import QrCode from './QrCode.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { MENTIONS, dateNaissance, note, titleCase } from '../lib/format.js'
@@ -224,7 +225,12 @@ export default function CandidateModal({ candidat: candidatPublic, session, serv
   return createPortal(
     <div className="modal" role="dialog" aria-modal="true" aria-label={t('att.title')}>
       <div className="modal__backdrop" onClick={onClose} />
-      {identifie && statut === 'ADMIS' && <Confetti intensite={candidat.mention === 'TRES_BIEN' ? 1.6 : 1} />}
+      {identifie && statut === 'ADMIS' && (
+        <>
+          <Confetti intensite={candidat.mention === 'TRES_BIEN' ? 1.6 : 1} />
+          <Ballons nombre={candidat.mention === 'TRES_BIEN' ? 20 : 14} />
+        </>
+      )}
 
       <div className="modal__panel">
         {!identifie ? (
@@ -258,7 +264,7 @@ export default function CandidateModal({ candidat: candidatPublic, session, serv
         </div>
 
         {/* ----- La feuille elle-même (c'est elle qui s'imprime) ----- */}
-        <article className="sheet">
+        <article className={`sheet${statut === 'ADMIS' ? ' sheet--fete' : ''}`}>
           <p className="sheet__watermark" aria-hidden="true">
             {t('att.watermark')}
           </p>
