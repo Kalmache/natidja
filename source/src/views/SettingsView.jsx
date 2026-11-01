@@ -22,6 +22,23 @@ export default function SettingsView({ theme, onSetTheme, palette, onPalette, la
   const enLigne = useOnline()
   const installer = useInstallPrompt() // null si l'installation n'est pas proposée par le navigateur
 
+  /**
+   * « Actualiser les résultats » : vide seulement la copie gardée des résultats puis recharge.
+   * Utile dans l'appli installée, qui n'a ni barre d'adresse ni bouton « Actualiser » : après une
+   * publication ou une correction, on est sûr de voir la dernière version. Les préférences restent.
+   */
+  const actualiser = async () => {
+    try {
+      if ('caches' in window) {
+        const noms = await caches.keys()
+        await Promise.all(noms.filter((n) => n.includes('resultats')).map((n) => caches.delete(n)))
+      }
+    } catch {
+      /* pas de cache accessible : le rechargement suffit */
+    }
+    window.location.reload()
+  }
+
   /** Efface les préférences et la copie hors-ligne des résultats, puis recharge. */
   const reinitialiser = async () => {
     if (!window.confirm(t('settings.resetConfirm'))) return
@@ -90,6 +107,10 @@ export default function SettingsView({ theme, onSetTheme, palette, onPalette, la
             </button>
           )}
           <div className="settings-reset">
+            <button type="button" className="btn btn--primary" onClick={actualiser}>
+              <Icon name="refresh" size={16} /> {t('settings.refresh')}
+            </button>
+            <p className="muted small">{t('settings.refreshHint')}</p>
             <button type="button" className="btn" onClick={reinitialiser}>
               <Icon name="refresh" size={16} /> {t('settings.reset')}
             </button>

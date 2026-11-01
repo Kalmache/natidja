@@ -151,3 +151,9 @@ Une **session** = un examen + une année + une édition (**session principale** 
 - Les années précédentes restent consultables : l'application propose alors trois listes — *Examen*, *Année*, *Session* — au lieu des onglets.
 
 **Identifiants** : `bac-2027` (session principale), `bac-2027-rattrapage` (rattrapage), `bepc-2027`… Une session ne peut pas être créée deux fois.
+
+## 9. Ce que voit le public, et le classement des établissements
+
+- Le site n'affiche **aucun nom** tant que personne n'a cherché : l'accueil montre des statistiques et le classement des meilleurs établissements. Détail et limites : [`CONFIDENTIALITE.md`](CONFIDENTIALITE.md).
+- Le classement se calcule à partir de la colonne **Établissement** du fichier Excel. **Écrivez toujours le même nom pour le même établissement** (même orthographe) ; les candidats libres (« Candidat Libre ») sont exclus du classement.
+- Il se règle dans `data/exams.json` (clé `classement` : `visible`, `top`, `topStatistiques`, `minCandidats`).
