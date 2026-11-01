@@ -404,7 +404,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
                 <p className="results__count">{t('results.count', { n: liste.length })}</p>
                 <div className="grid">
                   {liste.slice(0, visibles).map((c, i) => (
-                    <CandidateCard key={c.id} candidat={c} index={i} onOpen={ouvrirFiche} />
+                    <CandidateCard key={c.id} candidat={c} index={i} onOpen={ouvrirFiche} fete={liste.length === 1} />
                   ))}
                 </div>
                 {liste.length > visibles && (
@@ -421,7 +421,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
       )}
 
       {selection && (
-        <CandidateModal candidat={selection} session={session} onClose={fermerFiche} />
+        <CandidateModal candidat={selection} session={session} service={config.attestationService?.url} onClose={fermerFiche} />
       )}
       {etabOuvert && (
         <EtablissementModal

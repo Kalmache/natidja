@@ -13,14 +13,14 @@ import { titleCase } from '../lib/format.js'
 // Une icône par résultat : lisible même sans lire le texte.
 const ICONE = { ADMIS: 'check', SECOND_GROUPE: 'info', AJOURNE: 'close' }
 
-export default function CandidateCard({ candidat, onOpen, index = 0 }) {
+export default function CandidateCard({ candidat, onOpen, index = 0, fete = false }) {
   const { t } = useI18n()
   const statut = candidat.status
 
   return (
     <button
       type="button"
-      className={`card card--${statut}`}
+      className={`card card--${statut}${fete && statut === 'ADMIS' ? ' card--fete' : ''}`}
       onClick={() => onOpen(candidat)}
       // Les cartes apparaissent en cascade (léger décalage), limité à 12.
       style={{ '--delay': `${Math.min(index, 12) * 35}ms` }}
@@ -33,6 +33,7 @@ export default function CandidateCard({ candidat, onOpen, index = 0 }) {
           <span className={`badge badge--${statut}`}>
             <i aria-hidden="true" />
             {t(`status.${statut}`)}
+            {fete && statut === 'ADMIS' && <b className="badge__fete" aria-hidden="true">🎉</b>}
           </span>
         </div>
         <span className={`card__icon card__icon--${statut}`} aria-hidden="true">

@@ -197,6 +197,7 @@ export default {
   'id.submit': 'Afficher mon attestation',
   'id.error': 'Ces informations ne correspondent pas à ce candidat. Vérifiez et réessayez.',
   'id.locked': 'Trop d’essais. Patientez quelques secondes.',
+  'id.unavailable': 'Le service de vérification est momentanément indisponible. Votre résultat reste consultable ; réessayez dans quelques minutes pour l’attestation.',
   'att.admisCarte': 'Admis(e)',
   'att.shareCardBtn': 'Partager ma réussite',
   'att.shareCard': 'Je suis admis(e) ! Mon résultat sur Ndeze Natidja.',

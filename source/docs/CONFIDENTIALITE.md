@@ -64,3 +64,6 @@ Réglables sans toucher au code, dans `data/exams.json` :
 **Précautions de ce classement** : le taux est calculé sur les candidats de l'établissement ; les **candidats libres sont exclus** (ils ne sont rattachés à aucun établissement et pourraient servir à faire monter artificiellement un taux). Les données qui l'alimentent passent par la console : dépôt par une personne, approbation par une autre, journal d'audit.
 
 **À décider avec le ministère** : afficher ou non un classement ; afficher seulement les meilleurs établissements ou tous ; afficher ou non la mention publiquement ; exiger ou non un code sur la convocation.
+
+---
+**Mise à jour (1er nov. 2026)** — la protection réelle décrite au §3 est maintenant **écrite et testée** (service d'attestation, séparation des données). Elle reste **désactivée** tant qu'elle n'est pas hébergée : voir `docs/SERVICE-ATTESTATION.md`.

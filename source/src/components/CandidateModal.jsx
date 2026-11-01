@@ -5,11 +5,12 @@
 // vérification, et des boutons Imprimer / Partager. Si le candidat est admis,
 // des confettis célèbrent la réussite.
 // ============================================================================
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Icon from './Icon.jsx'
 import Flag from './Flag.jsx'
 import Confetti from './Confetti.jsx'
+import Ballons from './Ballons.jsx'
 import QrCode from './QrCode.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { MENTIONS, dateNaissance, note, titleCase } from '../lib/format.js'
@@ -19,6 +20,7 @@ import { Directory, Filesystem } from '@capacitor/filesystem'
 import { creerCarteReussite } from '../lib/carteReussite.js'
 import { isNativeApp, verificationCode, verificationUrl } from '../lib/verify.js'
 import { identiteCorrespond } from '../lib/identite.js'
+import { demanderAttestation } from '../lib/attestationService.js'
 
 // Module natif d'impression (voir android/.../ImpressionPlugin.java). Il n'existe
 // que dans l'application Android ; sur le web on utilise window.print().
@@ -33,17 +35,35 @@ const ImpressionNative = registerPlugin('ImpressionNative')
  * d'AFFICHAGE : les fichiers publiés contiennent encore ces détails. La protection réelle suppose
  * que la comparaison se fasse sur un serveur (voir docs/CONFIDENTIALITE.md).
  */
-function VerificationIdentite({ candidat, onValide, onClose }) {
+function VerificationIdentite({ candidat, session, service, onValide, onClose }) {
   const { t } = useI18n()
   const [numero, setNumero] = useState('')
   const [naissance, setNaissance] = useState('')
   const [erreur, setErreur] = useState(false)
   const [essais, setEssais] = useState(0)
   const [bloque, setBloque] = useState(false)
+  const [message, setMessage] = useState('') // 'locked' | 'unavailable' | ''
+  const [enCours, setEnCours] = useState(false)
 
-  const verifier = (e) => {
+  const verifier = async (e) => {
     e.preventDefault()
-    if (bloque) return
+    if (bloque || enCours) return
+    setMessage('')
+    if (service) {
+      // Protection RÉELLE : c'est le serveur qui compare ; la moyenne et la date n'existent pas dans les fichiers publics.
+      setEnCours(true)
+      const r = await demanderAttestation(service, session.id, numero, naissance)
+      setEnCours(false)
+      if (r.etat === 'ok') return onValide(r.details)
+      if (r.etat === 'indisponible') return setMessage('unavailable')
+      if (r.etat === 'limite') {
+        setBloque(true)
+        setMessage('locked')
+        setTimeout(() => setBloque(false), Math.min(r.attenteS, 60) * 1000)
+        return
+      }
+      return setErreur(true)
+    }
     if (identiteCorrespond(candidat, numero, naissance)) return onValide()
     setErreur(true)
     if (essais + 1 >= 5) {
@@ -70,14 +90,17 @@ function VerificationIdentite({ candidat, onValide, onClose }) {
         <span>{t('id.birth')}</span>
         <input type="text" inputMode="numeric" value={naissance} onChange={(e) => setNaissance(e.target.value)} placeholder={t('id.birthPh')} autoComplete="off" required />
       </label>
-      {erreur && <p className="gate__error" role="alert">{bloque ? t('id.locked') : t('id.error')}</p>}
-      <button type="submit" className="btn btn--primary" disabled={bloque}>{t('id.submit')}</button>
+      {message === 'unavailable' && <p className="gate__error" role="alert">{t('id.unavailable')}</p>}
+      {message !== 'unavailable' && erreur && <p className="gate__error" role="alert">{bloque ? t('id.locked') : t('id.error')}</p>}
+      <button type="submit" className="btn btn--primary" disabled={bloque || enCours}>{t('id.submit')}</button>
     </form>
   )
 }
 
-export default function CandidateModal({ candidat, session, onClose }) {
+export default function CandidateModal({ candidat: candidatPublic, session, service, onClose }) {
   const { t } = useI18n()
+  const [sensibles, setSensibles] = useState(null) // détails sensibles reçus du service d'attestation (s'il est activé)
+  const candidat = useMemo(() => (sensibles ? { ...candidatPublic, ...sensibles } : candidatPublic), [candidatPublic, sensibles])
   const [code, setCode] = useState('')
   const [copie, setCopie] = useState(false)
   const boutonFermer = useRef(null)
@@ -202,11 +225,16 @@ export default function CandidateModal({ candidat, session, onClose }) {
   return createPortal(
     <div className="modal" role="dialog" aria-modal="true" aria-label={t('att.title')}>
       <div className="modal__backdrop" onClick={onClose} />
-      {identifie && statut === 'ADMIS' && <Confetti intensite={candidat.mention === 'TRES_BIEN' ? 1.6 : 1} />}
+      {identifie && statut === 'ADMIS' && (
+        <>
+          <Confetti intensite={candidat.mention === 'TRES_BIEN' ? 1.6 : 1} />
+          <Ballons nombre={candidat.mention === 'TRES_BIEN' ? 20 : 14} />
+        </>
+      )}
 
       <div className="modal__panel">
         {!identifie ? (
-          <VerificationIdentite candidat={candidat} onValide={() => setIdentifie(true)} onClose={onClose} />
+          <VerificationIdentite candidat={candidat} session={session} service={service} onValide={(d) => { if (d) setSensibles(d); setIdentifie(true) }} onClose={onClose} />
         ) : (
         <>
         <div className="modal__bar no-print">
@@ -236,7 +264,7 @@ export default function CandidateModal({ candidat, session, onClose }) {
         </div>
 
         {/* ----- La feuille elle-même (c'est elle qui s'imprime) ----- */}
-        <article className="sheet">
+        <article className={`sheet${statut === 'ADMIS' ? ' sheet--fete' : ''}`}>
           <p className="sheet__watermark" aria-hidden="true">
             {t('att.watermark')}
           </p>
