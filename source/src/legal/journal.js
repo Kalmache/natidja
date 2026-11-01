@@ -5,6 +5,15 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.12.0',
+    date: '01/11/2026',
+    titre: 'L’accueil retrouve l’effet de la page Découvrir',
+    points: [
+      'La bande d’ouverture sombre pleine largeur revient sur l’accueil (titre en dégradé, barre de recherche qui rayonne doucement, chiffres clés lumineux, trois points forts), cette fois aux couleurs de la palette choisie',
+      'Le podium des meilleurs établissements (le premier, le deuxième et le troisième) reste affiché sous les chiffres tant que le classement est visible (exams.json, champ visible)',
+    ],
+  },
+  {
     version: '3.11.0',
     date: '01/11/2026',
     titre: 'Retour à l’ancien accueil',
