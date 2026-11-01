@@ -22,7 +22,7 @@ function Tableau({ entetes, lignes }) {
   )
 }
 
-export default function RapportStatistiques({ stats, session }) {
+export default function RapportStatistiques({ stats, session, avecClassement = true }) {
   const { t } = useI18n()
   const total = stats.total
   const admis = stats.parStatut.ADMIS ?? 0
@@ -74,7 +74,7 @@ export default function RapportStatistiques({ stats, session }) {
         </>
       )}
 
-      {stats.etablissements?.length > 0 && (
+      {avecClassement && stats.etablissements?.length > 0 && (
         <>
           <h2>{t('rapport.etablissements')}</h2>
           <Tableau entetes={entetesGroupe} lignes={stats.etablissements.map(ligneGroupe)} />

@@ -7,7 +7,7 @@
 // Tout est calculé dans le téléphone à partir des statistiques déjà publiées (aucun travail serveur).
 // Précaution : un très petit groupe donne des taux trompeurs (7 sur 8 = 87,5 %) → avertissement.
 // ============================================================================
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useI18n } from '../i18n/index.jsx'
 import { comparer } from '../lib/classement.js'
 
@@ -30,13 +30,30 @@ function Ligne({ libelle, a, b, pa, pb, texteA, texteB }) {
   )
 }
 
-export default function Comparateur({ groupes, minCandidats = 20 }) {
+export default function Comparateur({ groupes, minCandidats = 20, initial }) {
   const { t } = useI18n()
   // groupes : { cle: { titre, liste: [fiches] } } — seuls les types qui ont au moins 2 éléments sont proposés.
   const types = useMemo(() => Object.entries(groupes).filter(([, g]) => g.liste.length >= 2), [groupes])
   const [cle, setCle] = useState(types[0]?.[0])
   const [iA, setIA] = useState(0)
   const [iB, setIB] = useState(1)
+  const selectB = useRef(null)
+
+  // Arrivée depuis la fiche d'un établissement (« Comparer avec… ») : le premier élément est choisi,
+  // le second est le plus proche en taux de réussite (un duel intéressant dès l'ouverture).
+  useEffect(() => {
+    if (!initial) return
+    const t0 = types.find(([k]) => k === initial.type)
+    if (!t0) return
+    const l = t0[1].liste
+    const a = l.findIndex((f) => f.nom === initial.nom)
+    if (a < 0) return
+    let b = -1
+    l.forEach((f, i) => { if (i !== a && (b < 0 || Math.abs(f.taux - l[a].taux) < Math.abs(l[b].taux - l[a].taux))) b = i })
+    setCle(initial.type); setIA(a); setIB(b < 0 ? 0 : b)
+    setTimeout(() => selectB.current?.focus({ preventScroll: true }), 400)
+  }, [initial?.n]) // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!types.length) return null
 
   const type = types.find(([k]) => k === cle) ?? types[0]
@@ -77,7 +94,7 @@ export default function Comparateur({ groupes, minCandidats = 20 }) {
         <span className="cmp__vs" aria-hidden="true">VS</span>
         <label>
           <span className="cmp__pastille cmp__pastille--b" aria-hidden="true" />
-          <select className="select" value={iB} onChange={(e) => setIB(Number(e.target.value))} aria-label={t('cmp.second')}>
+          <select ref={selectB} className="select" value={iB} onChange={(e) => setIB(Number(e.target.value))} aria-label={t('cmp.second')}>
             {liste.map((f, i) => <option key={f.nom} value={i}>{f.nom}</option>)}
           </select>
         </label>

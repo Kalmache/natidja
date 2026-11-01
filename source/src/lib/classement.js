@@ -94,3 +94,43 @@ export function comparer(a, b) {
   const ecartPoints = Math.round((a.taux - b.taux) * 10) / 10
   return { ecartPoints, devant: ecartPoints === 0 ? null : ecartPoints > 0 ? 'a' : 'b' }
 }
+
+const un = (n) => Math.round(n * 10) / 10
+const ORDRE_MENTIONS = ['PASSABLE', 'ASSEZ_BIEN', 'BIEN', 'TRES_BIEN']
+
+/**
+ * « Où se situe cet établissement (ou ce centre) ? » : son taux comparé à la moyenne de son île et à
+ * la moyenne nationale, plus sa place dans le classement. `liste` = les éléments du même type ;
+ * `ilesFiches` = les îles sous forme de fiches (voir ficheIle) ; `nationale` = taux national en %.
+ */
+export function positionnement(fiche, ilesFiches, nationale, liste, minCandidats = 20) {
+  const ile = (ilesFiches ?? []).find((i) => i.nom === fiche.ile)
+  const rangs = classes(liste, minCandidats).sort((a, b) => b.taux - a.taux || b.total - a.total)
+  const rang = rangs.findIndex((x) => x.nom === fiche.nom) + 1
+  return {
+    taux: fiche.taux,
+    tauxIle: ile ? ile.taux : null,
+    tauxNational: nationale,
+    ecartNational: un(fiche.taux - nationale),
+    ecartIle: ile ? un(fiche.taux - ile.taux) : null,
+    rang: rang || null,
+    total: rangs.length,
+    petit: fiche.total < minCandidats,
+  }
+}
+
+/**
+ * Lit un tableau de mentions { PASSABLE: n, … } : total, mention la plus fréquente (et sa part en %),
+ * part cumulée de « Bien » et « Très bien ». Sert à écrire la phrase sous le graphique.
+ */
+export function analyseMentions(valeurs) {
+  const total = ORDRE_MENTIONS.reduce((s, m) => s + (valeurs?.[m] ?? 0), 0)
+  if (!total) return null
+  const plusFrequente = ORDRE_MENTIONS.reduce((a, m) => ((valeurs[m] ?? 0) > (valeurs[a] ?? 0) ? m : a), ORDRE_MENTIONS[0])
+  return {
+    total,
+    plusFrequente,
+    partPlusFrequente: un(((valeurs[plusFrequente] ?? 0) / total) * 100),
+    partHautes: un((((valeurs.BIEN ?? 0) + (valeurs.TRES_BIEN ?? 0)) / total) * 100),
+  }
+}

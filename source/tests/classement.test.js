@@ -70,3 +70,22 @@ describe('comparer deux fiches', () => {
     expect([f.nom, f.taux, f.ajournes, f.mentions.BIEN, f.series[0].taux]).toEqual(['BAC 2025', 45, 80, 10, 40])
   })
 })
+
+describe('positionnement (« Me situer ») et phrase des mentions', () => {
+  it('compare un établissement à la moyenne de son île et à la moyenne nationale, avec sa place', async () => {
+    const { positionnement } = await import('../src/lib/classement.js')
+    const iles = [{ nom: 'Ngazidja', taux: 47 }, { nom: 'Mwali', taux: 47.2 }]
+    const liste = [e('A', 'Ngazidja', 142, 54.9), e('B', 'Mwali', 104, 52.9), e('Petit', 'Mwali', 8, 87.5)]
+    const p = positionnement(liste[0], iles, 45.7, liste, 20)
+    expect([p.ecartNational, p.ecartIle, p.rang, p.total, p.petit]).toEqual([9.2, 7.9, 1, 2, false])
+    // un établissement trop petit n'est pas classé et le signale
+    const q = positionnement(liste[2], iles, 45.7, liste, 20)
+    expect([q.rang, q.petit]).toEqual([null, true])
+  })
+  it('analyse les mentions : la plus fréquente et la part de Bien + Très bien', async () => {
+    const { analyseMentions } = await import('../src/lib/classement.js')
+    const a = analyseMentions({ PASSABLE: 50, ASSEZ_BIEN: 25, BIEN: 15, TRES_BIEN: 10 })
+    expect([a.total, a.plusFrequente, a.partPlusFrequente, a.partHautes]).toEqual([100, 'PASSABLE', 50, 25])
+    expect(analyseMentions({})).toBeNull()
+  })
+})

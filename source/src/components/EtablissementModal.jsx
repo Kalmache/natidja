@@ -14,7 +14,7 @@ import { classes, ecart } from '../lib/classement.js'
 const fr = (n) => Number(n).toFixed(1).replace('.', ',')
 const part = (n, total) => (total ? (n / total) * 100 : 0)
 
-export default function EtablissementModal({ etablissement: e, etablissements, minCandidats = 20, nationale, type = 'etablissement', onClose }) {
+export default function EtablissementModal({ etablissement: e, etablissements, minCandidats = 20, nationale, type = 'etablissement', afficherRang = true, onClose, onComparer, onSituer }) {
   const { t } = useI18n()
   const boutonFermer = useRef(null)
   const degrade = 'etab-degrade-' + useId().replace(/:/g, '') // identifiant UNIQUE du dégradé de l'anneau
@@ -71,7 +71,7 @@ export default function EtablissementModal({ etablissement: e, etablissements, m
           </button>
 
           <header className="etab__head">
-            {rang > 0 && <span className={`medaille ${rang === 1 ? '' : rang === 2 ? 'medaille--2' : rang === 3 ? 'medaille--3' : 'medaille--n'} etab__medaille`}>{rang}</span>}
+            {afficherRang && rang > 0 && <span className={`medaille ${rang === 1 ? '' : rang === 2 ? 'medaille--2' : rang === 3 ? 'medaille--3' : 'medaille--n'} etab__medaille`}>{rang}</span>}
             <div>
               <h2>{e.nom}</h2>
               <p>{[e.ile !== e.nom && e.ile, t('rank.candidates', { n: e.total })].filter(Boolean).join(' · ')}</p>
@@ -132,11 +132,18 @@ export default function EtablissementModal({ etablissement: e, etablissements, m
             </section>
           )}
 
-          {rang > 0 && (
+          {afficherRang && rang > 0 && (
             <section className="etab__bloc etab__places">
               <p><Icon name="chart" size={16} /> {t(type === 'centre' ? 'etab.rankCenter' : type === 'ile' ? 'etab.rankIsle' : 'etab.rank', { n: rang, total: classes_.length })}</p>
               {memeIle.length > 1 && <p><Icon name="pin" size={16} /> {t('etab.rankIsland', { n: rangIle, total: memeIle.length, ile: e.ile })}</p>}
             </section>
+          )}
+
+          {(onComparer || onSituer) && (
+            <div className="etab__actions">
+              {onComparer && <button type="button" className="btn btn--primary" onClick={() => { fermer(); setTimeout(() => onComparer(e), 120) }}>⚖️ {t('etab.compare')}</button>}
+              {onSituer && type !== 'ile' && <button type="button" className="btn btn--ghost" onClick={() => { fermer(); setTimeout(() => onSituer(e), 120) }}>📍 {t('etab.locate')}</button>}
+            </div>
           )}
 
           <p className="etab__note">{t('etab.note')}</p>

@@ -307,6 +307,8 @@ export default function ResultsView({ config, session, onSession, island, onIsla
                       {i.id === 'all' ? t('filter.allIslands') : i.name.split(' (')[0]}
                     </button>
                   ))}
+                  {/* Mayotte : présente pour le symbole, grisée (pas de résultats dans cette session) */}
+                  <button type="button" className="pill pill--grise" disabled title={`${t('map.mayotte')} : ${t('map.mayotteNo')}`}>{t('map.mayotte')}</button>
                   <button type="button" className="pill pill--nav" onClick={() => changerIle(1)} aria-label={t('filter.next')}>
                     <Icon name="chevronR" size={16} className="flip-rtl" />
                   </button>

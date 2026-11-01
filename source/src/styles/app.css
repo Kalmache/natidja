@@ -77,8 +77,8 @@ button { cursor: pointer; }
 .header { position: sticky; top: 0; z-index: 60; padding-top: var(--safe-top); padding-inline: var(--safe-left) var(--safe-right); background: var(--glass); backdrop-filter: saturate(1.6) blur(14px); -webkit-backdrop-filter: saturate(1.6) blur(14px); border-bottom: 1px solid var(--border); }
 .header__inner { max-width: var(--maxw); margin: 0 auto; height: var(--header-h); padding: 0 20px; display: flex; align-items: center; gap: 20px; }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
-.brand__mark { width: 46px; height: 32px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgb(0 0 0 / 0.25); display: block; }
-.brand__mark .flag { display: block; width: 100%; height: 100%; }
+.brand__mark { width: 46px; height: 32px; display: block; }
+.brand__mark .fw { width: 100%; height: 100%; filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.3)); }
 .brand__text { display: flex; flex-direction: column; line-height: 1.15; }
 .brand__text strong { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.02em; }
 .brand__text small { font-size: 0.72rem; font-weight: 700; color: var(--accent-text); }
@@ -291,7 +291,7 @@ button { cursor: pointer; }
 .splash__aurora { position: absolute; inset: -20%; background: conic-gradient(from 0deg at 50% 50%, transparent, color-mix(in srgb, var(--flag-yellow) 20%, transparent), transparent 30%, color-mix(in srgb, var(--flag-blue) 28%, transparent), transparent 60%, color-mix(in srgb, var(--p-400) 25%, transparent), transparent); filter: blur(60px); animation: spin 14s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .splash__content { position: relative; display: grid; justify-items: center; gap: 14px; padding: 24px; text-align: center; }
-.splash__flag { width: min(280px, 64vw); height: auto; filter: drop-shadow(0 18px 30px rgb(0 0 0 / 0.45)); animation: flagIn 1s var(--ease) both; }
+.splash__flag { width: min(280px, 64vw); height: calc(min(280px, 64vw) * 0.6); filter: drop-shadow(0 18px 30px rgb(0 0 0 / 0.45)); animation: flagIn 1s var(--ease) both; margin-bottom: 40px; /* de l'air entre le drapeau (et son mât) et le titre : rien ne touche l'écriture */ }
 @keyframes flagIn { from { opacity: 0; transform: translateY(24px) scale(0.9) rotate(-2deg); } }
 .flag--animated .flag__band { transform: translateX(-320px); animation: bandIn 0.75s var(--ease) forwards; animation-delay: calc(0.15s + var(--i) * 0.11s); }
 @keyframes bandIn { to { transform: translateX(0); } }
@@ -819,3 +819,72 @@ html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-event
 .cmp__val { font-size: 0.82rem; font-weight: 800; font-variant-numeric: tabular-nums; } .cmp__val--a { text-align: end; color: #047857; } .cmp__val--b { text-align: start; color: #b45309; }
 .cmp__duo { display: grid; gap: 4px; } .cmp__barre { display: block; height: 8px; border-radius: 99px; transition: width 0.6s var(--ease, ease); }
 @media (max-width: 560px) { .cmp__choix { grid-template-columns: 1fr; } .cmp__vs { justify-self: center; padding: 0; } }
+
+/* ---- Mentions interactives ---- */
+.mnt h2 { font-size: 1.15rem; }
+.mnt__iles { margin-top: 12px; }
+.mnt__mode { display: flex; margin-top: 10px; padding: 3px; gap: 3px; border-radius: 99px; background: var(--surface-2); max-width: 340px; }
+.mnt__mode button { flex: 1; border: 0; background: transparent; padding: 8px 10px; border-radius: 99px; font-weight: 800; font-size: 0.82rem; color: var(--text-3); transition: all 0.2s; }
+.mnt__mode button.is-on { background: var(--surface); color: var(--accent-text); box-shadow: var(--shadow-sm); }
+.mnt__bars { list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(8px, 2.4vw, 18px); }
+.mnt__bar { width: 100%; display: grid; grid-template-rows: auto 170px auto; gap: 6px; justify-items: center; border: 0; background: transparent; padding: 4px 0; border-radius: 14px; cursor: pointer; transition: transform 0.2s, background 0.2s; }
+.mnt__bar:hover { background: color-mix(in srgb, var(--p-500) 8%, transparent); transform: translateY(-2px); }
+.mnt__bar:active { transform: scale(0.97); }
+.mnt__bar:focus-visible { outline: 3px solid var(--p-500); outline-offset: 2px; }
+.mnt__bar strong { font-size: 0.95rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.mnt__colonne { width: 100%; display: flex; align-items: flex-end; height: 170px; }
+.mnt__colonne i { display: block; width: 100%; border-radius: 12px 12px 4px 4px; background: linear-gradient(180deg, #34d399, #047857); transition: height 0.7s var(--ease, ease); }
+.mnt__bar em { font-style: normal; font-size: 0.78rem; font-weight: 800; color: var(--text-2); }
+.mnt__phrase { margin-top: 16px; padding: 12px 14px; border-radius: 14px; background: color-mix(in srgb, var(--p-500) 10%, var(--surface)); border: 1px solid color-mix(in srgb, var(--p-500) 25%, transparent); font-weight: 700; font-size: 0.9rem; line-height: 1.5; }
+.mnt__top { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.mnt__top li { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; font-size: 0.9rem; } .mnt__top b { color: var(--accent-text); }
+
+/* ---- Me situer ---- */
+.situ h2 { font-size: 1.15rem; }
+.situ__types { margin-top: 12px; }
+.situ__choix { margin-top: 12px; max-width: none; }
+.situ__res { margin-top: 16px; display: grid; gap: 6px; }
+.situ__ligne { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; font-weight: 800; font-size: 0.9rem; } .situ__ligne b { font-variant-numeric: tabular-nums; }
+.situ__piste { display: block; height: 14px; border-radius: 99px; background: var(--surface-2); overflow: hidden; } .situ__piste i { display: block; height: 100%; border-radius: 99px; transition: width 0.7s var(--ease, ease); }
+.situ__verdict { list-style: none; padding: 14px; margin: 14px 0 0; display: grid; gap: 7px; border-radius: 16px; background: color-mix(in srgb, var(--p-500) 10%, var(--surface)); border: 1px solid color-mix(in srgb, var(--p-500) 25%, transparent); font-weight: 800; font-size: 0.9rem; line-height: 1.4; }
+.situ__verdict .is-plus { color: var(--ok-strong); } .situ__verdict .is-moins { color: var(--warn-strong); }
+.situ__duel { justify-self: stretch; margin-top: 12px; justify-content: center; }
+
+/* ---- Boutons de la fiche (comparer / me situer) ---- */
+.etab__actions { display: grid; gap: 8px; }
+.etab__actions .btn { justify-content: center; width: 100%; }
+
+/* ---- Pied de page : ne plus être caché derrière la barre de navigation du bas (téléphone) ---- */
+@media (max-width: 820px) { .footer { padding-bottom: calc(96px + var(--safe-bottom)); } }
+
+/* ---- Drapeau qui flotte au vent (voir FlagWave dans Flag.jsx) ---- */
+.fw { position: relative; display: grid; grid-template-columns: repeat(var(--n), 1fr); aspect-ratio: 5 / 3; }
+.fw__t {
+  display: block; position: relative; will-change: transform;
+  width: calc(100% + 0.7px); /* léger recouvrement : pas de fine ligne entre deux bandes */
+  background-image: var(--fw-img); background-repeat: no-repeat;
+  background-size: calc((100% - 0.7px) * var(--n)) 100%;
+  background-position: calc(var(--i) / (var(--n) - 1) * 100%) 0;
+  /* amplitude : nulle au mât (i = 0), maximale au bord libre */
+  --a: calc(var(--i) / (var(--n) - 1) * var(--fw-amp));
+  animation: fw-vent var(--fw-t, 2.4s) ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -0.085s); /* décalage entre voisines = onde qui voyage */
+}
+/* ombre / lumière qui suivent l'onde (même rythme que la bande) */
+.fw__t::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: #000; opacity: 0; animation: fw-lumiere var(--fw-t, 2.4s) ease-in-out infinite alternate; animation-delay: inherit; }
+@keyframes fw-vent { from { transform: translateY(calc(var(--a) * -1)); } to { transform: translateY(var(--a)); } }
+@keyframes fw-lumiere { from { opacity: 0; } to { opacity: 0.26; } }
+/* Mât à gauche (écran d'ouverture) */
+.fw--mat::before { content: ''; position: absolute; z-index: 2; top: -9%; bottom: -20%; inset-inline-start: -9px; width: 7px; border-radius: 6px; background: linear-gradient(90deg, #e8eee9, #8a9a92 55%, #5f6f67); box-shadow: 0 6px 14px rgb(0 0 0 / 0.35); }
+.fw--mat::after { content: ''; position: absolute; z-index: 3; top: -13%; inset-inline-start: -11px; width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff3b0, #f0b41a 60%, #b27f08); }
+@media (prefers-reduced-motion: reduce) { .fw__t, .fw__t::after { animation: none; } .fw__t::after { opacity: 0.1; } }
+
+/* ---- Mayotte : présente pour le symbole, mais grisée (pas de résultats, pas de clic) ---- */
+.map__island--grise { cursor: default; }
+.map__island--grise path, .map__island--grise ellipse { fill: rgb(176 190 184 / 0.55); stroke: rgb(255 255 255 / 0.75); stroke-width: 2; stroke-dasharray: 5 4; filter: none; transform: none; }
+.map__island--grise:hover path { transform: none; filter: none; }
+.map__island--grise text { fill: rgb(235 242 238 / 0.9); stroke: rgb(0 0 0 / 0.25); font-size: 11px; }
+.map__island--grise .map__name { font-size: 11px; font-weight: 700; }
+.pill--grise, .pill--grise:hover { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+.ile-grise { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--border); color: var(--text-3); font-weight: 700; font-size: 0.88rem; opacity: 0.75; filter: grayscale(1); }
+.ile-grise em { font-style: normal; font-weight: 600; font-size: 0.8rem; }
