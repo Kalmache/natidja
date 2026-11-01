@@ -7,6 +7,7 @@
 //   node console/utilisateurs.mjs creer --nom amina --roles preparateur
 //   node console/utilisateurs.mjs creer --nom moussa --roles approbateur,admin
 //   node console/utilisateurs.mjs lister
+//   node console/utilisateurs.mjs affichage --nom amina --texte "Directeur Kabir Illiassa"   (titre lisible, affichage seul)
 //   node console/utilisateurs.mjs reinitialiser --nom amina     (mot de passe + double authentification)
 //   node console/utilisateurs.mjs desactiver --nom amina        (ou : activer)
 //
@@ -24,8 +25,29 @@ import { lireArguments } from '../scripts/lib/cli.mjs'
 
 export const ROLES = ['preparateur', 'approbateur', 'admin']
 
+/**
+ * « Nom d'affichage » : le titre lisible montré dans la console (ex. « Directeur Kabir Illiassa »).
+ * Il ne sert QU'À l'affichage : l'identifiant de connexion (preparateur1…) reste la référence
+ * technique (règle des deux personnes, journal d'audit). Texte vide = on retire l'affichage.
+ */
+export function nettoyerAffichage(texte) {
+  const t = String(texte ?? '').replace(/\s+/g, ' ').trim()
+  if (!t) return ''
+  if (t.length < 2 || t.length > 60) throw new Error('Le nom d’affichage doit faire de 2 à 60 caractères.')
+  if (/[<>"\u0000-\u001f]/.test(t)) throw new Error('Le nom d’affichage ne peut pas contenir de caractères spéciaux (< > ").')
+  return t
+}
+
+export function definirAffichage(stockage, nom, texte) {
+  const u = stockage.trouver(nom)
+  if (!u) throw new Error(`Compte « ${nom} » introuvable.`)
+  u.affichage = nettoyerAffichage(texte) || undefined
+  stockage.sauver(u)
+  return u
+}
+
 /** Crée un compte et renvoie ce qu'il faut remettre à la personne (UNE seule fois). */
-export async function creerUtilisateur(stockage, { nom, roles }) {
+export async function creerUtilisateur(stockage, { nom, roles, affichage }) {
   nom = normaliserNom(nom)
   if (!NOM_VALIDE.test(nom)) throw new Error('Identifiant invalide : 3 à 40 caractères (lettres, chiffres, point, tiret).')
   if (stockage.trouver(nom)) throw new Error(`L'identifiant « ${nom} » existe déjà.`)
@@ -33,7 +55,7 @@ export async function creerUtilisateur(stockage, { nom, roles }) {
   if (!roles.length || roles.some((r) => !ROLES.includes(r))) throw new Error(`Rôles valides : ${ROLES.join(', ')}.`)
   const motDePasse = motDePasseTemporaire()
   const secret = nouveauSecretTotp()
-  const u = { id: randomUUID(), nom, roles, hash: await hacherMotDePasse(motDePasse), totpSecret: secret, totpDernierCompteur: -1, doitChangerMdp: true, actif: true, creeLe: new Date().toISOString() }
+  const u = { id: randomUUID(), nom, roles, hash: await hacherMotDePasse(motDePasse), totpSecret: secret, totpDernierCompteur: -1, doitChangerMdp: true, actif: true, creeLe: new Date().toISOString(), affichage: nettoyerAffichage(affichage) || undefined }
   stockage.sauver(u)
   return { utilisateur: u, motDePasse, secret, uri: uriTotp(nom, secret) }
 }
@@ -69,7 +91,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const [commande] = args._
   try {
     if (commande === 'creer') {
-      const r = await creerUtilisateur(stockage, { nom: args.nom, roles: String(args.roles ?? '').split(',').filter(Boolean) })
+      const r = await creerUtilisateur(stockage, { nom: args.nom, roles: String(args.roles ?? '').split(',').filter(Boolean), affichage: args.affichage })
       audit.ajouter({ utilisateur: 'cli', action: 'utilisateur_cree', details: { nom: r.utilisateur.nom, roles: r.utilisateur.roles } })
       afficherRemise(r)
     } else if (commande === 'reinitialiser') {
@@ -83,12 +105,16 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       stockage.sauver(u)
       audit.ajouter({ utilisateur: 'cli', action: `utilisateur_${commande === 'activer' ? 'active' : 'desactive'}`, details: { nom: u.nom } })
       console.log(`\n✔ Compte « ${u.nom} » ${u.actif ? 'activé' : 'désactivé'}.\n`)
+    } else if (commande === 'affichage') {
+      const u = definirAffichage(stockage, args.nom, args.texte)
+      audit.ajouter({ utilisateur: 'cli', action: 'utilisateur_affichage', details: { nom: u.nom, affichage: u.affichage ?? null } })
+      console.log(`\n✔ Compte « ${u.nom} » : ${u.affichage ? `affiché comme « ${u.affichage} »` : 'nom d’affichage retiré'}.\n`)
     } else if (commande === 'lister') {
       console.log('')
-      for (const u of stockage.utilisateurs()) console.log(`  ${u.actif ? '●' : '○'} ${u.nom.padEnd(20)} ${u.roles.join(', ').padEnd(30)} dernière connexion : ${u.dernierLogin ?? 'jamais'}`)
+      for (const u of stockage.utilisateurs()) console.log(`  ${u.actif ? '●' : '○'} ${u.nom.padEnd(16)} ${u.roles.join(', ').padEnd(24)} ${(u.affichage ?? '').padEnd(28)} dernière connexion : ${u.dernierLogin ?? 'jamais'}`)
       console.log('')
     } else {
-      console.log('\nCommandes : creer --nom X --roles a,b · lister · reinitialiser --nom X · activer|desactiver --nom X\n')
+      console.log('\nCommandes : creer --nom X --roles a,b [--affichage "Titre Nom"] · affichage --nom X --texte "Titre Nom" · lister · reinitialiser --nom X · activer|desactiver --nom X\n')
     }
   } catch (e) {
     console.error(`\n✖ ${e.message}\n`)

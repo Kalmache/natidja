@@ -167,7 +167,7 @@ export function creerConsole(options = {}) {
   // ---- État de la session (utilisé par l'interface au chargement)
   route('GET', '/api/etat', 'aucune', null, ({ session }) => ({
     etape: session?.etape ?? 'aucune',
-    ...(session ? { csrf: session.csrf, utilisateur: { nom: session.nom, roles: session.roles } } : {}),
+    ...(session ? { csrf: session.csrf, utilisateur: { nom: session.nom, roles: session.roles, affichage: stockage.trouverId(session.userId)?.affichage ?? null } } : {}),
   }))
 
   // ---- Étape 1 : identifiant + mot de passe
@@ -219,7 +219,7 @@ export function creerConsole(options = {}) {
     sessions.delete(session.id)
     const s = ouvrirSession(u, session.ip, u.doitChangerMdp ? 'mdp' : 'ok')
     journal('connexion_ok', { session: s })
-    return { statut: 200, corps: { etape: s.etape, csrf: s.csrf, utilisateur: { nom: s.nom, roles: s.roles } }, extra: { 'Set-Cookie': cookie(s.id) } }
+    return { statut: 200, corps: { etape: s.etape, csrf: s.csrf, utilisateur: { nom: s.nom, roles: s.roles, affichage: stockage.trouverId(s.userId)?.affichage ?? null } }, extra: { 'Set-Cookie': cookie(s.id) } }
   })
 
   // ---- Changement de mot de passe (obligatoire à la première connexion)
@@ -295,7 +295,13 @@ export function creerConsole(options = {}) {
   })
 
   // ---- Propositions
-  const vue = (m) => ({ id: m.id, session: m.session, statut: m.statut, auteur: m.auteur, creeLe: m.creeLe, resume: m.resume, approbation: m.approbation, refus: m.refus, annulation: m.annulation, publieLe: m.publieLe, erreurPublication: m.erreurPublication, miseEnLigne: m.miseEnLigne })
+  // Ajoute le « nom d'affichage » (titre lisible) à une personne enregistrée dans une proposition ({ id, nom }).
+  // Lu au moment de l'affichage : une modification du titre vaut aussi pour les anciennes propositions.
+  const avecAffichage = (p) => (p ? { ...p, affichage: stockage.trouverId(p.id)?.affichage ?? null } : p)
+  const vue = (m) => ({ id: m.id, session: m.session, statut: m.statut, auteur: avecAffichage(m.auteur), creeLe: m.creeLe, resume: m.resume,
+    approbation: m.approbation && { ...m.approbation, par: avecAffichage(m.approbation.par) },
+    refus: m.refus && { ...m.refus, par: avecAffichage(m.refus.par) },
+    annulation: m.annulation && { ...m.annulation, par: avecAffichage(m.annulation.par) }, publieLe: m.publieLe, erreurPublication: m.erreurPublication, miseEnLigne: m.miseEnLigne })
 
   route('POST', '/api/propositions', 'ok', ['preparateur'], async ({ req, session, url }) => {
     const cfg = config()
