@@ -150,6 +150,7 @@ export default function StatsView({ session, sessions = [], classement: reglage 
         <section className="panel" id="stats-ile">
           <h2>{t('stats.byIsland')}</h2>
           <StackedBars rows={iles.map((i) => ({ key: i.id, label: i.nom, ...i }))} />
+          <p className="ile-grise"><span>{t('map.mayotte')}</span><em>{t('map.mayotteNo')}</em></p>
           <Legend parts={parts.map((p) => ({ ...p, value: p.value }))} total={total} />
         </section>
 

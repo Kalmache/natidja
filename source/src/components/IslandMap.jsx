@@ -1,5 +1,5 @@
 // ============================================================================
-// IslandMap.jsx – schéma interactif des trois îles de l'archipel
+// IslandMap.jsx – schéma interactif des îles de l'archipel (Mayotte figure en grisé, à titre symbolique)
 // ----------------------------------------------------------------------------
 // ⚠️ Ce n'est PAS une carte à l'échelle : ce sont des formes stylisées placées
 // à peu près comme sur la vraie carte (Ngazidja au nord-ouest, Mwali au centre,
@@ -31,14 +31,14 @@ export default function IslandMap({ islands, onSelect }) {
   const { t } = useI18n()
   return (
     <figure className="map">
-      <svg viewBox="0 0 430 250" role="group" aria-label={t('stats.map')}>
+      <svg viewBox="0 0 430 262" role="group" aria-label={t('stats.map')}>
         <defs>
           <radialGradient id="mer" cx="50%" cy="40%" r="75%">
             <stop offset="0%" stopColor="var(--sea-1)" />
             <stop offset="100%" stopColor="var(--sea-2)" />
           </radialGradient>
         </defs>
-        <rect width="430" height="250" rx="18" fill="url(#mer)" />
+        <rect width="430" height="262" rx="18" fill="url(#mer)" />
         {/* Vagues décoratives qui ondulent doucement */}
         {[40, 90, 150, 215].map((y, i) => (
           <path
@@ -72,6 +72,16 @@ export default function IslandMap({ islands, onSelect }) {
             </g>
           )
         })}
+        {/* Mayotte : présente sur la carte pour le symbole, mais grisée (aucun résultat publié ici) ;
+            ni cliquable, ni chiffrée. Placée au sud-est d'Anjouan, comme sur la vraie carte. */}
+        <g className="map__island map__island--grise" role="img" aria-label={`${t('map.mayotte')} : ${t('map.mayotteNo')}`}>
+          <title>{`${t('map.mayotte')} : ${t('map.mayotteNo')}`}</title>
+          <g transform="translate(396 205) scale(1.4) translate(-396 -205)">
+            <path d="M388 182 C395 176 403 181 402 193 C401 205 407 214 401 225 C396 232 388 229 386 220 C384 211 389 203 387 194 C386 188 386 184 388 182 Z" />
+            <ellipse cx="410" cy="186" rx="4.5" ry="7" />
+          </g>
+          <text x="396" y="250" textAnchor="middle"><tspan className="map__name">{t('map.mayotte')}</tspan></text>
+        </g>
       </svg>
       <figcaption>
         <strong>{t('stats.mapHint')}</strong> · {t('stats.mapNote')}

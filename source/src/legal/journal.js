@@ -14,6 +14,7 @@ export const JOURNAL = [
       'Dans la fiche d’un établissement, d’un centre ou d’une île : bouton « Comparer avec… » (le duel s’ouvre avec le premier élément déjà choisi et un adversaire proche en taux de réussite) et bouton « Me situer »',
       'Nouveau « Où se situe mon établissement ? » : un établissement (ou un centre) est comparé à la moyenne de son île et à la moyenne nationale, avec son rang et un verdict',
       'Les liens du pied de page ne sont plus cachés derrière la barre de navigation du téléphone',
+      'Mayotte figure désormais parmi les îles, en grisé et à titre symbolique : sur la carte des statistiques, dans le filtre des îles de la recherche et dans la réussite par île. Elle n’est pas cliquable et ne porte aucun chiffre (aucun résultat publié pour cette session)',
       '148 tests automatiques',
     ],
   },

@@ -878,3 +878,13 @@ html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-event
 .fw--mat::before { content: ''; position: absolute; z-index: 2; top: -9%; bottom: -20%; inset-inline-start: -9px; width: 7px; border-radius: 6px; background: linear-gradient(90deg, #e8eee9, #8a9a92 55%, #5f6f67); box-shadow: 0 6px 14px rgb(0 0 0 / 0.35); }
 .fw--mat::after { content: ''; position: absolute; z-index: 3; top: -13%; inset-inline-start: -11px; width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff3b0, #f0b41a 60%, #b27f08); }
 @media (prefers-reduced-motion: reduce) { .fw__t, .fw__t::after { animation: none; } .fw__t::after { opacity: 0.1; } }
+
+/* ---- Mayotte : présente pour le symbole, mais grisée (pas de résultats, pas de clic) ---- */
+.map__island--grise { cursor: default; }
+.map__island--grise path, .map__island--grise ellipse { fill: rgb(176 190 184 / 0.55); stroke: rgb(255 255 255 / 0.75); stroke-width: 2; stroke-dasharray: 5 4; filter: none; transform: none; }
+.map__island--grise:hover path { transform: none; filter: none; }
+.map__island--grise text { fill: rgb(235 242 238 / 0.9); stroke: rgb(0 0 0 / 0.25); font-size: 11px; }
+.map__island--grise .map__name { font-size: 11px; font-weight: 700; }
+.pill--grise, .pill--grise:hover { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+.ile-grise { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--border); color: var(--text-3); font-weight: 700; font-size: 0.88rem; opacity: 0.75; filter: grayscale(1); }
+.ile-grise em { font-style: normal; font-weight: 600; font-size: 0.8rem; }
