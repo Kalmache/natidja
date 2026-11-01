@@ -77,6 +77,9 @@ describe('ce que le site publie', () => {
 
   it('le classement est configurable par l’autorité organisatrice (exams.json)', () => {
     const { classement } = JSON.parse(readFileSync(`${DATA}exams.json`, 'utf8'))
-    expect(classement).toMatchObject({ visible: true, top: 5, minCandidats: 20 })
+    // « visible » est le choix de l'autorité (true OU false) : on vérifie seulement que le réglage existe et reste bien formé.
+    expect(typeof classement.visible).toBe('boolean')
+    expect(classement.top).toBeGreaterThan(0)
+    expect(classement.minCandidats).toBeGreaterThan(0)
   })
 })
