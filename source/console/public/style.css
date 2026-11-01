@@ -42,3 +42,20 @@ th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; colo
 code { background: var(--fond); padding: 2px 6px; border-radius: 6px; word-break: break-all; }
 ul.liste { margin: 8px 0; padding-left: 20px; }
 @media (max-width: 600px) { main { padding: 16px 12px 50px; } th, td { padding: 7px 6px; } }
+
+/* ---- Lignes modifiées : couleurs de gravité (rouge = critique, orange = à vérifier, gris = information, vert = ajout) ---- */
+.grav { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin: 0 6px 4px 0; }
+.grav--critique { background: #ffe4e6; color: var(--danger); }
+.grav--attention { background: #fef3c7; color: var(--alerte); }
+.grav--info { background: #eef2f0; color: var(--doux); }
+.grav--ajout { background: #d1fae5; color: var(--ok); }
+.grav-resume { margin: 6px 0 12px; }
+.lig--critique td:first-child { border-left: 4px solid var(--danger); background: #fff5f6; }
+.lig--critique td { background: #fff5f6; }
+.lig--attention td:first-child { border-left: 4px solid var(--alerte); }
+.lig--attention td { background: #fffbeb; }
+.lig--ajout td:first-child { border-left: 4px solid var(--ok); }
+.lig--info td:first-child { border-left: 4px solid var(--bord); }
+.chg s { color: var(--doux); }
+.chg--critique b { color: var(--danger); }
+.chg--attention b { color: var(--alerte); }
