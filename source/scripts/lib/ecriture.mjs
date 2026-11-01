@@ -8,7 +8,7 @@
 // Si quelque chose échoue avant l'étape 2, rien n'a changé. Pour revenir en
 // arrière : remettre le dossier sauvegardé à la place (voir le guide).
 // ============================================================================
-import { copyFileSync, mkdirSync, renameSync, rmSync, writeFileSync, existsSync } from 'node:fs'
+import { copyFileSync, cpSync, mkdirSync, renameSync, rmSync, writeFileSync, existsSync } from 'node:fs'
 import { randomBytes } from 'node:crypto'
 import { dirname, join } from 'node:path'
 import { DATA, SOURCE } from './cli.mjs'
@@ -17,6 +17,21 @@ import { DATA, SOURCE } from './cli.mjs'
  * @param opts.dataDir   dossier des données (par défaut : data/ du dépôt)
  * @param opts.backupDir dossier des sauvegardes (par défaut : source/backups)
  */
+/**
+ * Déplace un dossier. Renommer suffit quand source et destination sont sur le même disque ;
+ * sinon (ex. deux volumes Docker différents) Linux répond « EXDEV » : on copie alors le dossier
+ * puis on supprime l'original (plus lent, mais le résultat est identique).
+ */
+function deplacer(source, destination) {
+  try {
+    renameSync(source, destination)
+  } catch (e) {
+    if (e.code !== 'EXDEV') throw e
+    cpSync(source, destination, { recursive: true })
+    rmSync(source, { recursive: true, force: true })
+  }
+}
+
 export function ecrireSession(sessionId, fichiers, nouvelleConfig, opts = {}) {
   const dossierData = opts.dataDir ?? DATA
   const dossierSauvegardes = opts.backupDir ?? join(SOURCE, 'backups')
@@ -36,7 +51,7 @@ export function ecrireSession(sessionId, fichiers, nouvelleConfig, opts = {}) {
   // 2. sauvegarde de l'ancien dossier
   if (existsSync(cible)) {
     mkdirSync(dirname(sauvegarde), { recursive: true })
-    renameSync(cible, sauvegarde)
+    deplacer(cible, sauvegarde)
     // On garde aussi une copie de exams.json (ses chiffres) à côté de la sauvegarde.
     copyFileSync(join(dossierData, 'exams.json'), `${sauvegarde}.exams.json`)
   }
@@ -44,7 +59,7 @@ export function ecrireSession(sessionId, fichiers, nouvelleConfig, opts = {}) {
   try {
     renameSync(tmp, cible)
   } catch (e) {
-    if (existsSync(sauvegarde)) renameSync(sauvegarde, cible) // on remet l'ancien
+    if (existsSync(sauvegarde)) deplacer(sauvegarde, cible) // on remet l'ancien
     rmSync(tmp, { recursive: true, force: true })
     throw e
   }
