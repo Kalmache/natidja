@@ -27,7 +27,7 @@ import {
   egalConstant, hacherMotDePasse, jetonAleatoire, nouveauSecretTotp, uriTotp,
   verifierForceMotDePasse, verifierLeurre, verifierMotDePasse, verifierTotp,
 } from './lib/securite.mjs'
-import { analyserFichier, comparer, erreurHttp, publier } from './lib/publication.mjs'
+import { analyserFichier, comparer, erreurHttp, lireCandidatsPublies, publier } from './lib/publication.mjs'
 import { synchroDepuisEnvironnement } from './lib/synchro.mjs'
 import { creerSession } from '../scripts/lib/sessions.mjs'
 import { ecrireConfig } from '../scripts/lib/ecriture.mjs'
@@ -317,7 +317,7 @@ export function creerConsole(options = {}) {
       auteur: { id: session.userId, nom: session.nom }, creeLe: new Date(horloge()).toISOString(),
       fichier: { nom: nomFichier, taille: octets.length, sha256: createHash('sha256').update(octets).digest('hex') },
       baseMajLe: cfg.updatedAt,
-      resume: comparer(candidats, sessionExamen), avertissements: avertissements.slice(0, 200),
+      resume: comparer(candidats, sessionExamen, lireCandidatsPublies(dossierDonnees, sessionExamen.id)), avertissements: avertissements.slice(0, 200),
     }
     stockage.creerProposition(meta, candidats)
     journal('proposition_creee', { session, details: { id: meta.id, session: meta.session, candidats: candidats.length, sha256: meta.fichier.sha256 } })

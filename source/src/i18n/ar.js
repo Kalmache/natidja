@@ -294,7 +294,7 @@ export default {
   'stats.bySeries': 'نسبة النجاح حسب الشعبة',
   'stats.byMention': 'التقديرات الممنوحة',
   'stats.map': 'جزر الأرخبيل',
-  'map.mayotte': 'مايوت',
+  'map.mayotte': 'ماوري',
   'map.mayotteNo': 'لا نتائج لهذه الدورة',
   'stats.mapHint': 'المس جزيرة لرؤية تفاصيلها',
   'stats.mapNote': 'رسم تقريبي وغير مقيّد بالمقياس',

@@ -198,6 +198,23 @@ async function ecranSessions() {
 
 const ligneChiffre = (titre, valeur) => h('div', { class: 'chiffre' }, h('strong', null, valeur), h('span', null, titre))
 
+// Noms lisibles des champs d'un candidat (affichés dans la liste des lignes modifiées).
+const NOMS_CHAMPS = { lastName: 'Nom', firstName: 'Prénom', birthDate: 'Date de naissance', birthPlace: 'Lieu de naissance', gender: 'Sexe', series: 'Série', center: 'Centre', school: 'Établissement', island: 'Île', islandId: 'Île (code)', status: 'Résultat', mention: 'Mention', average: 'Moyenne' }
+const nomChamp = (c) => (c.startsWith('note:') ? `Note ${c.slice(5)}` : NOMS_CHAMPS[c] ?? c)
+const valeur = (v) => (v === null || v === undefined ? '—' : (RESULTATS[v] ?? String(v)))
+
+/** Carte « Lignes modifiées » : ce que le relecteur doit vraiment vérifier. */
+function modificationsCarte(m) {
+  if (!m) return null // proposition créée avant l'ajout de cette fonction
+  const total = m.ajoutes + m.supprimes + m.modifies
+  if (!total) return h('div', { class: 'carte' }, h('h3', null, 'Lignes modifiées : 0'), h('p', { class: 'doux' }, 'Ce fichier est identique à la version publiée : aucun candidat ne change.'))
+  return h('div', { class: 'carte' }, h('h3', null, `Lignes modifiées : ${total}`),
+    h('p', { class: 'doux' }, `${m.modifies} modifié(s) · ${m.ajoutes} ajouté(s) · ${m.supprimes} supprimé(s)${m.tronque ? ` — seules les ${m.lignes.length} premières sont affichées` : ''}`),
+    h('table', null, h('thead', null, h('tr', null, ['N° de table', 'Nom', 'Changement'].map((t) => h('th', null, t)))),
+      h('tbody', null, m.lignes.map((l) => h('tr', null, h('td', null, l.tableNumber), h('td', null, l.nom),
+        h('td', null, l.type === 'ajoute' ? 'Nouveau candidat' : l.type === 'supprime' ? 'Candidat retiré' : l.champs.map((c) => h('div', null, `${nomChamp(c.champ)} : ${valeur(c.avant)} → ${valeur(c.apres)}`))))))))
+}
+
 async function ecranDetail() {
   const r = await api('GET', `/api/propositions/${vue.id}`)
   if (!r.ok) return h('div', null, h('div', { class: 'message erreur' }, r.json?.erreur ?? 'Introuvable.'))
@@ -227,6 +244,7 @@ async function ecranDetail() {
       h('table', null, h('thead', null, h('tr', null, ['', 'Actuellement publié', 'Cette proposition'].map((t) => h('th', null, t)))),
         h('tbody', null, [['Candidats', b.total, a.total], ['Admis', b.admis, a.admis], ['Second groupe', b.second, a.second], ['Ajournés', b.ajournes, a.ajournes], ['Taux de réussite', b.taux, a.taux]].map(([t, x, y]) => h('tr', null, h('td', null, t), h('td', null, x), h('td', null, y))))),
       h('p', { class: 'doux' }, `Par île : ${Object.entries(a.parIle).map(([k, v]) => `${k} ${v}`).join(' · ')}`)),
+    modificationsCarte(p.resume.modifications),
     p.avertissements?.length ? h('div', { class: 'carte' }, h('h3', null, `${p.avertissements.length} avertissement(s) à relire`), h('ul', { class: 'liste' }, p.avertissements.slice(0, 30).map((x) => h('li', null, `Ligne ${x.ligne || '—'} : ${x.message}`)))) : null,
     h('div', { class: 'carte' }, h('h3', null, 'Extrait (10 premiers candidats)'),
       p.donneesPurgees ? h('p', { class: 'doux' }, 'Données purgées (durée de conservation dépassée).') :
