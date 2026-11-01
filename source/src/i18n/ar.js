@@ -21,10 +21,6 @@ export default {
 
   'hero.eyebrow': 'دورة {session}',
   'hero.title': 'اكتشف نتيجتك',
-  'hero.chipsLabel': 'نقاط القوة',
-  'hero.chip1': 'فوري',
-  'hero.chip2': 'يعمل بدون اتصال',
-  'hero.chip3': 'بياناتك تبقى خاصة',
   'hero.subtitle': 'أدخل رقم الطاولة أو اسمك. سريع وآمن ويعمل حتى بدون اتصال بالإنترنت.',
 
   'kpi.candidates': 'المترشحون',

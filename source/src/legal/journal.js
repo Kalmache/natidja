@@ -5,6 +5,15 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.11.0',
+    date: '01/11/2026',
+    titre: 'Retour à l’ancien accueil',
+    points: [
+      'L’accueil retrouve son apparence d’avant (carte d’en-tête colorée, chiffres clés, podium des meilleurs établissements avec le premier, le deuxième et le troisième) ; la bande d’ouverture sombre pleine largeur est abandonnée',
+      'Tout le reste est conservé : drapeau qui flotte, Mayotte en grisé, mentions interactives, comparer et se situer, mode sans classement',
+    ],
+  },
+  {
     version: '3.10.1',
     date: '01/11/2026',
     titre: 'L’accueil respecte la palette choisie',

@@ -22,10 +22,6 @@ export default {
 
   'hero.eyebrow': 'Session {session}',
   'hero.title': 'Découvrez votre résultat',
-  'hero.chipsLabel': 'Points forts',
-  'hero.chip1': 'Instantané',
-  'hero.chip2': 'Fonctionne hors-ligne',
-  'hero.chip3': 'Vos données restent privées',
   'hero.subtitle':
     'Entrez votre numéro de table ou votre nom. Rapide, sécurisé, et même disponible hors-ligne.',
 
