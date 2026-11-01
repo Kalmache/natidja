@@ -17,6 +17,7 @@ import Stat from '../components/Stat.jsx'
 import SessionPicker from '../components/SessionPicker.jsx'
 import Classement from '../components/Classement.jsx'
 import CandidateCard from '../components/CandidateCard.jsx'
+import '../styles/accueil.css'
 import CandidateModal from '../components/CandidateModal.jsx'
 import EtablissementModal from '../components/EtablissementModal.jsx'
 import { useI18n } from '../i18n/index.jsx'
@@ -178,7 +179,8 @@ export default function ResultsView({ config, session, onSession, island, onIsla
 
   return (
     <>
-      {/* ================= HÉROS ================= */}
+      {/* ================= BANDE D'OUVERTURE (héros + chiffres clés) : pleine largeur, façon « Découvrir » ================= */}
+      <div className={`accueil-cine ${recherche ? 'accueil-cine--compact' : ''}`}>
       <section className={`hero ${recherche ? 'hero--compact' : ''}`}>
         <div className="hero__aurora" aria-hidden="true">
           <i /><i /><i />
@@ -241,19 +243,30 @@ export default function ResultsView({ config, session, onSession, island, onIsla
           <p className={`hero__hint ${plan.etat === 'trop-court' || ARABE.test(saisie) ? 'is-warn' : ''}`} aria-live="polite">
             {aide}
           </p>
+          {!recherche && (
+            <ul className="hero__chips" aria-label={t('hero.chipsLabel')}>
+              <li><Icon name="download" size={14} /> {t('hero.chip1')}</li>
+              <li><Icon name="check" size={14} /> {t('hero.chip2')}</li>
+              <li><Icon name="lock" size={14} /> {t('hero.chip3')}</li>
+            </ul>
+          )}
         </div>
       </section>
+
+      {!recherche && (
+      <section className="kpis" aria-label="Chiffres clés">
+        {/* Toucher une carte mène aux statistiques détaillées (jamais à une liste de noms). */}
+        <Stat value={stats.total} label={t('kpi.candidates')} onClick={() => navigate('/stats')} />
+        <Stat value={stats.admitted} label={t('kpi.admitted')} tone="ok" onClick={() => navigate('/stats')} />
+        <Stat value={stats.oralSecondGroup} label={t('kpi.second')} tone="warn" onClick={() => navigate('/stats')} />
+        <Stat value={taux} decimals={1} suffix=" %" label={t('kpi.rate')} tone="accent" onClick={() => navigate('/stats')} />
+      </section>
+      )}
+      </div>
 
       {/* ================= ACCUEIL : statistiques (aucun nom de candidat) ================= */}
       {!recherche && (
         <>
-          <section className="kpis" aria-label="Chiffres clés">
-            {/* Toucher une carte mène aux statistiques détaillées (jamais à une liste de noms). */}
-          <Stat value={stats.total} label={t('kpi.candidates')} onClick={() => navigate('/stats')} />
-          <Stat value={stats.admitted} label={t('kpi.admitted')} tone="ok" onClick={() => navigate('/stats')} />
-          <Stat value={stats.oralSecondGroup} label={t('kpi.second')} tone="warn" onClick={() => navigate('/stats')} />
-          <Stat value={taux} decimals={1} suffix=" %" label={t('kpi.rate')} tone="accent" onClick={() => navigate('/stats')} />
-          </section>
 
           {classement.visible && (
             <Classement
