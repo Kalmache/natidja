@@ -5,7 +5,7 @@
 //   - triangle vert côté mât, avec un croissant blanc et 4 étoiles
 // `animated` fait glisser les bandes l'une après l'autre (écran d'accueil).
 // ============================================================================
-import { useId } from 'react'
+import { useId, useMemo } from 'react'
 
 const BANDES = ['#fcd116', '#ffffff', '#ce1126', '#3d4fb3']
 
@@ -63,5 +63,46 @@ export default function Flag({ animated = false, className = '' }) {
         </g>
       </g>
     </svg>
+  )
+}
+
+// ----------------------------------------------------------------------------
+// Drapeau QUI FLOTTE AU VENT
+// ----------------------------------------------------------------------------
+// Logique : on dessine le drapeau UNE fois (en SVG, transformé en image), puis on le découpe en fines
+// bandes verticales. Chaque bande monte et descend, mais avec un léger RETARD sur sa voisine : ce
+// décalage donne l'impression d'une ondulation qui voyage le long du tissu. Le côté du mât (à gauche)
+// bouge à peine ; le bord libre (à droite) bouge le plus, comme un vrai drapeau. Un jeu d'ombre et de
+// lumière suit l'ondulation. Uniquement des transformations CSS : fluide sur un téléphone modeste, et
+// tout s'arrête si l'appareil demande « moins d'animations ».
+// ----------------------------------------------------------------------------
+function drapeauSvg() {
+  const bandes = BANDES.map((c, i) => `<rect x="0" y="${i * 45}" width="300" height="45" fill="${c}"/>`).join('')
+  const etoiles = [64.5, 81.5, 98.5, 115.5].map((y) => `<polygon points="${etoile(60, y, 6.5)}" fill="#fff"/>`).join('')
+  return (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180"><defs><clipPath id="c"><rect width="300" height="180" rx="8"/></clipPath></defs>' +
+    `<g clip-path="url(#c)">${bandes}<polygon points="0,0 135,90 0,180" fill="#3a9d23"/><circle cx="40" cy="90" r="27" fill="#fff"/><circle cx="50" cy="90" r="24" fill="#3a9d23"/>${etoiles}</g></svg>`
+  )
+}
+
+/**
+ * @param {number} tranches   nombre de bandes (plus = plus fluide ; 12 suffit pour un petit drapeau)
+ * @param {string} amplitude  hauteur maximale de l'ondulation au bord libre (ex. « 9px »)
+ * @param {string} duree      durée d'un aller-retour (ex. « 2.4s »)
+ * @param {boolean} mat       dessine un mât à gauche
+ */
+export function FlagWave({ tranches = 20, amplitude = '8px', duree = '2.4s', mat = false, className = '' }) {
+  const image = useMemo(() => `url("data:image/svg+xml,${encodeURIComponent(drapeauSvg())}")`, [])
+  return (
+    <div
+      className={`fw ${mat ? 'fw--mat' : ''} ${className}`}
+      role="img"
+      aria-label="Drapeau de l’Union des Comores"
+      style={{ '--fw-img': image, '--n': tranches, '--fw-amp': amplitude, '--fw-t': duree }}
+    >
+      {Array.from({ length: tranches }, (_, i) => (
+        <i key={i} className="fw__t" style={{ '--i': i }} />
+      ))}
+    </div>
   )
 }

@@ -5,6 +5,19 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.10.0',
+    date: '01/11/2026',
+    titre: 'Un drapeau qui flotte, des mentions vivantes, se situer et comparer',
+    points: [
+      'Le drapeau flotte au vent : sur l’écran d’ouverture (accroché à un mât) et, plus discrètement, en haut à gauche dans l’application. L’ondulation voyage le long du tissu, avec ombre et lumière ; elle s’arrête si l’appareil demande moins d’animations',
+      '« Mentions décernées » devient interactive : choix de l’île, passage du nombre au pourcentage (les barres se redessinent en s’animant), phrase de synthèse écrite automatiquement, et fiche détaillée en touchant une barre (par île et établissements où la mention est la plus fréquente)',
+      'Dans la fiche d’un établissement, d’un centre ou d’une île : bouton « Comparer avec… » (le duel s’ouvre avec le premier élément déjà choisi et un adversaire proche en taux de réussite) et bouton « Me situer »',
+      'Nouveau « Où se situe mon établissement ? » : un établissement (ou un centre) est comparé à la moyenne de son île et à la moyenne nationale, avec son rang et un verdict',
+      'Les liens du pied de page ne sont plus cachés derrière la barre de navigation du téléphone',
+      '148 tests automatiques',
+    ],
+  },
+  {
     version: '3.9.0',
     date: '01/11/2026',
     titre: 'Un accueil à la hauteur de la présentation',

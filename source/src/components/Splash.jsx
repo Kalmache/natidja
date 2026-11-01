@@ -13,7 +13,7 @@
 //    ailleurs ne le coupe PAS : sinon un effleurement accidentel l'interromprait.
 // ============================================================================
 import { useEffect, useState } from 'react'
-import Flag from './Flag.jsx'
+import { FlagWave } from './Flag.jsx'
 import Signature from './Signature.jsx'
 import { EDITOR } from '../legal/config.js'
 import { useI18n } from '../i18n/index.jsx'
@@ -80,7 +80,7 @@ export default function Splash({ onDone }) {
     >
       <div className="splash__aurora" aria-hidden="true" />
       <div className="splash__content">
-        <Flag animated className="splash__flag" />
+        <FlagWave mat tranches={28} amplitude="11px" duree="2.2s" className="splash__flag" />
         <h1 className="splash__title" aria-label={titre}>
           {[...titre].map((lettre, i) => (
             <span key={i} style={{ '--d': `${0.9 + i * 0.045}s` }} aria-hidden="true">

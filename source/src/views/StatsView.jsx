@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Icon from '../components/Icon.jsx'
 import Stat from '../components/Stat.jsx'
 import IslandMap from '../components/IslandMap.jsx'
-import { Columns, Donut, Legend, StackedBars } from '../components/Charts.jsx'
+import { Donut, Legend, StackedBars } from '../components/Charts.jsx'
 import { registerPlugin } from '@capacitor/core'
 import { isNativeApp } from '../lib/verify.js'
 import { useI18n } from '../i18n/index.jsx'
@@ -16,13 +16,14 @@ import ClassementComparaison from '../components/ClassementComparaison.jsx'
 import MeilleursParIle from '../components/MeilleursParIle.jsx'
 import { ficheIle, ficheNationale } from '../lib/classement.js'
 import Comparateur from '../components/Comparateur.jsx'
+import SeSituer from '../components/SeSituer.jsx'
+import MentionsInteractives from '../components/MentionsInteractives.jsx'
 import RapportStatistiques from '../components/RapportStatistiques.jsx'
 import CentresExamen from '../components/CentresExamen.jsx'
 import EtablissementModal from '../components/EtablissementModal.jsx'
 import { prefersReducedMotion } from '../hooks.js'
 
 const ORDRE_STATUTS = ['ADMIS', 'SECOND_GROUPE', 'AJOURNE']
-const ORDRE_MENTIONS = ['PASSABLE', 'ASSEZ_BIEN', 'BIEN', 'TRES_BIEN']
 
 // Module natif d'impression (application Android) ; sur le web : window.print().
 const ImpressionNative = registerPlugin('ImpressionNative')
@@ -32,6 +33,8 @@ export default function StatsView({ session, sessions = [], classement: reglage 
   const [stats, setStats] = useState(null)
   const [erreur, setErreur] = useState(false)
   const [annees, setAnnees] = useState([]) // fiches nationales des autres années du MÊME examen (pour « Comparer »)
+  const [duel, setDuel] = useState(null) // { type, nom, n } : « Comparer avec… » demandé depuis une fiche
+  const [situer, setSituer] = useState(null) // idem pour « Me situer »
   const [etabOuvert, setEtabOuvert] = useState(null) // établissement dont on regarde la fiche
   const fermerEtab = useCallback(() => setEtabOuvert(null), [])
   // Toucher un chiffre clé fait glisser jusqu'au graphique qui le détaille, qui s'illumine un instant.
@@ -75,6 +78,11 @@ export default function StatsView({ session, sessions = [], classement: reglage 
     return () => { actif = false }
   }, [sessions, session.examType])
 
+  // Depuis une fiche : on ouvre le comparateur (ou « Me situer ») avec l'élément déjà choisi, et on y glisse.
+  const typeDe = (e) => e._type === 'centre' ? 'centres' : e._type === 'ile' ? 'iles' : 'etablissements'
+  const lancerDuel = (e) => { setDuel({ type: typeDe(e), nom: e.nom, n: Date.now() }); setTimeout(() => aller('stats-comparer'), 150) }
+  const lancerSituer = (e) => { setSituer({ type: typeDe(e), nom: e.nom, n: Date.now() }); setTimeout(() => aller('stats-situer'), 150) }
+
   if (erreur) {
     return (
       <div className="notice notice--error page">
@@ -104,11 +112,6 @@ export default function StatsView({ session, sessions = [], classement: reglage 
   }))
   const iles = Object.entries(stats.parIle).map(([id, v]) => ({ id, ...v }))
   const series = Object.entries(stats.parSerie).map(([k, v]) => ({ key: k, label: `${t('filter.series')} ${k}`, ...v }))
-  const mentions = ORDRE_MENTIONS.map((k) => ({
-    key: k,
-    label: t(`mention.${k}`),
-    value: stats.parMention[k] ?? 0,
-  }))
 
   return (
     <div className="page">
@@ -175,9 +178,24 @@ export default function StatsView({ session, sessions = [], classement: reglage 
           </section>
         )}
 
+        <section className="panel panel--wide" id="stats-situer">
+          <SeSituer
+            minCandidats={rang.minCandidats}
+            nationale={(admis / total) * 100}
+            iles={iles.map(ficheIle)}
+            initial={situer}
+            onComparer={(type, nom) => { setDuel({ type, nom, n: Date.now() }); setTimeout(() => aller('stats-comparer'), 100) }}
+            groupes={{
+              etablissements: { titre: t('cmp.tabEtab'), liste: [...(stats.etablissements ?? [])].sort((x, y) => x.nom.localeCompare(y.nom, 'fr')) },
+              centres: { titre: t('cmp.tabCentre'), liste: [...(stats.centres ?? [])].sort((x, y) => x.nom.localeCompare(y.nom, 'fr')) },
+            }}
+          />
+        </section>
+
         <section className="panel panel--wide" id="stats-comparer">
           <Comparateur
             minCandidats={rang.minCandidats}
+            initial={duel}
             groupes={{
               etablissements: { titre: t('cmp.tabEtab'), liste: [...(stats.etablissements ?? [])].sort((x, y) => x.nom.localeCompare(y.nom, 'fr')) },
               iles: { titre: t('cmp.tabIle'), liste: iles.map(ficheIle) },
@@ -188,8 +206,7 @@ export default function StatsView({ session, sessions = [], classement: reglage 
         </section>
 
         <section className="panel panel--wide" id="stats-mention">
-          <h2>{t('stats.byMention')}</h2>
-          <Columns items={mentions} />
+          <MentionsInteractives stats={stats} iles={iles.map((i) => ({ id: i.id, nom: i.nom, mentions: i.mentions }))} minCandidats={rang.minCandidats} />
         </section>
       </div>
 
@@ -203,6 +220,8 @@ export default function StatsView({ session, sessions = [], classement: reglage 
           type={etabOuvert._type}
           nationale={(admis / total) * 100}
           onClose={fermerEtab}
+          onComparer={lancerDuel}
+          onSituer={lancerSituer}
         />
       )}
     </div>

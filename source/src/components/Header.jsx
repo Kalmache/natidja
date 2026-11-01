@@ -3,7 +3,7 @@
 // du bas, façon application mobile, visible seulement sur petit écran).
 // ============================================================================
 import Icon from './Icon.jsx'
-import Flag from './Flag.jsx'
+import { FlagWave } from './Flag.jsx'
 import { LANGS, useI18n } from '../i18n/index.jsx'
 import { navigate, useInstallPrompt, useOnline } from '../hooks.js'
 import Signature from './Signature.jsx'
@@ -34,7 +34,7 @@ export function Header({ view, theme, onTheme, palette, onPalette, lang, onLang,
     <header className="header no-print">
       <div className="header__inner">
         <a className="brand" href="#/" onClick={() => navigate('/')}>
-          <span className="brand__mark"><Flag /></span>
+          <span className="brand__mark"><FlagWave tranches={12} amplitude="2.2px" duree="3.2s" /></span>
           <span className="brand__text">
             <strong>{t('app.name')}</strong>
             <small>{sessionLabel}</small>
