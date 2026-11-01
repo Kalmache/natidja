@@ -11,11 +11,14 @@ import { PALETTES } from '../components/Header.jsx'
 import { LANGS, useI18n } from '../i18n/index.jsx'
 import { isNativeApp } from '../lib/verify.js'
 import { useInstallPrompt, useOnline } from '../hooks.js'
-import { EDITOR, VERSION } from '../legal/config.js'
+import { VERSION } from '../legal/config.js'
+import { redigerDemandeInformations } from '../legal/autorisation.js'
 import { PAGES_LEGALES } from './LegalView.jsx'
 
 export default function SettingsView({ theme, onSetTheme, palette, onPalette, lang, onLang }) {
   const { t } = useI18n()
+  // « Demander des informations » : l'e-mail s'ouvre déjà rédigé dans la messagerie.
+  const demandeInfos = redigerDemandeInformations({ version: VERSION })
   const enLigne = useOnline()
   const installer = useInstallPrompt() // null si l'installation n'est pas proposée par le navigateur
 
@@ -101,7 +104,7 @@ export default function SettingsView({ theme, onSetTheme, palette, onPalette, la
           <p>{t('settings.managerBody')}</p>
           <div className="manager__actions">
             <button type="button" className="btn" disabled><Icon name="lock" size={16} /> {t('settings.managerButton')}</button>
-            <a className="btn btn--ghost" href={`mailto:${EDITOR.email}`}>{t('settings.managerContact')}</a>
+            <a className="btn btn--ghost" href={demandeInfos.lien}>{t('settings.managerContact')}</a>
           </div>
         </section>
 
