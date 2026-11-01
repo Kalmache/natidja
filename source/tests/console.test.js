@@ -306,6 +306,22 @@ describe('approbation et publication', () => {
     await cl.appel('POST', `/api/propositions/${id}/annuler`, {})
   })
 
+  it('le résumé liste précisément les lignes modifiées (champ, avant → après)', async () => {
+    const { cl, id, resume } = await nouvelleProposition()
+    const m = resume.modifications
+    // csvModifie() ne change que le premier candidat (résultat, mention, moyenne).
+    expect(m.modifies).toBe(1)
+    expect(m.ajoutes).toBe(0)
+    expect(m.supprimes).toBe(0)
+    expect(m.lignes).toHaveLength(1)
+    expect(m.lignes[0].tableNumber).toBe(base[0].tableNumber)
+    const champs = m.lignes[0].champs.map((c) => c.champ)
+    expect(champs).toContain('status')
+    expect(champs).toContain('average')
+    expect(m.lignes[0].champs.find((c) => c.champ === 'average')).toMatchObject({ avant: base[0].average, apres: 5.5 })
+    await cl.appel('POST', `/api/propositions/${id}/annuler`, {})
+  })
+
   it('un PRÉPARATEUR ne peut pas approuver', async () => {
     const { cl, id } = await nouvelleProposition()
     expect((await cl.appel('POST', `/api/propositions/${id}/approuver`, {})).statut).toBe(403)
