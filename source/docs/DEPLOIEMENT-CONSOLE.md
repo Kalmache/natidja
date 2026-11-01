@@ -89,8 +89,10 @@ Dans la zone DNS de `mmbt.fr` (espace client OVH → Noms de domaine → `mmbt.f
 *Docker est un outil qui fait tourner la console dans une « boîte » isolée : même résultat sur n'importe quel serveur, et mise à jour facile.*
 
 ```bash
-curl -fsSL https://get.docker.com | sudo sh && sudo usermod -aG docker $USER
+sudo apt install -y docker.io docker-compose-v2 git && sudo usermod -aG docker $USER
 ```
+
+*(Ce sont les paquets d'Ubuntu lui-même : plus sûrs sur une version récente d'Ubuntu, comme la 26.04, que le script `get.docker.com`, qui ne la gère pas toujours encore.)*
 
 Déconnectez-vous puis reconnectez-vous en SSH (pour que le droit s'applique), puis récupérez le code :
 
@@ -102,7 +104,7 @@ git clone https://github.com/Kalmache/natidja.git
 cd natidja/source/console/deploiement
 ```
 
-**Vérification** : `docker --version` affiche un numéro de version.
+**Vérification** : `docker --version` et `docker compose version` affichent un numéro de version, et `docker run --rm hello-world` affiche « Hello from Docker! ».
 
 ---
 
