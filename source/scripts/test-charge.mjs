@@ -84,7 +84,7 @@ async function visiteur(arret) {
     await appeler('application', '/manifest.webmanifest')
   }
   await appeler('données', '/data/exams.json')
-  await appeler('données', `/data/${sessionId}/initial.json`)
+  await appeler('données', `/data/${sessionId}/stats.json`)
   await pause(1000 + hasard(3000))
   const recherches = 1 + hasard(3)
   for (let i = 0; i < recherches && performance.now() < arret; i++) {

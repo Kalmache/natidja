@@ -27,9 +27,10 @@ Le code source est rangé à part dans `source/`.
 | `source/src/` | Le code source (React) : `components/`, `views/`, `lib/`, `i18n/` (textes FR/AR), `styles/` |
 | `source/public/` | Icônes et `.htaccess` (sécurité/cache Apache) copiés dans le site |
 | `source/scripts/` | `build-stats.mjs` (calcule les statistiques) et `publish.mjs` (reconstruit le site à la racine) |
-| `source/tests/` | Tests automatiques du moteur de recherche |
+| `source/tests/` | Tests automatiques (recherche, import, console, confidentialité…) |
 
 ## Commandes (terminal, dans le dossier `source/`)
+⚠️ Le projet vit dans le dossier **`source/`** : toutes ces commandes se lancent **depuis ce dossier** (`cd source`), pas depuis la racine du dépôt, qui ne contient que le site déjà construit.
 ```bash
 npm install          # une seule fois : télécharge les outils
 npm run dev          # lance le site en local (http://localhost:5173) pour travailler

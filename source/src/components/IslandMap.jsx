@@ -58,11 +58,11 @@ export default function IslandMap({ islands, onSelect }) {
               key={ile.id}
               className="map__island"
               style={{ '--rate': `${Math.round(35 + taux * 60)}%` }}
-              role="button"
-              tabIndex={0}
+              role={onSelect ? 'button' : 'img'}
+              tabIndex={onSelect ? 0 : undefined}
               aria-label={`${ile.nom} : ${pct(ile.ADMIS ?? 0, ile.total)}`}
-              onClick={() => onSelect(ile.id)}
-              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onSelect(ile.id))}
+              onClick={onSelect ? () => onSelect(ile.id) : undefined}
+              onKeyDown={onSelect ? (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onSelect(ile.id)) : undefined}
             >
               <path d={forme.d} />
               <text x={forme.label[0]} y={forme.label[1]} textAnchor="middle">

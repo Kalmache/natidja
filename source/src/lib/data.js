@@ -50,7 +50,5 @@ export const loadConfig = async () => {
   if (!config) throw new Error('Configuration des examens introuvable.')
   return configPublique(config) // sessions en brouillon masquées, session par défaut valide
 }
-export const loadInitial = async (sessionId) =>
-  (await getJson(`./data/${sessionId}/initial.json`)) ?? []
 export const loadStats = (sessionId) => getJson(`./data/${sessionId}/stats.json`)
 export const loadShard = async (url) => (await getJson(url)) ?? []

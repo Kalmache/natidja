@@ -10,13 +10,12 @@ import IslandMap from '../components/IslandMap.jsx'
 import { Columns, Donut, Legend, StackedBars } from '../components/Charts.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { loadStats } from '../lib/data.js'
-import { navigate } from '../hooks.js'
-import { demanderFiltre } from '../lib/demande.js'
+import Classement from '../components/Classement.jsx'
 
 const ORDRE_STATUTS = ['ADMIS', 'SECOND_GROUPE', 'AJOURNE']
 const ORDRE_MENTIONS = ['PASSABLE', 'ASSEZ_BIEN', 'BIEN', 'TRES_BIEN']
 
-export default function StatsView({ session }) {
+export default function StatsView({ session, classement: reglage }) {
   const { t } = useI18n()
   const [stats, setStats] = useState(null)
   const [erreur, setErreur] = useState(false)
@@ -51,6 +50,8 @@ export default function StatsView({ session }) {
     )
   }
 
+  // Classement des établissements : réglage de l'autorité organisatrice (exams.json > classement).
+  const rang = { visible: false, top: 5, topStatistiques: 10, minCandidats: 20, ...reglage }
   const total = stats.total
   const admis = stats.parStatut.ADMIS ?? 0
   const parts = ORDRE_STATUTS.map((k) => ({
@@ -66,13 +67,6 @@ export default function StatsView({ session }) {
     value: stats.parMention[k] ?? 0,
   }))
 
-  // Toucher une carte, une barre ou une légende → on arrive directement sur la
-  // liste des résultats concernés (ex. { statut: 'ADMIS', mention: 'BIEN' }).
-  const voir = (filtre) => {
-    demanderFiltre(filtre)
-    navigate('/')
-  }
-
   return (
     <div className="page">
       <header className="page__head">
@@ -81,9 +75,9 @@ export default function StatsView({ session }) {
       </header>
 
       <section className="kpis kpis--flat">
-        <Stat value={total} label={t('kpi.candidates')} onClick={() => voir({})} />
-        <Stat value={admis} label={t('kpi.admitted')} tone="ok" onClick={() => voir({ statut: 'ADMIS' })} />
-        <Stat value={(admis / total) * 100} decimals={1} suffix=" %" label={t('kpi.rate')} tone="accent" onClick={() => voir({ statut: 'ADMIS' })} />
+        <Stat value={total} label={t('kpi.candidates')} />
+        <Stat value={admis} label={t('kpi.admitted')} tone="ok" />
+        <Stat value={(admis / total) * 100} decimals={1} suffix=" %" label={t('kpi.rate')} tone="accent" />
         <Stat value={stats.moyenneGenerale} decimals={2} suffix=" /20" label={t('stats.average')} />
       </section>
 
@@ -92,31 +86,37 @@ export default function StatsView({ session }) {
           <h2>{t('stats.byStatus')}</h2>
           <div className="panel__split">
             <Donut parts={parts} total={total} centerValue={`${((admis / total) * 100).toFixed(1).replace('.', ',')} %`} centerLabel={t('kpi.rate')} />
-            <Legend parts={parts} total={total} onSelect={(p) => voir({ statut: p.key })} />
+            <Legend parts={parts} total={total} />
           </div>
         </section>
 
         <section className="panel">
           <h2>{t('stats.map')}</h2>
-          <IslandMap islands={iles} onSelect={(id) => voir({ island: id })} />
+          <IslandMap islands={iles} />
         </section>
 
         <section className="panel">
           <h2>{t('stats.byIsland')}</h2>
-          <StackedBars rows={iles.map((i) => ({ key: i.id, label: i.nom, ...i }))} onSelect={(r) => voir({ island: r.key })} />
-          <Legend parts={parts.map((p) => ({ ...p, value: p.value }))} total={total} onSelect={(p) => voir({ statut: p.key })} />
+          <StackedBars rows={iles.map((i) => ({ key: i.id, label: i.nom, ...i }))} />
+          <Legend parts={parts.map((p) => ({ ...p, value: p.value }))} total={total} />
         </section>
 
         {series.length > 0 && (
           <section className="panel">
             <h2>{t('stats.bySeries')}</h2>
-            <StackedBars rows={series} onSelect={(r) => voir({ serie: r.key })} />
+            <StackedBars rows={series} />
           </section>
+        )}
+
+        {rang.visible && stats.etablissements?.length > 0 && (
+          <div className="panel--wide">
+            <Classement etablissements={stats.etablissements} top={rang.topStatistiques} minCandidats={rang.minCandidats} />
+          </div>
         )}
 
         <section className="panel panel--wide">
           <h2>{t('stats.byMention')}</h2>
-          <Columns items={mentions} onSelect={(m) => voir({ statut: 'ADMIS', mention: m.key })} />
+          <Columns items={mentions} />
         </section>
       </div>
     </div>

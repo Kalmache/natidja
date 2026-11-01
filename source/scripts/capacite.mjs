@@ -27,7 +27,7 @@ const sessionId = String(args.session ?? config.defaultSessionId)
 const racineFichiers = ['index.html', 'registerSW.js', 'manifest.webmanifest', 'sw.js', ...readdirSync(RACINE).filter((f) => /^workbox-.*\.js$/.test(f))]
 const assets = readdirSync(join(RACINE, 'assets')).map((f) => `assets/${f}`)
 const application = [...racineFichiers, ...assets].reduce((s, f) => s + gz(join(RACINE, f)), 0)
-const accueil = gz(join(DATA, 'exams.json')) + gz(join(DATA, sessionId, 'initial.json'))
+const accueil = gz(join(DATA, 'exams.json')) + gz(join(DATA, sessionId, 'stats.json'))
 const tailles = ['numeros', 'noms'].flatMap((d) => readdirSync(join(DATA, sessionId, d)).map((f) => gz(join(DATA, sessionId, d, f))))
 const recherche = tailles.reduce((s, n) => s + n, 0) / tailles.length
 
@@ -52,7 +52,7 @@ function scenario(n) {
 if (!visiteurs) {
   console.log(`\nPoids mesurés (compressés) pour la session ${sessionId} :`)
   console.log(`  Application (page, scripts, style, mode hors-ligne) : ${ko(application)}  — téléchargée UNE fois par appareil`)
-  console.log(`  Accueil (configuration + 120 premiers candidats)    : ${ko(accueil)}`)
+  console.log(`  Accueil (configuration + statistiques)             : ${ko(accueil)}`)
   console.log(`  Une recherche (fichier moyen sur ${tailles.length})                    : ${ko(recherche)}  (la plus lourde : ${ko(Math.max(...tailles))})`)
   console.log(`  → Première visite : ${ko(application + accueil + nbRecherches * recherche)} en ≈ ${REQ_PREMIERE} requêtes · visite suivante : ${ko(accueil + nbRecherches * recherche)} en ≈ ${REQ_SUIVANTE} requêtes\n`)
   console.log('Scénarios (fenêtre de 30 min, pic = 5 × la moyenne, 30 % d’appareils déjà équipés) :')

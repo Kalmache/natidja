@@ -5,7 +5,10 @@ const inc = (obj, key) => {
   obj[key] = (obj[key] ?? 0) + 1
 }
 
-export function calculerStats(candidats, session, chiffresNumero = 3) {
+/** « Candidat Libre », « Candidate libre »… : pas rattaché à un établissement. */
+export const estCandidatLibre = (nom) => /candidat(e)?s?\s+libres?/i.test(String(nom ?? ''))
+
+export function calculerStats(candidats, session) {
   const stats = {
     session: session.id,
     total: candidats.length,
@@ -14,17 +17,20 @@ export function calculerStats(candidats, session, chiffresNumero = 3) {
     parIle: {}, // { ngazidja: { nom, total, ADMIS, ... } }
     parSerie: {}, // { A1: { total, ADMIS, ... } }
     moyenneGenerale: 0,
-    // Liste ordonnée des fichiers « numeros/<clé>.json » : l'application s'en sert
-    // pour PARCOURIR les résultats quand on filtre sans rien taper (ex. « Admis »).
-    fichiersNumeros: [],
+    etablissements: [], // classement par taux de réussite (candidats libres exclus), voir plus bas
   }
-  const cles = new Set()
+  const parEtablissement = new Map() // nom → { total, admis, iles: { id → nombre } }
   let sommeMoyennes = 0
   let avecMoyenne = 0
   for (const c of candidats) {
-    // Même règle que construireFichiers : début de la dernière partie numérique du n° de table.
-    const cle = String(c.tableNumber).match(/\d+/g)?.at(-1)?.slice(0, chiffresNumero)
-    if (cle) cles.add(cle)
+    // Classement des établissements : les candidats libres n'appartiennent à aucun établissement.
+    if (c.school && !estCandidatLibre(c.school)) {
+      const e = parEtablissement.get(c.school) ?? { total: 0, admis: 0, iles: {} }
+      e.total++
+      if (c.status === 'ADMIS') e.admis++
+      e.iles[c.island] = (e.iles[c.island] ?? 0) + 1
+      parEtablissement.set(c.school, e)
+    }
     inc(stats.parStatut, c.status)
     if (c.mention && c.mention !== 'SANS') inc(stats.parMention, c.mention)
     stats.parIle[c.islandId] ??= { nom: c.island, total: 0 }
@@ -40,7 +46,14 @@ export function calculerStats(candidats, session, chiffresNumero = 3) {
       avecMoyenne++
     }
   }
-  stats.fichiersNumeros = [...cles].sort()
+  // Du meilleur au moins bon taux ; à égalité, l'établissement qui présente le plus de candidats, puis l'ordre alphabétique.
+  stats.etablissements = [...parEtablissement].map(([nom, e]) => ({
+    nom,
+    ile: Object.entries(e.iles).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '',
+    total: e.total,
+    admis: e.admis,
+    taux: Math.round((e.admis / e.total) * 1000) / 10, // en %, une décimale
+  })).sort((a, b) => b.taux - a.taux || b.total - a.total || a.nom.localeCompare(b.nom, 'fr'))
   stats.moyenneGenerale = avecMoyenne ? Math.round((sommeMoyennes / avecMoyenne) * 100) / 100 : 0
   return stats
 }

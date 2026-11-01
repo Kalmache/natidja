@@ -15,6 +15,7 @@ import { readFileSync } from 'node:fs'
 import { extname } from 'node:path'
 import ExcelJS from 'exceljs'
 import { normalize } from '../../src/lib/search.js'
+import { lireDate } from '../../src/lib/dates.js'
 
 // --------------------------------------------------------------------------
 // 1. LES COLONNES DU TABLEAU
@@ -61,35 +62,8 @@ export const ILES = {
 
 const enTeteNorm = (t) => normalize(t).toLowerCase()
 
-// --------------------------------------------------------------------------
-// LECTURE D'UNE DATE DE NAISSANCE
-// --------------------------------------------------------------------------
-/**
- * Comprend les écritures usuelles et renvoie une date au format « AAAA-MM-JJ » (sans heure,
- * donc sans décalage de fuseau), ou null si ce n'est pas une vraie date.
- *   « 15/03/2007 », « 15-03-2007 », « 15.03.2007 », « 15 03 2007 »  → JOUR d'abord (usage français)
- *   « 2007-03-15 »                                                   → format international
- *   un nombre (date « brute » d'Excel, ex. 39156)                    → converti
- * Une date impossible (31/02/2007) est refusée.
- */
-export function lireDate(brut) {
-  let j, m, a
-  if (typeof brut === 'number') {
-    if (!(brut > 1 && brut < 80000)) return null
-    const d = new Date(Date.UTC(1899, 11, 30) + Math.round(brut) * 86_400_000) // l'« origine » des dates Excel
-    ;[a, m, j] = [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()]
-  } else {
-    const t = String(brut ?? '').trim()
-    let r
-    if ((r = /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T ].*)?$/.exec(t))) [a, m, j] = [r[1], r[2], r[3]].map(Number)
-    else if ((r = /^(\d{1,2})[\s/.\-](\d{1,2})[\s/.\-](\d{4})$/.exec(t))) [j, m, a] = [r[1], r[2], r[3]].map(Number)
-    else return null
-  }
-  // On vérifie que la date existe vraiment (pas de 31 février).
-  const d = new Date(Date.UTC(a, m - 1, j))
-  if (d.getUTCFullYear() !== a || d.getUTCMonth() !== m - 1 || d.getUTCDate() !== j) return null
-  return `${String(a).padStart(4, '0')}-${String(m).padStart(2, '0')}-${String(j).padStart(2, '0')}`
-}
+// La lecture d'une date de naissance est partagée avec l'application : src/lib/dates.js
+export { lireDate }
 
 // --------------------------------------------------------------------------
 // 2. LECTURE DU FICHIER  (xlsx ou csv)  ->  lignes brutes
@@ -337,7 +311,7 @@ const parNumero = (a, b) => (a.tableNumber < b.tableNumber ? -1 : a.tableNumber 
 /**
  * @returns {Map<string,string>} chemin relatif (ex. "numeros/001.json") -> contenu JSON
  */
-export function construireFichiers(candidats, shardKeys = {}, tailleAccueil = 120) {
+export function construireFichiers(candidats, shardKeys = {}) {
   const chiffres = shardKeys.numberDigits ?? 3
   const lettres = shardKeys.nameLetters ?? 2
   const tries = [...candidats].sort(parNumero)
@@ -358,7 +332,7 @@ export function construireFichiers(candidats, shardKeys = {}, tailleAccueil = 12
     for (const cle of cles) ajouter(`noms/${cle}.json`, c)
   }
 
-  const sortie = new Map([['initial.json', JSON.stringify(tries.slice(0, tailleAccueil))]])
+  const sortie = new Map()
   for (const [chemin, liste] of fichiers) sortie.set(chemin, JSON.stringify(liste))
   return sortie
 }

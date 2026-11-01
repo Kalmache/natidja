@@ -554,3 +554,63 @@ html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-event
 .session-picker select:focus-visible { outline: 3px solid var(--flag-yellow); outline-offset: 2px; }
 .session-picker option { color: #111; }
 @media (max-width: 420px) { .session-picker { gap: 6px; } .session-picker select { padding: 9px 4px; font-size: 0.88rem; } }
+
+/* ==========================================================================
+   Vérification d'identité avant l'attestation
+   ========================================================================== */
+.gate { position: relative; display: grid; gap: 14px; padding: 34px 24px 26px; text-align: center; background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); }
+.gate__close { position: absolute; inset-block-start: 10px; inset-inline-end: 10px; }
+.gate__lock { justify-self: center; display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; color: var(--p-700); background: color-mix(in srgb, var(--p-500) 14%, transparent); }
+.gate h2 { font-size: 1.3rem; }
+.gate__who { font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em; }
+.gate__intro { color: var(--text-2); font-size: 0.92rem; }
+.gate label { display: grid; gap: 6px; text-align: start; font-size: 0.8rem; font-weight: 800; color: var(--text-2); }
+.gate input { width: 100%; font: inherit; font-size: 1.05rem; font-weight: 600; color: var(--text); background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 12px; padding: 13px 14px; }
+.gate input:focus-visible { outline: 3px solid var(--p-500); outline-offset: 1px; }
+.gate__error { padding: 10px 12px; border-radius: 12px; font-size: 0.88rem; font-weight: 700; color: var(--bad-strong, #b91c1c); background: color-mix(in srgb, var(--bad, #ef4444) 12%, transparent); }
+.gate .btn { justify-content: center; padding: 13px; }
+
+/* ==========================================================================
+   Accueil sans liste de noms : classement des établissements, recherche active, carte sobre
+   ========================================================================== */
+.classement { margin: 22px 20px 0; padding: 22px 22px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+.classement__head h2 { font-size: 1.15rem; }
+.classement__head p { color: var(--text-3); font-size: 0.85rem; margin-top: 2px; }
+.classement__liste { display: grid; gap: 12px; margin-top: 16px; }
+.classement__liste li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; animation: rise 0.55s var(--delay, 0ms) var(--ease) both; }
+.classement__rang { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font-weight: 900; color: var(--text-2); background: var(--surface-2); border: 1px solid var(--border); }
+.classement__liste li.is-first .classement__rang { color: #3b2a00; background: linear-gradient(135deg, #fde68a, #f59e0b); border-color: transparent; }
+.classement__corps { display: grid; gap: 3px; min-width: 0; }
+.classement__corps strong { overflow-wrap: anywhere; font-size: 0.95rem; line-height: 1.25; }
+.classement__corps small { color: var(--text-3); font-size: 0.78rem; }
+.classement__barre { height: 7px; border-radius: 999px; background: var(--surface-2); overflow: hidden; margin-top: 3px; }
+.classement__barre i { display: block; height: 100%; width: var(--w); border-radius: inherit; background: linear-gradient(90deg, var(--p-600), var(--p-400)); transform-origin: left; animation: croit 1.1s 0.2s var(--ease) both; }
+[dir='rtl'] .classement__barre i { transform-origin: right; }
+@keyframes croit { from { transform: scaleX(0); } }
+.classement__taux { font-size: 1.15rem; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--ok-strong); }
+.classement__skel { display: grid; gap: 14px; margin-top: 16px; } .classement__skel i { height: 46px; border-radius: 12px; background: var(--surface-2); animation: pulse 1.4s ease-in-out infinite; }
+.classement__note { margin-top: 16px; font-size: 0.74rem; color: var(--text-3); line-height: 1.5; }
+.classement__plus { margin-top: 10px; }
+@media (max-width: 720px) { .classement { margin-inline: 10px; padding: 18px 16px 14px; } }
+
+/* Pendant une recherche : l'en-tête est plus court, les filtres sont repliés, les résultats arrivent tout de suite */
+.hero--compact .hero__inner { padding-bottom: 36px; }
+.filters-box { margin: 16px 20px 0; }
+.filters-box > summary { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; padding: 9px 14px; font-weight: 800; font-size: 0.88rem; color: var(--text-2); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; list-style: none; }
+.filters-box > summary::-webkit-details-marker { display: none; }
+.filters-box__badge { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; font-size: 0.72rem; color: #fff; background: var(--p-600); }
+.filters-box[open] > summary { margin-bottom: 10px; }
+.filters-box .filters { margin: 0; }
+@media (max-width: 720px) { .filters-box { margin-inline: 10px; } }
+.results { margin-top: 14px; }
+
+/* Carte de résultat sobre : une icône de résultat à la place de l'anneau de moyenne */
+.card__icon { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; }
+.card__icon--ADMIS { color: var(--ok-strong); background: color-mix(in srgb, var(--ok) 16%, transparent); }
+.card__icon--SECOND_GROUPE { color: var(--warn-strong); background: color-mix(in srgb, var(--warn) 18%, transparent); }
+.card__icon--AJOURNE { color: var(--bad-strong); background: color-mix(in srgb, var(--bad) 14%, transparent); }
+
+/* Pendant une recherche, l'en-tête garde seulement le choix de session, la barre de recherche et son aide :
+   les résultats apparaissent tout de suite dessous, sans qu'il faille descendre. */
+.hero--compact .hero__eyebrow, .hero--compact .hero__title, .hero--compact .hero__subtitle { display: none; }
+.hero--compact .hero__inner { padding-top: 26px; }

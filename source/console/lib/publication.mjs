@@ -48,7 +48,7 @@ export function comparer(candidats, session) {
 export function publier(meta, candidats, config, { dossierDonnees, dossierSauvegardes }) {
   const session = config.sessions.find((s) => s.id === meta.session)
   const fichiers = construireFichiers(candidats, config.shardKeys)
-  fichiers.set('stats.json', JSON.stringify(calculerStats(candidats, session, config.shardKeys?.numberDigits ?? 3)))
+  fichiers.set('stats.json', JSON.stringify(calculerStats(candidats, session)))
   return ecrireSession(meta.session, fichiers, majConfig(config, meta.session, candidats, new Date()), {
     dataDir: dossierDonnees,
     backupDir: dossierSauvegardes,
