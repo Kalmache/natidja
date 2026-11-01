@@ -12,6 +12,7 @@
 //     rien d'inventé, et les limites sont écrites noir sur blanc.
 // ============================================================================
 import { useEffect, useRef } from 'react'
+import { useI18n } from '../i18n/index.jsx'
 import Flag from '../components/Flag.jsx'
 import Icon from '../components/Icon.jsx'
 import Signature from '../components/Signature.jsx'
@@ -65,19 +66,19 @@ function GrandChiffre({ valeur, decimales = 0, suffixe = '', legende, delai = 0 
 }
 
 /** Le téléphone : l'application « en vrai », qui tape une recherche puis affiche un résultat. */
-function Telephone() {
+function Telephone({ t }) {
   return (
     <div className="d-phone" aria-hidden="true">
-      <div className="d-puce d-puce--a"><Icon name="download" size={14} /> 4,2 Ko par recherche</div>
-      <div className="d-puce d-puce--b"><Icon name="check" size={14} /> Fonctionne hors-ligne</div>
+      <div className="d-puce d-puce--a"><Icon name="download" size={14} /> {t('d.puceA')}</div>
+      <div className="d-puce d-puce--b"><Icon name="check" size={14} /> {t('d.puceB')}</div>
       <div className="d-puce d-puce--c">FR · عربي</div>
       <div className="d-phone__cadre">
         <div className="d-phone__encoche" />
         <div className="d-phone__ecran">
           <div className="d-app__entete"><Flag className="d-app__drapeau" /><b>Ndeze Natidja</b><i className="d-app__live" /></div>
           <div className="d-app__hero">
-            <small>SESSION JUIN 2026</small>
-            <strong>Découvrez votre résultat</strong>
+            <small>{t('d.phoneSession')}</small>
+            <strong>{t('d.phoneTitle')}</strong>
             <div className="d-app__recherche">
               <Icon name="search" size={14} />
               <span className="d-app__saisie">maabadi ben</span>
@@ -86,7 +87,7 @@ function Telephone() {
           </div>
           <div className="d-app__carte">
             <div className="d-app__nom"><b>MAABADI</b> Ben Tamou</div>
-            <span className="d-app__badge"><i /> Admis(e)</span>
+            <span className="d-app__badge"><i /> {t('d.phoneAdmis')}</span>
             <small>Groupe Scolaire Avenir (Moroni)</small>
             <span className="d-app__icone"><Icon name="check" size={18} /></span>
           </div>
@@ -98,76 +99,77 @@ function Telephone() {
 }
 
 export default function DiscoverView() {
+  const { t, lang } = useI18n()
   const demo = redigerDemandeDemonstration({ version: VERSION })
   const versChiffres = () => document.getElementById('d-chiffres')?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' })
 
   return (
-    <div className="decouvrir" lang="fr">
+    <div className="decouvrir" lang={lang}>
       {/* ===================== HÉROS ===================== */}
       <section className="d-hero">
         <div className="d-orbe d-orbe--1" aria-hidden="true" />
         <div className="d-orbe d-orbe--2" aria-hidden="true" />
         <div className="d-orbe d-orbe--3" aria-hidden="true" />
         <div className="d-hero__texte">
-          <Reveal className="d-surtitre"><Flag className="d-surtitre__drapeau" /> Résultats des examens · Union des Comores</Reveal>
+          <Reveal className="d-surtitre"><Flag className="d-surtitre__drapeau" /> {t('d.surtitre')}</Reveal>
           <Reveal as="h1" delay={120} className="d-titre">
-            Vos résultats.<br />
-            <span className="d-degrade">Sans attendre.</span>
+            {t('d.hero1')}<br />
+            <span className="d-degrade">{t('d.hero2')}</span>
           </Reveal>
           <Reveal as="p" delay={260} className="d-chapo">
-            Le jour des résultats, tout un pays cherche en même temps. Ndeze Natidja répond en un instant, même sur une connexion fragile.
+            {t('d.chapo')}
           </Reveal>
           <Reveal delay={400} className="d-actions">
             <button type="button" className="d-bouton d-bouton--plein" onClick={() => navigate('/')}>
-              <Icon name="search" size={18} /> Chercher un résultat
+              <Icon name="search" size={18} /> {t('d.btnSearch')}
             </button>
             <button type="button" className="d-bouton d-bouton--vide" onClick={versChiffres}>
-              Voir comment ça marche <Icon name="chevronR" size={16} className="flip-rtl d-bas" />
+              {t('d.btnHow')} <Icon name="chevronR" size={16} className="flip-rtl d-bas" />
             </button>
           </Reveal>
-          <Reveal delay={520} className="d-mini">Baccalauréat · BEPC · Français et arabe · Application Android</Reveal>
+          <Reveal delay={520} className="d-mini">{t('d.mini')}</Reveal>
         </div>
-        <Reveal delay={300} className="d-hero__visuel"><Telephone /></Reveal>
+        <Reveal delay={300} className="d-hero__visuel"><Telephone t={t} /></Reveal>
         <div className="d-defile" aria-hidden="true"><i /></div>
       </section>
 
       {/* ===================== LES CHIFFRES ===================== */}
       <section className="d-section d-section--chiffres" id="d-chiffres">
-        <Reveal as="h2" className="d-h2">Des chiffres, <span className="d-degrade">pas des promesses.</span></Reveal>
+        <Reveal as="h2" className="d-h2">{t('d.chT1')} <span className="d-degrade">{t('d.chT2')}</span></Reveal>
         <div className="d-chiffres">
-          <GrandChiffre valeur={4.2} decimales={1} suffixe=" Ko" legende="pour une recherche (moyenne mesurée)" delai={0} />
-          <GrandChiffre valeur={12} suffixe=" Ko" legende="pour chaque visite suivante, une fois l'application installée" delai={120} />
-          <GrandChiffre valeur={1500} suffixe="*" legende="visiteurs simultanés, sans la moindre erreur" delai={240} />
-          <GrandChiffre valeur={0} legende="base de données à attaquer" delai={360} />
+          <GrandChiffre valeur={4.2} decimales={1} suffixe={t('d.unit')} legende={t('d.ch1')} delai={0} />
+          <GrandChiffre valeur={12} suffixe={t('d.unit')} legende={t('d.ch2')} delai={120} />
+          <GrandChiffre valeur={1500} suffixe="*" legende={t('d.ch3')} delai={240} />
+          <GrandChiffre valeur={0} legende={t('d.ch4')} delai={360} />
         </div>
         <Reveal as="p" className="d-note">
-          * Test de charge réalisé en local avec les outils du projet. La capacité de l'hébergement final se mesure lors de l'essai sur le serveur réel.
+          {t('d.chNote')}
         </Reveal>
       </section>
 
       {/* ===================== INSTANTANÉ ===================== */}
       <section className="d-section d-bloc">
         <Reveal className="d-bloc__texte">
-          <p className="d-kicker">Instantané</p>
-          <h2 className="d-h2">Un petit fichier. <span className="d-degrade">Pas un serveur qui travaille.</span></h2>
-          <p>Les résultats sont découpés à l'avance en petits fichiers. Une recherche télécharge uniquement le bon, et la comparaison se fait dans le téléphone. Rien à calculer côté serveur : pas de file d'attente, pas de page qui ne charge plus le jour J.</p>
+          <p className="d-kicker">{t('d.k1')}</p>
+          <h2 className="d-h2">{t('d.i1')} <span className="d-degrade">{t('d.i2')}</span></h2>
+          <p>{t('d.ip')}</p>
         </Reveal>
         <Reveal delay={150} className="d-bloc__visuel">
-          <div className="d-pulse" aria-hidden="true"><i /><i /><i /><b>4,2 Ko</b></div>
+          <div className="d-pulse" aria-hidden="true"><i /><i /><i /><b>{t('d.puceA').split(' ').slice(0, 2).join(' ')}</b></div>
         </Reveal>
       </section>
 
       {/* ===================== HORS-LIGNE ===================== */}
       <section className="d-section d-bloc d-bloc--inverse">
         <Reveal className="d-bloc__texte">
-          <p className="d-kicker">Hors-ligne</p>
-          <h2 className="d-h2">Le réseau disparaît. <span className="d-degrade">Pas votre résultat.</span></h2>
-          <p>L'application garde en mémoire ce que vous avez consulté. Elle s'ouvre et affiche vos résultats même quand la connexion tombe : dans le taxi-brousse comme à la maison.</p>
+          <p className="d-kicker">{t('d.k2')}</p>
+          <h2 className="d-h2">{t('d.o1')} <span className="d-degrade">{t('d.o2')}</span></h2>
+          <p>{t('d.op')}</p>
         </Reveal>
         <Reveal delay={150} className="d-bloc__visuel">
           <div className="d-signal" aria-hidden="true">
             <div className="d-signal__barres"><i /><i /><i /><i /></div>
-            <div className="d-signal__etat"><span className="d-signal__hors"><Icon name="alert" size={16} /> Pas de réseau</span><span className="d-signal__ok"><Icon name="check" size={16} /> Résultat disponible</span></div>
+            <div className="d-signal__etat"><span className="d-signal__hors"><Icon name="alert" size={16} /> {t('d.noNet')}</span><span className="d-signal__ok"><Icon name="check" size={16} /> {t('d.available')}</span></div>
           </div>
         </Reveal>
       </section>
@@ -175,17 +177,17 @@ export default function DiscoverView() {
       {/* ===================== SÉCURITÉ ===================== */}
       <section className="d-section d-bloc">
         <Reveal className="d-bloc__texte">
-          <p className="d-kicker">Sécurité</p>
-          <h2 className="d-h2">Rien à attaquer. <span className="d-degrade">Rien publié sans deux personnes.</span></h2>
-          <p>Le site public ne contient aucune connexion. Les résultats sont publiés depuis une console à double authentification : un fichier n'est jamais mis en ligne sans l'accord d'une seconde personne, et chaque action est inscrite dans un journal d'audit infalsifiable.</p>
-          <p className="d-petit">Console testée en prototype ; un audit de sécurité indépendant sera réalisé avant tout usage officiel.</p>
+          <p className="d-kicker">{t('d.k3')}</p>
+          <h2 className="d-h2">{t('d.s1')} <span className="d-degrade">{t('d.s2')}</span></h2>
+          <p>{t('d.sp')}</p>
+          <p className="d-petit">{t('d.sSmall')}</p>
         </Reveal>
         <Reveal delay={150} className="d-bloc__visuel">
           <div className="d-cles" aria-hidden="true">
-            <div className="d-cle d-cle--1"><Icon name="lock" size={22} /><span>Préparateur</span></div>
+            <div className="d-cle d-cle--1"><Icon name="lock" size={22} /><span>{t('d.keyPrep')}</span></div>
             <div className="d-cle__lien"><i /></div>
-            <div className="d-cle d-cle--2"><Icon name="shield" size={22} /><span>Approbateur</span></div>
-            <div className="d-cles__resultat"><Icon name="check" size={18} /> Publié</div>
+            <div className="d-cle d-cle--2"><Icon name="shield" size={22} /><span>{t('d.keyAppr')}</span></div>
+            <div className="d-cles__resultat"><Icon name="check" size={18} /> {t('d.published')}</div>
           </div>
         </Reveal>
       </section>
@@ -193,15 +195,15 @@ export default function DiscoverView() {
       {/* ===================== VIE PRIVÉE ===================== */}
       <section className="d-section d-bloc d-bloc--inverse">
         <Reveal className="d-bloc__texte">
-          <p className="d-kicker">Vie privée</p>
-          <h2 className="d-h2">Aucun nom à l'accueil. <span className="d-degrade">Le détail, sur confirmation.</span></h2>
-          <p>L'accueil n'affiche que des statistiques. Un résultat n'apparaît qu'après une recherche, et l'attestation (moyenne, date de naissance) ne s'ouvre qu'après confirmation du numéro de table et de la date de naissance. Les candidats peuvent partager leur réussite avec une image qui ne montre ni numéro ni date.</p>
+          <p className="d-kicker">{t('d.k4')}</p>
+          <h2 className="d-h2">{t('d.v1')} <span className="d-degrade">{t('d.v2')}</span></h2>
+          <p>{t('d.vp')}</p>
         </Reveal>
         <Reveal delay={150} className="d-bloc__visuel">
           <div className="d-confid" aria-hidden="true">
             <div className="d-confid__carte d-confid__carte--flou"><b>••••••••</b><span>•• / •• / ••••</span></div>
             <div className="d-confid__cadenas"><Icon name="lock" size={26} /></div>
-            <div className="d-confid__carte d-confid__carte--net"><b>ADMIS(E)</b><span>Mention Bien</span></div>
+            <div className="d-confid__carte d-confid__carte--net"><b>{t('d.phoneCard')}</b><span>{t('d.phoneMention')}</span></div>
           </div>
         </Reveal>
       </section>
@@ -209,9 +211,9 @@ export default function DiscoverView() {
       {/* ===================== POUR TOUS ===================== */}
       <section className="d-section d-bloc">
         <Reveal className="d-bloc__texte">
-          <p className="d-kicker">Pour tous</p>
-          <h2 className="d-h2">Français, arabe. <span className="d-degrade">Clair, sombre, vos couleurs.</span></h2>
-          <p>Une interface en français et en arabe (avec lecture de droite à gauche), quatre palettes, un mode clair et un mode sombre. Sur téléphone comme sur ordinateur, et installable comme une vraie application Android.</p>
+          <p className="d-kicker">{t('d.k5')}</p>
+          <h2 className="d-h2">{t('d.p1')} <span className="d-degrade">{t('d.p2')}</span></h2>
+          <p>{t('d.pp')}</p>
         </Reveal>
         <Reveal delay={150} className="d-bloc__visuel">
           <div className="d-palettes" aria-hidden="true">
@@ -223,12 +225,12 @@ export default function DiscoverView() {
 
       {/* ===================== COMMENT ÇA MARCHE ===================== */}
       <section className="d-section d-section--etapes">
-        <Reveal as="h2" className="d-h2 d-centre">Du fichier Excel <span className="d-degrade">à l'écran du candidat.</span></Reveal>
+        <Reveal as="h2" className="d-h2 d-centre">{t('d.e1')} <span className="d-degrade">{t('d.e2')}</span></Reveal>
         <ol className="d-etapes">
           {[
-            ['1', 'Un responsable dépose le fichier', 'Le tableau Excel est vérifié ligne par ligne : doublons, champs manquants, dates impossibles. Rien n\'est publié.'],
-            ['2', 'Une seconde personne approuve', 'Elle relit le « avant / après », puis approuve. Personne ne peut approuver son propre dépôt.'],
-            ['3', 'Le site se met à jour tout seul', 'Une publication, une sauvegarde de l\'ancienne version, et les candidats voient leurs résultats.'],
+            ['1', t('d.st1t'), t('d.st1p')],
+            ['2', t('d.st2t'), t('d.st2p')],
+            ['3', t('d.st3t'), t('d.st3p')],
           ].map(([n, titre, texte], i) => (
             <Reveal as="li" key={n} delay={i * 160} className="d-etape">
               <span className="d-etape__n">{n}</span>
@@ -242,15 +244,15 @@ export default function DiscoverView() {
       {/* ===================== APPEL FINAL ===================== */}
       <section className="d-section d-final">
         <div className="d-orbe d-orbe--4" aria-hidden="true" />
-        <Reveal as="h2" className="d-titre d-titre--moyen d-centre">Prêt à le voir <span className="d-degrade">en vrai ?</span></Reveal>
-        <Reveal as="p" delay={120} className="d-chapo d-centre">Essayez la recherche tout de suite, ou demandez une démonstration complète : de l'import du fichier Excel à l'écran du candidat.</Reveal>
+        <Reveal as="h2" className="d-titre d-titre--moyen d-centre">{t('d.f1')} <span className="d-degrade">{t('d.f2')}</span></Reveal>
+        <Reveal as="p" delay={120} className="d-chapo d-centre">{t('d.fp')}</Reveal>
         <Reveal delay={240} className="d-actions d-actions--centre">
-          <button type="button" className="d-bouton d-bouton--plein" onClick={() => navigate('/')}><Icon name="search" size={18} /> Chercher un résultat</button>
-          <a className="d-bouton d-bouton--vide" href={demo.lien}><Icon name="share" size={18} /> Demander une démonstration</a>
+          <button type="button" className="d-bouton d-bouton--plein" onClick={() => navigate('/')}><Icon name="search" size={18} /> {t('d.btnSearch')}</button>
+          <a className="d-bouton d-bouton--vide" href={demo.lien}><Icon name="share" size={18} /> {t('d.btnDemo')}</a>
         </Reveal>
         <Reveal delay={360} className="d-signature">
           <Signature size="lg" link />
-          <p>Une œuvre originale · mmbt.fr</p>
+          <p>{t('d.sig')}</p>
         </Reveal>
       </section>
     </div>
