@@ -35,7 +35,7 @@ const ImpressionNative = registerPlugin('ImpressionNative')
  * d'AFFICHAGE : les fichiers publiés contiennent encore ces détails. La protection réelle suppose
  * que la comparaison se fasse sur un serveur (voir docs/CONFIDENTIALITE.md).
  */
-function VerificationIdentite({ candidat, session, service, onValide, onClose }) {
+function VerificationIdentite({ candidat, session, service, demo, onValide, onClose }) {
   const { t } = useI18n()
   const [numero, setNumero] = useState('')
   const [naissance, setNaissance] = useState('')
@@ -44,6 +44,16 @@ function VerificationIdentite({ candidat, session, service, onValide, onClose })
   const [bloque, setBloque] = useState(false)
   const [message, setMessage] = useState('') // 'locked' | 'unavailable' | ''
   const [enCours, setEnCours] = useState(false)
+
+  // MODE DÉMONSTRATION : les données sont fictives, donc on peut proposer de remplir le formulaire à la place
+  // du visiteur (utile pour montrer l'attestation sans connaître le numéro ni la date). Le bouton n'existe
+  // QUE si exams.json contient "demo": true ; avec de vraies données il disparaît.
+  const remplirDemo = () => {
+    const [a, m, j] = String(candidat.birthDate ?? '').split('-')
+    setNumero(candidat.tableNumber)
+    setNaissance(j ? `${j}/${m}/${a}` : '')
+    setErreur(false)
+  }
 
   const verifier = async (e) => {
     e.preventDefault()
@@ -92,12 +102,15 @@ function VerificationIdentite({ candidat, session, service, onValide, onClose })
       </label>
       {message === 'unavailable' && <p className="gate__error" role="alert">{t('id.unavailable')}</p>}
       {message !== 'unavailable' && erreur && <p className="gate__error" role="alert">{bloque ? t('id.locked') : t('id.error')}</p>}
+      {demo && candidat.birthDate && (
+        <button type="button" className="btn btn--ghost gate__demo" onClick={remplirDemo}>{t('id.demoFill')}</button>
+      )}
       <button type="submit" className="btn btn--primary" disabled={bloque || enCours}>{t('id.submit')}</button>
     </form>
   )
 }
 
-export default function CandidateModal({ candidat: candidatPublic, session, service, onClose }) {
+export default function CandidateModal({ candidat: candidatPublic, session, service, demo, onClose }) {
   const { t } = useI18n()
   const [sensibles, setSensibles] = useState(null) // détails sensibles reçus du service d'attestation (s'il est activé)
   const candidat = useMemo(() => (sensibles ? { ...candidatPublic, ...sensibles } : candidatPublic), [candidatPublic, sensibles])
@@ -234,7 +247,7 @@ export default function CandidateModal({ candidat: candidatPublic, session, serv
 
       <div className="modal__panel">
         {!identifie ? (
-          <VerificationIdentite candidat={candidat} session={session} service={service} onValide={(d) => { if (d) setSensibles(d); setIdentifie(true) }} onClose={onClose} />
+          <VerificationIdentite candidat={candidat} session={session} service={service} demo={demo} onValide={(d) => { if (d) setSensibles(d); setIdentifie(true) }} onClose={onClose} />
         ) : (
         <>
         <div className="modal__bar no-print">

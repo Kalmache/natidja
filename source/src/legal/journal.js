@@ -5,6 +5,15 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.7.1',
+    date: '01/11/2026',
+    titre: 'Mode démonstration : voir l’attestation sans connaître les données',
+    points: [
+      'Dans la version de démonstration (résultats fictifs), la fenêtre « Confirmez votre identité » propose un bouton « Démonstration : remplir pour moi » qui saisit le numéro de table et la date de naissance du candidat',
+      'Ce bouton n’existe que tant que les données sont déclarées fictives : avec de vraies données, il disparaît',
+    ],
+  },
+  {
     version: '3.7.0',
     date: '01/11/2026',
     titre: 'Des félicitations qui se voient',
