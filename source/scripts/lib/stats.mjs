@@ -25,10 +25,16 @@ export function calculerStats(candidats, session) {
   for (const c of candidats) {
     // Classement des établissements : les candidats libres n'appartiennent à aucun établissement.
     if (c.school && !estCandidatLibre(c.school)) {
-      const e = parEtablissement.get(c.school) ?? { total: 0, admis: 0, iles: {} }
+      const e = parEtablissement.get(c.school) ?? { total: 0, admis: 0, second: 0, iles: {}, series: {} }
       e.total++
       if (c.status === 'ADMIS') e.admis++
+      if (c.status === 'SECOND_GROUPE') e.second++
       e.iles[c.island] = (e.iles[c.island] ?? 0) + 1
+      if (c.series) {
+        const s = (e.series[c.series] ??= { total: 0, admis: 0 })
+        s.total++
+        if (c.status === 'ADMIS') s.admis++
+      }
       parEtablissement.set(c.school, e)
     }
     inc(stats.parStatut, c.status)
@@ -52,7 +58,13 @@ export function calculerStats(candidats, session) {
     ile: Object.entries(e.iles).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '',
     total: e.total,
     admis: e.admis,
+    second: e.second,
+    ajournes: e.total - e.admis - e.second,
     taux: Math.round((e.admis / e.total) * 1000) / 10, // en %, une décimale
+    // Résultats par série dans cet établissement (pour la fiche détaillée), du meilleur au moins bon taux.
+    series: Object.entries(e.series)
+      .map(([serie, s]) => ({ serie, total: s.total, admis: s.admis, taux: Math.round((s.admis / s.total) * 1000) / 10 }))
+      .sort((a, b) => b.taux - a.taux || a.serie.localeCompare(b.serie)),
   })).sort((a, b) => b.taux - a.taux || b.total - a.total || a.nom.localeCompare(b.nom, 'fr'))
   stats.moyenneGenerale = avecMoyenne ? Math.round((sommeMoyennes / avecMoyenne) * 100) / 100 : 0
   return stats

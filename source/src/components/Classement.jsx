@@ -22,7 +22,7 @@ const Couronne = () => (
   </svg>
 )
 
-export default function Classement({ etablissements, top = 5, minCandidats = 20, chargement = false, onPlus }) {
+export default function Classement({ etablissements, top = 5, minCandidats = 20, chargement = false, onPlus, onOuvrir }) {
   const { t } = useI18n()
   const classes = (etablissements ?? []).filter((e) => e.total >= minCandidats)
   const liste = classes.slice(0, top)
@@ -37,7 +37,7 @@ export default function Classement({ etablissements, top = 5, minCandidats = 20,
     <section className="classement" aria-label={t('rank.title')}>
       <header className="classement__head">
         <h2>{t('rank.title')}</h2>
-        <p>{t('rank.sub')}</p>
+        <p>{t('rank.sub')}{onOuvrir && !chargement ? ` · ${t('rank.tap')}` : ''}</p>
       </header>
 
       {chargement ? (
@@ -52,11 +52,14 @@ export default function Classement({ etablissements, top = 5, minCandidats = 20,
                 const rang = rangDe(e)
                 return (
                   <li key={e.nom} className={`podium__col podium__col--${rang}`}>
-                    {rang === 1 && <Couronne />}
-                    <span className="podium__nom">{e.nom}</span>
-                    <span className="podium__taux">{fr(e.taux)} %</span>
-                    <span className="podium__details">{[e.ile, t('rank.candidates', { n: e.total })].filter(Boolean).join(' · ')}</span>
-                    <span className="podium__bloc" aria-label={`${t('rank.place')} ${rang}`}>{rang}</span>
+                    {/* Un bouton : on touche la marche, la fiche de l'établissement s'ouvre. */}
+                    <button type="button" className="podium__btn" onClick={() => onOuvrir?.(e)} aria-label={`${t('rank.place')} ${rang} : ${e.nom}, ${fr(e.taux)} %`}>
+                      {rang === 1 && <Couronne />}
+                      <span className="podium__nom">{e.nom}</span>
+                      <span className="podium__taux">{fr(e.taux)} %</span>
+                      <span className="podium__details">{[e.ile, t('rank.candidates', { n: e.total })].filter(Boolean).join(' · ')}</span>
+                      <span className="podium__bloc" aria-hidden="true">{rang}</span>
+                    </button>
                   </li>
                 )
               })}
@@ -67,12 +70,14 @@ export default function Classement({ etablissements, top = 5, minCandidats = 20,
             <ol className="podium__suite" start={podium.length ? 4 : 1}>
               {suite.map((e) => (
                 <li key={e.nom}>
-                  <span className="podium__rang" aria-label={`${t('rank.place')} ${rangDe(e)}`}>{rangDe(e)}</span>
-                  <span className="podium__ligne">
-                    <strong>{e.nom}</strong>
-                    <small>{[e.ile, t('rank.candidates', { n: e.total })].filter(Boolean).join(' · ')}</small>
-                  </span>
-                  <b>{fr(e.taux)} %</b>
+                  <button type="button" className="podium__rangee" onClick={() => onOuvrir?.(e)}>
+                    <span className="podium__rang" aria-label={`${t('rank.place')} ${rangDe(e)}`}>{rangDe(e)}</span>
+                    <span className="podium__ligne">
+                      <strong>{e.nom}</strong>
+                      <small>{[e.ile, t('rank.candidates', { n: e.total })].filter(Boolean).join(' · ')}</small>
+                    </span>
+                    <b>{fr(e.taux)} %</b>
+                  </button>
                 </li>
               ))}
             </ol>

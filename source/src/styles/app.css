@@ -633,3 +633,105 @@ html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-event
 @media (prefers-reduced-motion: reduce) { .podium__bloc, .classement__couronne, .podium__suite li { animation: none !important; } }
 /* Sur la page Statistiques, la carte du classement occupe toute la largeur de la grille (pas de marge d'accueil). */
 .panel--wide > .classement { margin: 0; }
+
+/* ==========================================================================
+   Page Statistiques : comparaison à la moyenne nationale + champion de chaque île
+   ========================================================================== */
+.vs h2, .iles-champions h2 { font-size: 1.15rem; }
+.vs__sous { color: var(--text-3); font-size: 0.85rem; margin: 2px 0 16px; }
+.vs__axe, .vs__ligne { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr) 72px; gap: 14px; align-items: center; }
+.vs__axe { font-size: 0.72rem; color: var(--text-3); margin-bottom: 4px; }
+.vs__axe div { grid-column: 2; display: flex; justify-content: space-between; }
+.vs__liste { display: grid; gap: 10px; list-style: none; padding: 0; }
+.vs__ligne { animation: rise 0.5s var(--delay, 0ms) var(--ease) both; }
+.vs__nom strong { display: block; font-size: 0.9rem; line-height: 1.25; overflow-wrap: anywhere; }
+.vs__nom small { color: var(--text-3); font-size: 0.74rem; }
+.vs__piste { position: relative; height: 28px; background: linear-gradient(var(--border), var(--border)) center / 100% 2px no-repeat; }
+.vs__nat { position: absolute; top: 0; bottom: 0; width: 0; border-inline-start: 2px dashed var(--text-3); }
+.vs__trait { position: absolute; top: 50%; height: 7px; margin-top: -3.5px; border-radius: 999px; background: linear-gradient(90deg, var(--p-600), var(--p-400)); transform-origin: left; animation: croit 0.9s calc(var(--delay, 0ms) + 0.2s) var(--ease) both; }
+.vs__trait--sous { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+@keyframes croit { from { transform: scaleX(0); } }
+.vs__point { position: absolute; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--p-500); border: 3px solid var(--surface); box-shadow: 0 2px 8px rgb(0 0 0 / 0.3); }
+.vs__point--or { background: #f59e0b; }
+.vs__point--sous { background: #f59e0b; }
+[dir='rtl'] .vs__point { margin: -9px -9px 0 0; }
+.vs__ecart { color: var(--ok-strong); font-variant-numeric: tabular-nums; text-align: end; font-size: 0.9rem; }
+.vs__ecart--sous { color: var(--warn-strong); }
+[data-theme='dark'] .vs__ecart { color: #6ee7b7; } [data-theme='dark'] .vs__ecart--sous { color: #fcd34d; }
+.vs__legende { margin-top: 14px; font-size: 0.76rem; color: var(--text-3); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.vs__trait-leg { display: inline-block; height: 14px; border-inline-start: 2px dashed var(--text-3); }
+@media (max-width: 560px) { .vs__axe, .vs__ligne { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) 60px; gap: 10px; } .vs__ecart { font-size: 0.8rem; } }
+.iles-champions__liste { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; list-style: none; padding: 0; }
+.iles-champions__liste li { display: grid; justify-items: center; text-align: center; gap: 4px; padding: 18px 14px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 20px; animation: rise 0.55s var(--delay, 0ms) var(--ease) both; }
+.iles-champions__ile { font-size: 0.74rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+.iles-champions__couronne { width: 24px; height: 24px; fill: #f59e0b; }
+.iles-champions__taux { font-size: 2.1rem; font-weight: 900; letter-spacing: -0.02em; color: var(--ok-strong); }
+[data-theme='dark'] .iles-champions__taux { color: #6ee7b7; }
+.iles-champions__nom { font-weight: 800; line-height: 1.2; }
+.iles-champions small { color: var(--text-3); font-size: 0.76rem; }
+@media (prefers-reduced-motion: reduce) { .vs__ligne, .vs__trait, .iles-champions__liste li { animation: none !important; } }
+
+/* ==========================================================================
+   Les blocs RÉAGISSENT au toucher et FLOTTENT doucement de haut en bas
+   ========================================================================== */
+/* boutons : on neutralise le style par défaut, on garde un retour visuel net */
+.podium__btn, .podium__rangee, .vs__ligne, .iles-champions__btn { font: inherit; color: inherit; background: none; border: 0; padding: 0; text-align: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.podium__btn { width: 100%; display: grid; justify-items: center; align-content: end; gap: 4px; }
+.podium__btn:hover .podium__bloc { filter: brightness(1.12); } .podium__btn:active .podium__bloc { filter: brightness(1.25); }
+.podium__btn:focus-visible, .podium__rangee:focus-visible, .vs__ligne:focus-visible, .iles-champions__btn:focus-visible { outline: 3px solid var(--p-500); outline-offset: 3px; border-radius: 14px; }
+.podium__rangee { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 0; transition: transform 0.2s var(--ease); }
+.podium__suite li { padding: 0; }
+.podium__rangee { padding: 10px 12px; border-radius: 14px; } .podium__rangee:hover { background: color-mix(in srgb, var(--p-500) 10%, transparent); } .podium__rangee:active { background: color-mix(in srgb, var(--p-500) 18%, transparent); }
+.vs__ligne { width: 100%; padding: 6px 8px; margin-inline: -8px; border-radius: 14px; transition: background 0.2s; } .vs__ligne:hover { background: color-mix(in srgb, var(--p-500) 9%, transparent); } .vs__ligne:active { background: color-mix(in srgb, var(--p-500) 16%, transparent); }
+.vs__liste > li { animation: rise 0.5s var(--delay, 0ms) var(--ease) both; } .vs__ligne { animation: none; }
+.iles-champions__liste li { padding: 0; }
+.iles-champions__btn { width: 100%; display: grid; justify-items: center; gap: 4px; padding: 18px 14px; border-radius: 20px; transition: box-shadow 0.25s var(--ease), background 0.2s; } .iles-champions__btn:hover { box-shadow: var(--shadow); background: color-mix(in srgb, var(--p-500) 8%, transparent); } .iles-champions__btn:active { background: color-mix(in srgb, var(--p-500) 16%, transparent); }
+
+/* flottement vertical très doux (chaque bloc a son rythme) : démarre APRÈS l'apparition */
+@keyframes flotteVert { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+.podium__col--1 { animation: flotteVert 6.4s 1.4s ease-in-out infinite; }
+.podium__col--2 { animation: flotteVert 7.3s 2.2s ease-in-out infinite; }
+.podium__col--3 { animation: flotteVert 6.8s 3.1s ease-in-out infinite; }
+.iles-champions__liste li { animation: rise 0.55s var(--delay, 0ms) var(--ease) both, flotteVert 7s calc(var(--flot, 0s) + 1.2s) ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .podium__col, .iles-champions__liste li { animation: none !important; } }
+
+/* un chiffre clé touché fait glisser vers son graphique, qui s'illumine un instant */
+.panel[id] { scroll-margin-top: calc(var(--safe-top) + 92px); }
+.is-flash { animation: eclat 1.8s var(--ease); }
+@keyframes eclat { 0%, 100% { box-shadow: var(--shadow-sm); } 25%, 60% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--p-500) 55%, transparent), var(--shadow); } }
+
+/* ==========================================================================
+   Fiche d'un établissement
+   ========================================================================== */
+.etab { position: relative; display: grid; gap: 18px; padding: 24px 22px 22px; background: var(--surface); border-radius: 22px; box-shadow: var(--shadow-lg); }
+.etab__close { position: absolute; inset-block-start: 10px; inset-inline-end: 10px; }
+.etab__head { display: flex; align-items: center; gap: 14px; padding-inline-end: 44px; }
+.etab__medaille { flex: none; width: 46px; height: 46px; font-size: 1.2rem; }
+.etab__head h2 { font-size: 1.2rem; line-height: 1.2; overflow-wrap: anywhere; } .etab__head p { color: var(--text-3); font-size: 0.85rem; margin-top: 2px; }
+.etab__taux { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 16px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--border); }
+.etab__anneau { position: relative; flex: none; width: 112px; height: 112px; }
+.etab__anneau svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.etab__piste { fill: none; stroke: var(--border); stroke-width: 9; } .etab__val { fill: none; stroke-width: 9; stroke-linecap: round; animation: croitAnneau 1.2s 0.15s var(--ease) both; }
+@keyframes croitAnneau { from { stroke-dasharray: 0 100; } }
+.etab__anneau b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 1.35rem; font-weight: 900; }
+.etab__legende { font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); }
+.etab__ecart { margin-top: 4px; font-weight: 800; color: var(--ok-strong); max-width: 26ch; } .etab__ecart--sous { color: var(--warn-strong); }
+[data-theme='dark'] .etab__ecart { color: #6ee7b7; } [data-theme='dark'] .etab__ecart--sous { color: #fcd34d; }
+.etab__bloc h3 { font-size: 0.95rem; margin-bottom: 10px; }
+.etab__barre { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--surface-2); gap: 2px; }
+.etab__legende-liste { display: grid; gap: 8px; margin-top: 12px; list-style: none; padding: 0; }
+.etab__legende-liste li { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 700; }
+.etab__legende-liste small { color: var(--text-3); min-width: 52px; text-align: end; }
+.etab__series { display: grid; gap: 10px; list-style: none; padding: 0; }
+.etab__series li { display: grid; grid-template-columns: 70px minmax(0, 1fr) 58px; gap: 6px 12px; align-items: center; font-size: 0.88rem; font-weight: 700; }
+.etab__series small { grid-column: 2 / -1; margin-top: -6px; color: var(--text-3); font-size: 0.72rem; font-weight: 600; }
+.etab__jauge { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; } .etab__jauge i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--p-600), var(--p-400)); transform-origin: left; animation: croit 0.9s 0.3s var(--ease) both; }
+.etab__series b { text-align: end; color: var(--ok-strong); } [data-theme='dark'] .etab__series b { color: #6ee7b7; }
+.etab__places { display: grid; gap: 6px; padding: 14px 16px; border-radius: 16px; background: var(--surface-2); font-weight: 700; font-size: 0.9rem; } .etab__places p { display: flex; align-items: center; gap: 8px; }
+.etab__note { font-size: 0.74rem; color: var(--text-3); }
+
+/* Pastille de rang : or (1er), argent (2e), bronze (3e), neutre ensuite */
+.medaille { display: grid; place-items: center; font-weight: 900; border-radius: 50%; color: #3b2a00; background: linear-gradient(135deg, #fde68a, #f59e0b); box-shadow: 0 4px 14px rgb(245 158 11 / 0.45); }
+.medaille--2 { color: #1e293b; background: linear-gradient(135deg, #f1f5f9, #94a3b8); box-shadow: 0 4px 14px rgb(148 163 184 / 0.5); }
+.medaille--3 { color: #431407; background: linear-gradient(135deg, #fdba74, #c2410c); box-shadow: 0 4px 14px rgb(194 65 12 / 0.4); }
+.medaille--n { color: var(--text-2); background: var(--surface-2); box-shadow: none; border: 1px solid var(--border); }

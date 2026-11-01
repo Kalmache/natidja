@@ -5,6 +5,17 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.1.1',
+    date: '01/11/2026',
+    titre: 'Des statistiques qui apportent du nouveau',
+    points: [
+      'Le podium reste sur l’accueil ; la page Statistiques ne le répète plus. Elle montre chaque établissement comparé à la moyenne nationale (de combien il la dépasse) et le meilleur établissement de chaque île',
+      'Toucher un établissement ouvre sa fiche : taux de réussite, écart avec la moyenne nationale, répartition des résultats, réussite par série et place dans le classement (chiffres agrégés, aucun nom de candidat)',
+      'Les blocs flottent doucement de haut en bas, et les chiffres clés de la page Statistiques mènent au graphique qui les détaille',
+      '128 tests automatiques',
+    ],
+  },
+  {
     version: '3.1.0',
     date: '01/11/2026',
     titre: 'Le podium des établissements',

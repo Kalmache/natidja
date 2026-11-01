@@ -3,14 +3,17 @@
 // Les chiffres viennent de public/data/<session>/stats.json, fichier calculé
 // à l'avance par scripts/build-stats.mjs (voir ce fichier pour le détail).
 // ============================================================================
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Icon from '../components/Icon.jsx'
 import Stat from '../components/Stat.jsx'
 import IslandMap from '../components/IslandMap.jsx'
 import { Columns, Donut, Legend, StackedBars } from '../components/Charts.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { loadStats } from '../lib/data.js'
-import Classement from '../components/Classement.jsx'
+import ClassementComparaison from '../components/ClassementComparaison.jsx'
+import MeilleursParIle from '../components/MeilleursParIle.jsx'
+import EtablissementModal from '../components/EtablissementModal.jsx'
+import { prefersReducedMotion } from '../hooks.js'
 
 const ORDRE_STATUTS = ['ADMIS', 'SECOND_GROUPE', 'AJOURNE']
 const ORDRE_MENTIONS = ['PASSABLE', 'ASSEZ_BIEN', 'BIEN', 'TRES_BIEN']
@@ -19,6 +22,16 @@ export default function StatsView({ session, classement: reglage }) {
   const { t } = useI18n()
   const [stats, setStats] = useState(null)
   const [erreur, setErreur] = useState(false)
+  const [etabOuvert, setEtabOuvert] = useState(null) // établissement dont on regarde la fiche
+  const fermerEtab = useCallback(() => setEtabOuvert(null), [])
+  // Toucher un chiffre clé fait glisser jusqu'au graphique qui le détaille, qui s'illumine un instant.
+  const aller = useCallback((id) => {
+    const el = document.getElementById(id)
+    if (!el) return
+    el.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' })
+    el.classList.add('is-flash')
+    setTimeout(() => el.classList.remove('is-flash'), 1800)
+  }, [])
 
   useEffect(() => {
     let actif = true
@@ -75,14 +88,14 @@ export default function StatsView({ session, classement: reglage }) {
       </header>
 
       <section className="kpis kpis--flat">
-        <Stat value={total} label={t('kpi.candidates')} />
-        <Stat value={admis} label={t('kpi.admitted')} tone="ok" />
-        <Stat value={(admis / total) * 100} decimals={1} suffix=" %" label={t('kpi.rate')} tone="accent" />
-        <Stat value={stats.moyenneGenerale} decimals={2} suffix=" /20" label={t('stats.average')} />
+        <Stat value={total} label={t('kpi.candidates')} onClick={() => aller('stats-statut')} />
+        <Stat value={admis} label={t('kpi.admitted')} tone="ok" onClick={() => aller('stats-statut')} />
+        <Stat value={(admis / total) * 100} decimals={1} suffix=" %" label={t('kpi.rate')} tone="accent" onClick={() => aller('stats-ile')} />
+        <Stat value={stats.moyenneGenerale} decimals={2} suffix=" /20" label={t('stats.average')} onClick={() => aller('stats-mention')} />
       </section>
 
       <div className="stats-grid">
-        <section className="panel">
+        <section className="panel" id="stats-statut">
           <h2>{t('stats.byStatus')}</h2>
           <div className="panel__split">
             <Donut parts={parts} total={total} centerValue={`${((admis / total) * 100).toFixed(1).replace('.', ',')} %`} centerLabel={t('kpi.rate')} />
@@ -95,7 +108,7 @@ export default function StatsView({ session, classement: reglage }) {
           <IslandMap islands={iles} />
         </section>
 
-        <section className="panel">
+        <section className="panel" id="stats-ile">
           <h2>{t('stats.byIsland')}</h2>
           <StackedBars rows={iles.map((i) => ({ key: i.id, label: i.nom, ...i }))} />
           <Legend parts={parts.map((p) => ({ ...p, value: p.value }))} total={total} />
@@ -108,17 +121,33 @@ export default function StatsView({ session, classement: reglage }) {
           </section>
         )}
 
+        {/* L'accueil montre déjà le podium : ici, de l'information NOUVELLE (écart avec la moyenne nationale, champion de chaque île). */}
         {rang.visible && stats.etablissements?.length > 0 && (
-          <div className="panel--wide">
-            <Classement etablissements={stats.etablissements} top={rang.topStatistiques} minCandidats={rang.minCandidats} />
-          </div>
+          <>
+            <section className="panel panel--wide">
+              <ClassementComparaison etablissements={stats.etablissements} top={rang.topStatistiques} minCandidats={rang.minCandidats} nationale={(admis / total) * 100} onOuvrir={setEtabOuvert} />
+            </section>
+            <section className="panel panel--wide">
+              <MeilleursParIle etablissements={stats.etablissements} minCandidats={rang.minCandidats} onOuvrir={setEtabOuvert} />
+            </section>
+          </>
         )}
 
-        <section className="panel panel--wide">
+        <section className="panel panel--wide" id="stats-mention">
           <h2>{t('stats.byMention')}</h2>
           <Columns items={mentions} />
         </section>
       </div>
+
+      {etabOuvert && (
+        <EtablissementModal
+          etablissement={etabOuvert}
+          etablissements={stats.etablissements}
+          minCandidats={rang.minCandidats}
+          nationale={(admis / total) * 100}
+          onClose={fermerEtab}
+        />
+      )}
     </div>
   )
 }
