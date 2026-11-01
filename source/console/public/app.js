@@ -203,16 +203,37 @@ const NOMS_CHAMPS = { lastName: 'Nom', firstName: 'Prénom', birthDate: 'Date de
 const nomChamp = (c) => (c.startsWith('note:') ? `Note ${c.slice(5)}` : NOMS_CHAMPS[c] ?? c)
 const valeur = (v) => (v === null || v === undefined ? '—' : (RESULTATS[v] ?? String(v)))
 
-/** Carte « Lignes modifiées » : ce que le relecteur doit vraiment vérifier. */
+// Gravité d'un changement (pour que le relecteur repère l'essentiel sans tout lire) :
+//   critique  = change le sort du candidat (résultat) ou le retire de la liste → ROUGE
+//   attention = chiffres ou identité à vérifier (moyenne, mention, notes, nom, naissance) → ORANGE
+//   info      = information d'organisation (centre, établissement, série, île…) → GRIS
+const IDENTITE = ['lastName', 'firstName', 'birthDate', 'birthPlace']
+const gravite = (champ) => (champ === 'status' ? 'critique' : champ === 'average' || champ === 'mention' || champ.startsWith('note:') || IDENTITE.includes(champ) ? 'attention' : 'info')
+const ORDRE = { info: 0, attention: 1, critique: 2 }
+const graviteLigne = (l) => (l.type === 'supprime' ? 'critique' : l.type === 'ajoute' ? 'ajout' : l.champs.map((c) => gravite(c.champ)).reduce((m, g) => (ORDRE[g] > ORDRE[m] ? g : m), 'info'))
+const ETIQUETTES = { critique: 'Critique', attention: 'À vérifier', info: 'Information', ajout: 'Ajout' }
+
+/** Carte « Lignes modifiées » : ce que le relecteur doit vraiment vérifier, classé par gravité. */
 function modificationsCarte(m) {
   if (!m) return null // proposition créée avant l'ajout de cette fonction
   const total = m.ajoutes + m.supprimes + m.modifies
   if (!total) return h('div', { class: 'carte' }, h('h3', null, 'Lignes modifiées : 0'), h('p', { class: 'doux' }, 'Ce fichier est identique à la version publiée : aucun candidat ne change.'))
+  // Les lignes les plus graves d'abord (rouge → orange → gris → ajouts).
+  const rang = { critique: 0, attention: 1, ajout: 2, info: 3 }
+  const lignes = [...m.lignes].sort((x, y) => rang[graviteLigne(x)] - rang[graviteLigne(y)])
+  const nb = (g) => m.lignes.filter((l) => graviteLigne(l) === g).length
+  const pastille = (g, n) => n > 0 && h('span', { class: `grav grav--${g}` }, `${n} ${ETIQUETTES[g].toLowerCase()}${g === 'critique' && n > 1 ? 's' : ''}`)
   return h('div', { class: 'carte' }, h('h3', null, `Lignes modifiées : ${total}`),
     h('p', { class: 'doux' }, `${m.modifies} modifié(s) · ${m.ajoutes} ajouté(s) · ${m.supprimes} supprimé(s)${m.tronque ? ` — seules les ${m.lignes.length} premières sont affichées` : ''}`),
+    h('p', { class: 'grav-resume' }, pastille('critique', nb('critique')), pastille('attention', nb('attention')), pastille('ajout', nb('ajout')), pastille('info', nb('info'))),
     h('table', null, h('thead', null, h('tr', null, ['N° de table', 'Nom', 'Changement'].map((t) => h('th', null, t)))),
-      h('tbody', null, m.lignes.map((l) => h('tr', null, h('td', null, l.tableNumber), h('td', null, l.nom),
-        h('td', null, l.type === 'ajoute' ? 'Nouveau candidat' : l.type === 'supprime' ? 'Candidat retiré' : l.champs.map((c) => h('div', null, `${nomChamp(c.champ)} : ${valeur(c.avant)} → ${valeur(c.apres)}`))))))))
+      h('tbody', null, lignes.map((l) => {
+        const g = graviteLigne(l)
+        return h('tr', { class: `lig lig--${g}` }, h('td', null, l.tableNumber), h('td', null, l.nom),
+          h('td', null, h('span', { class: `grav grav--${g}` }, ETIQUETTES[g]),
+            l.type === 'ajoute' ? h('div', null, 'Nouveau candidat') : l.type === 'supprime' ? h('div', null, 'Candidat retiré de la liste')
+              : l.champs.map((c) => h('div', { class: `chg chg--${gravite(c.champ)}` }, `${nomChamp(c.champ)} : `, h('s', null, valeur(c.avant)), ' → ', h('b', null, valeur(c.apres))))))
+      }))))
 }
 
 async function ecranDetail() {
