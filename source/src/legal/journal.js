@@ -5,6 +5,14 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.13.1',
+    date: '01/11/2026',
+    titre: 'Maore, avec son nom comorien',
+    points: [
+      'Sur la carte, dans le filtre des îles et dans les statistiques, Mayotte s’écrit désormais « Maore », comme Ngazidja, Mwali et Ndzuwani (toujours en grisé, à titre symbolique).',
+    ],
+  },
+  {
     version: '3.13.0',
     date: '01/11/2026',
     titre: 'Un comparateur refait : le duel',

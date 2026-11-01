@@ -1,5 +1,5 @@
 // ============================================================================
-// IslandMap.jsx – schéma interactif des îles de l'archipel (Mayotte figure en grisé, à titre symbolique)
+// IslandMap.jsx – schéma interactif des îles de l'archipel (Maore (Mayotte) figure en grisé, à titre symbolique)
 // ----------------------------------------------------------------------------
 // ⚠️ Ce n'est PAS une carte à l'échelle : ce sont des formes stylisées placées
 // à peu près comme sur la vraie carte (Ngazidja au nord-ouest, Mwali au centre,

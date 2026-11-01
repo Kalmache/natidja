@@ -296,7 +296,7 @@ export default {
   'stats.bySeries': 'Réussite par série',
   'stats.byMention': 'Mentions décernées',
   'stats.map': 'Les îles de l’archipel',
-  'map.mayotte': 'Mayotte',
+  'map.mayotte': 'Maore',
   'map.mayotteNo': 'pas de résultats pour cette session',
   'stats.mapHint': 'Touchez une île pour voir ses détails',
   'stats.mapNote': 'Schéma indicatif, non à l’échelle',
