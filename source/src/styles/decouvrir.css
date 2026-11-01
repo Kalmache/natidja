@@ -183,7 +183,10 @@
 
 /* ---------- téléphone et petits écrans ---------- */
 @media (max-width: 900px) {
-  .d-hero { grid-template-columns: 1fr; text-align: center; min-height: 0; padding-bottom: 110px; }
+  .d-hero { grid-template-columns: 1fr; text-align: center; min-height: 0; padding-bottom: 84px; }
+  /* Téléphone : moins de vide autour du téléphone d'exemple et entre les sections. */
+  .d-phone__cadre { aspect-ratio: 9 / 15.4; }
+  .d-section { padding-block: clamp(48px, 9vw, 150px); }
   .d-hero__texte { justify-items: center; }
   .d-actions { justify-content: center; }
   .d-hero .d-chapo { margin-inline: auto; }
@@ -195,7 +198,7 @@
   .d-bloc--inverse .d-bloc__visuel { order: 0; }
   .d-bloc__visuel { min-height: 0; }
   .d-etapes { grid-template-columns: 1fr; }
-  .d-defile { display: none; }
+  .d-defile { bottom: 22px; } /* le petit bouton de défilement reste visible sur téléphone */
 }
 @media (max-width: 420px) {
   .d-actions { width: 100%; } .d-actions .d-bouton { width: 100%; }
@@ -204,7 +207,7 @@
 }
 
 /* ---------- un téléphone, un parallaxe doux au défilement (navigateurs récents) ---------- */
-@supports (animation-timeline: scroll()) {
+@supports (animation-timeline: scroll()) and (min-width: 901px) {
   .d-hero__visuel { animation: d-parallaxe linear both; animation-timeline: scroll(root); animation-range: 0 90vh; }
   @keyframes d-parallaxe { to { transform: translateY(-60px) scale(0.94); opacity: 0.55; } }
 }
