@@ -5,6 +5,17 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.9.0',
+    date: '01/11/2026',
+    titre: 'Un accueil à la hauteur de la présentation',
+    points: [
+      'L’accueil prend l’esprit de la page « Découvrir » : bande d’ouverture sombre sur toute la largeur, titre en dégradé, barre de recherche qui rayonne doucement, chiffres clés lumineux, fine ligne aux couleurs du drapeau',
+      'Trois points forts sous la recherche : instantané, fonctionne hors-ligne, vos données restent privées (en arabe aussi)',
+      'Pendant une recherche, la bande se réduit pour que les résultats apparaissent tout de suite ; rien ne change dans le fonctionnement de la recherche',
+      'Les animations se calment si l’appareil demande moins de mouvement',
+    ],
+  },
+  {
     version: '3.8.0',
     date: '01/11/2026',
     titre: 'Comparer, et des attestations accordées',
