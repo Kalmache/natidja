@@ -1,9 +1,11 @@
 # ============================================================================
 # Fabrication automatique de l'application Android (fichier APK)
 # ----------------------------------------------------------------------------
-# Quand ? À chaque envoi sur « main » qui modifie le code (source/) ou les
-# données (data/), ou à la demande : onglet Actions > « Application Android »
-# > « Run workflow ».
+# Quand ? 1) À chaque PROPOSITION de modification (« pull request ») vers main :
+# l'APK est fabriqué AVANT la fusion, pour pouvoir l'essayer sur un téléphone et
+# décider ensuite de valider ou non. 2) À chaque envoi sur « main » qui modifie le
+# code (source/) ou les données (data/). 3) À la demande : onglet Actions >
+# « Application Android » > « Run workflow ».
 # Résultat : un fichier « ndeze-natidja-android » téléchargeable en bas de la
 # page de l'exécution (conservé 30 jours). C'est un APK « debug » : il
 # s'installe directement sur un téléphone Android (autoriser les sources
@@ -13,6 +15,9 @@ name: Application Android
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths: ['source/**', 'data/**', '.github/workflows/android.yml']
   push:
     branches: [main]
     paths: ['source/**', 'data/**', '.github/workflows/android.yml']
@@ -41,6 +46,19 @@ jobs:
       - name: Construire l'APK
         working-directory: source/android
         run: ./gradlew assembleDebug --no-daemon -PversionCode=${{ github.run_number }}
+      - name: Résumé (où trouver l'APK)
+        working-directory: .
+        run: |
+          {
+            echo "### 📱 APK prêt à essayer"
+            echo "Version : $(node -p "require('./source/package.json').version")"
+            echo ""
+            echo "Téléchargez **ndeze-natidja-android** en bas de cette page, décompressez le fichier .zip, puis installez **app-debug.apk** sur votre téléphone."
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              echo ""
+              echo "_Ceci est un essai AVANT fusion : rien n'est publié tant que la proposition n'est pas fusionnée._"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: ndeze-natidja-android
