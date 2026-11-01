@@ -5,6 +5,25 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.11.0',
+    date: '01/11/2026',
+    titre: 'Retour à l’ancien accueil',
+    points: [
+      'L’accueil retrouve son apparence d’avant (carte d’en-tête colorée, chiffres clés, podium des meilleurs établissements avec le premier, le deuxième et le troisième) ; la bande d’ouverture sombre pleine largeur est abandonnée',
+      'Tout le reste est conservé : drapeau qui flotte, Mayotte en grisé, mentions interactives, comparer et se situer, mode sans classement',
+    ],
+  },
+  {
+    version: '3.10.1',
+    date: '01/11/2026',
+    titre: 'L’accueil respecte la palette choisie',
+    points: [
+      'La bande d’ouverture de l’accueil suit désormais la couleur choisie (émeraude, saphir, ambre ou rubis) : fond, titre, icônes, chiffres et lueur ; elle restait verte quelle que soit la palette',
+      'Le halo autour de la barre de recherche est plus discret',
+      'Quand le classement est masqué, la bande rejoint directement le pied de page : plus de grand vide sombre',
+    ],
+  },
+  {
     version: '3.10.0',
     date: '01/11/2026',
     titre: 'Un drapeau qui flotte, des mentions vivantes, se situer et comparer',
