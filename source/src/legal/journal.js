@@ -5,6 +5,27 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.2.0',
+    date: '01/11/2026',
+    titre: 'La page « Découvrir »',
+    points: [
+      'Nouvelle page de présentation plein écran (À propos → Découvrir la présentation, ou lien « Découvrir » en bas de page) : chiffres animés, démonstration de la recherche sur un téléphone, hors-ligne, sécurité, vie privée, palettes, circuit de publication',
+      'Chargée à la demande : elle n’alourdit pas l’ouverture de l’application, et les animations se calment si l’appareil demande moins de mouvement',
+      'Un bouton « Demander une démonstration » prépare directement l’e-mail',
+    ],
+  },
+  {
+    version: '3.1.1',
+    date: '01/11/2026',
+    titre: 'Des statistiques qui apportent du nouveau',
+    points: [
+      'Le podium reste sur l’accueil ; la page Statistiques ne le répète plus. Elle montre chaque établissement comparé à la moyenne nationale (de combien il la dépasse) et le meilleur établissement de chaque île',
+      'Toucher un établissement ouvre sa fiche : taux de réussite, écart avec la moyenne nationale, répartition des résultats, réussite par série et place dans le classement (chiffres agrégés, aucun nom de candidat)',
+      'Les blocs flottent doucement de haut en bas, et les chiffres clés de la page Statistiques mènent au graphique qui les détaille',
+      '128 tests automatiques',
+    ],
+  },
+  {
     version: '3.1.0',
     date: '01/11/2026',
     titre: 'Le podium des établissements',

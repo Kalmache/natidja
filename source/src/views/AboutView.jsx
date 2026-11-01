@@ -15,6 +15,12 @@ export default function AboutView() {
         <h1>{t('about.title')}</h1>
       </header>
 
+      <button type="button" className="about-discover" onClick={() => navigate('/decouvrir')}>
+        <span className="about-discover__etincelle" aria-hidden="true"><Icon name="chart" size={22} /></span>
+        <span><strong>{t('about.discover')}</strong><small>{t('about.discoverSub')}</small></span>
+        <Icon name="chevronR" size={20} className="flip-rtl" />
+      </button>
+
       <div className="notice notice--warn">
         <Icon name="info" />
         <div>

@@ -18,6 +18,7 @@ import SessionPicker from '../components/SessionPicker.jsx'
 import Classement from '../components/Classement.jsx'
 import CandidateCard from '../components/CandidateCard.jsx'
 import CandidateModal from '../components/CandidateModal.jsx'
+import EtablissementModal from '../components/EtablissementModal.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { buildQuery, matchesFilters } from '../lib/search.js'
 import { loadShard, loadStats } from '../lib/data.js'
@@ -36,6 +37,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
   const [serie, setSerie] = useState('ALL')
   const [statut, setStatut] = useState('ALL')
   const [selection, setSelection] = useState(null) // candidat ouvert dans la fenêtre
+  const [etabOuvert, setEtabOuvert] = useState(null) // établissement dont on regarde la fiche
 
   // ---------- Fiche d'un candidat et bouton RETOUR ----------
   // Problème : la fiche n'était qu'un état de l'écran, sans trace dans
@@ -257,6 +259,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
               minCandidats={classement.minCandidats}
               chargement={!statsSession}
               onPlus={() => navigate('/stats')}
+              onOuvrir={setEtabOuvert}
             />
           )}
         </>
@@ -398,6 +401,15 @@ export default function ResultsView({ config, session, onSession, island, onIsla
 
       {selection && (
         <CandidateModal candidat={selection} session={session} onClose={fermerFiche} />
+      )}
+      {etabOuvert && (
+        <EtablissementModal
+          etablissement={etabOuvert}
+          etablissements={statsSession?.etablissements}
+          minCandidats={classement.minCandidats}
+          nationale={stats.total ? (stats.admitted / stats.total) * 100 : 0}
+          onClose={() => setEtabOuvert(null)}
+        />
       )}
     </>
   )
