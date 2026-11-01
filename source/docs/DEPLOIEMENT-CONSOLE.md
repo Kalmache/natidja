@@ -196,6 +196,8 @@ docker compose exec console node console/utilisateurs.mjs affichage --nom amina 
 
 Ce titre ne sert qu'à l'affichage (liste des propositions, « déposée par », « approuvée par »). L'identifiant de connexion reste la référence pour la règle des deux personnes et pour le journal d'audit. Un texte vide (`--texte ""`) retire le titre.
 
+**Journal d'audit.** Pour le vérifier à la main : `docker compose exec console node console/journal-audit.mjs verifier`. Si la console affiche « ALTÉRATION DÉTECTÉE » alors que vous savez pourquoi (ex. un journal créé avant la correction du double écrivain), `… journal-audit.mjs archiver` conserve l'ancien journal tel quel et en démarre un nouveau qui renvoie vers lui. Ne le faites jamais pour « faire disparaître » une alerte dont vous ignorez la cause : cherchez d'abord qui a touché au fichier.
+
 Autres commandes : `lister`, `reinitialiser --nom X`, `desactiver --nom X` (à utiliser dès qu'une personne quitte son poste).
 
 ---
