@@ -67,3 +67,8 @@ Réglables sans toucher au code, dans `data/exams.json` :
 
 ---
 **Mise à jour (1er nov. 2026)** — la protection réelle décrite au §3 est maintenant **écrite et testée** (service d'attestation, séparation des données). Elle reste **désactivée** tant qu'elle n'est pas hébergée : voir `docs/SERVICE-ATTESTATION.md`.
+
+---
+**Mode « sans classement »** — dans `data/exams.json`, `"classement": { "visible": false }` masque, partout dans l'application, ce qui classe ou compare des **établissements** : podium de l'accueil, classements de la page Statistiques, onglet « Établissements » du comparateur, « Me situer » pour un établissement, établissements cités dans le détail d'une mention, tableau des établissements du rapport PDF. Restent affichés : les statistiques nationales, par île, par série, par mention et par centre d'examen. Avec `"visible": true` (réglage actuel), rien ne change.
+
+⚠️ Il s'agit d'un masquage **à l'affichage** : le fichier `stats.json` publié contient toujours les chiffres par établissement, lisibles par une personne qui ouvre ce fichier. Pour les retirer réellement du fichier public, il faudrait les omettre au moment du calcul (à décider avec le ministère).

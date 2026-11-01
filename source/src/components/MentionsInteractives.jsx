@@ -19,7 +19,7 @@ const ORDRE = ['PASSABLE', 'ASSEZ_BIEN', 'BIEN', 'TRES_BIEN']
 const fr = (n) => Number(n).toFixed(1).replace('.', ',')
 
 /** La fiche d'une mention (même comportement que les autres fiches : le bouton Retour d'Android la ferme). */
-function FicheMention({ mention, iles, etablissements, minCandidats, parMention, onClose }) {
+function FicheMention({ mention, iles, etablissements, minCandidats, parMention, afficherEtablissements, onClose }) {
   const { t } = useI18n()
   const fermerBtn = useRef(null)
   const fermer = useCallback(() => {
@@ -49,7 +49,7 @@ function FicheMention({ mention, iles, etablissements, minCandidats, parMention,
   const parIle = iles.map((i) => ({ nom: i.nom, n: i.mentions?.[mention] ?? 0 })).sort((a, b) => b.n - a.n)
   const maxIle = Math.max(...parIle.map((i) => i.n), 1)
   // Part de la mention dans chaque établissement (seulement ceux assez grands pour que ce soit fiable)
-  const top = classes(etablissements, minCandidats)
+  const top = !afficherEtablissements ? [] : classes(etablissements, minCandidats)
     .map((e) => ({ nom: e.nom, ile: e.ile, part: ((e.mentions?.[mention] ?? 0) / e.total) * 100 }))
     .filter((e) => e.part > 0)
     .sort((a, b) => b.part - a.part)
@@ -102,7 +102,7 @@ function FicheMention({ mention, iles, etablissements, minCandidats, parMention,
   )
 }
 
-export default function MentionsInteractives({ stats, iles, minCandidats = 20 }) {
+export default function MentionsInteractives({ stats, iles, minCandidats = 20, afficherEtablissements = true }) {
   const { t } = useI18n()
   const [ile, setIle] = useState('all')
   const [mode, setMode] = useState('nombre') // 'nombre' | 'part'
@@ -152,7 +152,7 @@ export default function MentionsInteractives({ stats, iles, minCandidats = 20 })
         </p>
       )}
 
-      {ouverte && <FicheMention mention={ouverte} iles={iles} etablissements={stats.etablissements} minCandidats={minCandidats} parMention={stats.parMention} onClose={fermer} />}
+      {ouverte && <FicheMention mention={ouverte} iles={iles} etablissements={stats.etablissements} minCandidats={minCandidats} parMention={stats.parMention} afficherEtablissements={afficherEtablissements} onClose={fermer} />}
     </div>
   )
 }

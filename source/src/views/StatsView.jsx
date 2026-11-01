@@ -185,9 +185,10 @@ export default function StatsView({ session, sessions = [], classement: reglage 
             nationale={(admis / total) * 100}
             iles={iles.map(ficheIle)}
             initial={situer}
+            afficherRang={rang.visible}
             onComparer={(type, nom) => { setDuel({ type, nom, n: Date.now() }); setTimeout(() => aller('stats-comparer'), 100) }}
             groupes={{
-              etablissements: { titre: t('cmp.tabEtab'), liste: [...(stats.etablissements ?? [])].sort((x, y) => x.nom.localeCompare(y.nom, 'fr')) },
+              ...(rang.visible ? { etablissements: { titre: t('cmp.tabEtab'), liste: [...(stats.etablissements ?? [])].sort((x, y) => x.nom.localeCompare(y.nom, 'fr')) } } : {}), // sans classement : aucun établissement comparé
               centres: { titre: t('cmp.tabCentre'), liste: [...(stats.centres ?? [])].sort((x, y) => x.nom.localeCompare(y.nom, 'fr')) },
             }}
           />
@@ -198,7 +199,7 @@ export default function StatsView({ session, sessions = [], classement: reglage 
             minCandidats={rang.minCandidats}
             initial={duel}
             groupes={{
-              etablissements: { titre: t('cmp.tabEtab'), liste: [...(stats.etablissements ?? [])].sort((x, y) => x.nom.localeCompare(y.nom, 'fr')) },
+              ...(rang.visible ? { etablissements: { titre: t('cmp.tabEtab'), liste: [...(stats.etablissements ?? [])].sort((x, y) => x.nom.localeCompare(y.nom, 'fr')) } } : {}), // sans classement : aucun établissement comparé
               iles: { titre: t('cmp.tabIle'), liste: iles.map(ficheIle) },
               centres: { titre: t('cmp.tabCentre'), liste: [...(stats.centres ?? [])].sort((x, y) => x.nom.localeCompare(y.nom, 'fr')) },
               annees: { titre: t('cmp.tabYear'), liste: annees },
@@ -207,11 +208,11 @@ export default function StatsView({ session, sessions = [], classement: reglage 
         </section>
 
         <section className="panel panel--wide" id="stats-mention">
-          <MentionsInteractives stats={stats} iles={iles.map((i) => ({ id: i.id, nom: i.nom, mentions: i.mentions }))} minCandidats={rang.minCandidats} />
+          <MentionsInteractives stats={stats} iles={iles.map((i) => ({ id: i.id, nom: i.nom, mentions: i.mentions }))} minCandidats={rang.minCandidats} afficherEtablissements={rang.visible} />
         </section>
       </div>
 
-      <RapportStatistiques stats={stats} session={session} />
+      <RapportStatistiques stats={stats} session={session} avecClassement={rang.visible} />
 
       {etabOuvert && (
         <EtablissementModal
@@ -221,6 +222,7 @@ export default function StatsView({ session, sessions = [], classement: reglage 
           type={etabOuvert._type}
           nationale={(admis / total) * 100}
           onClose={fermerEtab}
+          afficherRang={rang.visible}
           onComparer={lancerDuel}
           onSituer={lancerSituer}
         />

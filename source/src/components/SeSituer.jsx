@@ -18,7 +18,7 @@ function Ecart({ n, cible, nom, t }) {
   return <li className={n > 0 ? 'is-plus' : n < 0 ? 'is-moins' : ''}>{t(cle, { n: sansSigne(n), cible, nom })}</li>
 }
 
-export default function SeSituer({ groupes, iles, nationale, minCandidats = 20, initial, onComparer }) {
+export default function SeSituer({ groupes, iles, nationale, minCandidats = 20, initial, afficherRang = true, onComparer }) {
   const { t } = useI18n()
   const types = useMemo(() => Object.entries(groupes).filter(([, g]) => g.liste.length > 0), [groupes])
   const [cle, setCle] = useState(types[0]?.[0])
@@ -68,7 +68,7 @@ export default function SeSituer({ groupes, iles, nationale, minCandidats = 20, 
           <ul className="situ__verdict" role="status">
             <Ecart n={pos.ecartNational} cible={t('situ.nationalLow')} t={t} />
             <Ecart n={pos.ecartIle} cible={t('situ.islandLow', { ile: fiche.ile })} t={t} />
-            {pos.rang && <li>🏆 {t(type[0] === 'centres' ? 'etab.rankCenter' : 'etab.rank', { n: pos.rang, total: pos.total })}</li>}
+            {afficherRang && pos.rang && <li>🏆 {t(type[0] === 'centres' ? 'etab.rankCenter' : 'etab.rank', { n: pos.rang, total: pos.total })}</li>}
             {pos.petit && <li className="is-moins">{t('situ.small', { n: minCandidats })}</li>}
           </ul>
           <button type="button" className="btn btn--ghost situ__duel" onClick={() => onComparer?.(type[0], fiche.nom)}>⚖️ {t('situ.compare')}</button>
