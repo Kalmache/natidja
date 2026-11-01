@@ -8,16 +8,22 @@ import Icon from '../components/Icon.jsx'
 import Stat from '../components/Stat.jsx'
 import IslandMap from '../components/IslandMap.jsx'
 import { Columns, Donut, Legend, StackedBars } from '../components/Charts.jsx'
+import { registerPlugin } from '@capacitor/core'
+import { isNativeApp } from '../lib/verify.js'
 import { useI18n } from '../i18n/index.jsx'
 import { loadStats } from '../lib/data.js'
 import ClassementComparaison from '../components/ClassementComparaison.jsx'
 import MeilleursParIle from '../components/MeilleursParIle.jsx'
+import RapportStatistiques from '../components/RapportStatistiques.jsx'
 import CentresExamen from '../components/CentresExamen.jsx'
 import EtablissementModal from '../components/EtablissementModal.jsx'
 import { prefersReducedMotion } from '../hooks.js'
 
 const ORDRE_STATUTS = ['ADMIS', 'SECOND_GROUPE', 'AJOURNE']
 const ORDRE_MENTIONS = ['PASSABLE', 'ASSEZ_BIEN', 'BIEN', 'TRES_BIEN']
+
+// Module natif d'impression (application Android) ; sur le web : window.print().
+const ImpressionNative = registerPlugin('ImpressionNative')
 
 export default function StatsView({ session, classement: reglage }) {
   const { t } = useI18n()
@@ -45,6 +51,16 @@ export default function StatsView({ session, classement: reglage }) {
       actif = false
     }
   }, [session.id])
+
+  // « Télécharger le rapport » : ouvre l'impression, d'où l'on choisit « Enregistrer en PDF ».
+  const telechargerRapport = async () => {
+    try {
+      if (isNativeApp()) await ImpressionNative.imprimer({ nom: `Statistiques ${session.examType} ${session.year}` })
+      else window.print()
+    } catch {
+      /* impression annulée : rien à faire */
+    }
+  }
 
   if (erreur) {
     return (
@@ -87,6 +103,12 @@ export default function StatsView({ session, classement: reglage }) {
         <h1>{t('stats.title')}</h1>
         <p>{t('stats.subtitle', { session: `${session.examType} ${session.year}`, total: total.toLocaleString('fr-FR') })}</p>
       </header>
+
+      <div className="page__actions">
+        <button type="button" className="btn btn--ghost" onClick={telechargerRapport}>
+          <Icon name="download" size={16} /> {t('rapport.button')}
+        </button>
+      </div>
 
       <section className="kpis kpis--flat">
         <Stat value={total} label={t('kpi.candidates')} onClick={() => aller('stats-statut')} />
@@ -145,6 +167,8 @@ export default function StatsView({ session, classement: reglage }) {
           <Columns items={mentions} />
         </section>
       </div>
+
+      <RapportStatistiques stats={stats} session={session} />
 
       {etabOuvert && (
         <EtablissementModal

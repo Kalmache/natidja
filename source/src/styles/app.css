@@ -758,3 +758,19 @@ html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-event
 .centres__barre i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--p-500), #fcd116); }
 .centres__taux { font-variant-numeric: tabular-nums; min-width: 4.2em; text-align: end; }
 @media (max-width: 560px) { .centres__ligne { grid-template-columns: 1fr auto; } .centres__barre { grid-column: 1 / -1; order: 3; } }
+
+/* ---- Rapport statistiques : invisible à l'écran, seul visible à l'impression / « Enregistrer en PDF » ---- */
+.page__actions { display: flex; justify-content: flex-end; margin: -6px 0 14px; }
+.rapport { display: none; }
+@media print {
+  .rapport { display: block !important; color: #111; font: 11pt/1.4 system-ui, sans-serif; }
+  .rapport__tete { border-bottom: 3px solid #047857; margin-bottom: 14px; padding-bottom: 8px; }
+  .rapport h1 { font-size: 18pt; margin: 0 0 4px; }
+  .rapport h2 { font-size: 13pt; margin: 18px 0 6px; color: #065f46; break-after: avoid; }
+  .rapport__table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  .rapport__table th, .rapport__table td { border: 1px solid #cbd5d1; padding: 4px 7px; text-align: start; }
+  .rapport__table th { background: #e7f5ef; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rapport__table thead { display: table-header-group; } /* l'en-tête se répète à chaque page */
+  .rapport__table tr { break-inside: avoid; }
+  .rapport__pied { margin-top: 20px; font-size: 8.5pt; color: #555; border-top: 1px solid #ccc; padding-top: 6px; }
+}
