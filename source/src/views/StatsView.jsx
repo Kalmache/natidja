@@ -12,6 +12,7 @@ import { useI18n } from '../i18n/index.jsx'
 import { loadStats } from '../lib/data.js'
 import ClassementComparaison from '../components/ClassementComparaison.jsx'
 import MeilleursParIle from '../components/MeilleursParIle.jsx'
+import CentresExamen from '../components/CentresExamen.jsx'
 import EtablissementModal from '../components/EtablissementModal.jsx'
 import { prefersReducedMotion } from '../hooks.js'
 
@@ -133,6 +134,12 @@ export default function StatsView({ session, classement: reglage }) {
           </>
         )}
 
+        {stats.centres?.length > 0 && (
+          <section className="panel panel--wide" id="stats-centres">
+            <CentresExamen centres={stats.centres} onOuvrir={(c) => setEtabOuvert({ ...c, _centre: true })} />
+          </section>
+        )}
+
         <section className="panel panel--wide" id="stats-mention">
           <h2>{t('stats.byMention')}</h2>
           <Columns items={mentions} />
@@ -142,8 +149,9 @@ export default function StatsView({ session, classement: reglage }) {
       {etabOuvert && (
         <EtablissementModal
           etablissement={etabOuvert}
-          etablissements={stats.etablissements}
-          minCandidats={rang.minCandidats}
+          etablissements={etabOuvert._centre ? stats.centres : stats.etablissements}
+          minCandidats={etabOuvert._centre ? 0 : rang.minCandidats}
+          centre={Boolean(etabOuvert._centre)}
           nationale={(admis / total) * 100}
           onClose={fermerEtab}
         />

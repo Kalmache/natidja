@@ -36,6 +36,10 @@ export default {
   'search.hint': 'لا تُحتسب علامات التشكيل: البحث عن « zainaba » يجد « Zaïnaba ».',
 
   'filter.island': 'الجزيرة',
+  'filter.center': 'مركز الامتحان',
+  'filter.allCenters': 'كل المراكز',
+  'centres.title': 'مراكز الامتحان',
+  'centres.sub': 'نسبة النجاح في كل مركز أُجريت فيه الاختبارات',
   'filter.allIslands': 'كل الجزر',
   'filter.series': 'الشعبة',
   'filter.allSeries': 'الكل',
@@ -107,6 +111,7 @@ export default {
   'etab.below': 'أقل من المعدل الوطني بـ {n} نقطة ({nat} %)',
   'etab.equal': 'يساوي المعدل الوطني ({nat} %)',
   'etab.rank': 'المرتبة {n} من {total} مؤسسة مصنّفة',
+  'etab.rankCenter': 'المرتبة {n} من {total} مركز امتحان',
   'etab.rankIsland': 'المرتبة {n} من {total} في {ile}',
   'etab.note': 'أرقام مجمّعة للدورة: لا يظهر أي اسم مترشح.',
   'rank.more': 'عرض كل الإحصائيات',

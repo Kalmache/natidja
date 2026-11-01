@@ -56,6 +56,9 @@ export default defineConfig({
     VitePWA({
       // L'appli se met à jour toute seule quand une nouvelle version existe.
       registerType: 'autoUpdate',
+      // L'enregistrement du service worker se fait à la main dans src/main.jsx :
+      // on ne le veut PAS dans l'application Android (tout y est déjà dans le téléphone).
+      injectRegister: false,
       includeAssets: ['favicon.svg', 'icons/*.png'],
 
       // --- Le manifest : la "carte d'identité" de l'appli sur le téléphone ---

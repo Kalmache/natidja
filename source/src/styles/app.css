@@ -741,3 +741,20 @@ html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-event
 .about-discover:hover { transform: translateY(-2px); box-shadow: 0 20px 50px rgb(16 185 129 / 0.5); } .about-discover:active { transform: scale(0.99); }
 .about-discover > span:nth-child(2) { flex: 1; display: grid; gap: 2px; } .about-discover strong { font-size: 1.1rem; } .about-discover small { opacity: 0.85; font-size: 0.85rem; }
 .about-discover__etincelle { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: rgb(255 255 255 / 0.18); }
+
+/* ---- Filtre « centre d'examen » (liste déroulante) ---- */
+.select { width: 100%; max-width: 420px; font-weight: 600; font-size: 0.95rem; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; }
+.select:focus-visible { outline: 3px solid var(--p-500); outline-offset: 1px; }
+
+/* ---- Centres d'examen (page Statistiques) ---- */
+.centres h2 { font-size: 1.15rem; }
+.centres__liste { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 8px; }
+.centres__ligne { width: 100%; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(60px, 1fr) auto; align-items: center; gap: 14px; text-align: start; padding: 11px 14px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface-2); cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+.centres__ligne:hover { transform: translateY(-2px); border-color: var(--p-500); }
+.centres__nom { display: grid; gap: 2px; min-width: 0; }
+.centres__nom strong { font-size: 0.95rem; overflow-wrap: anywhere; }
+.centres__nom small { color: var(--text-soft, var(--text)); opacity: 0.7; }
+.centres__barre { height: 10px; border-radius: 99px; background: var(--border); overflow: hidden; }
+.centres__barre i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--p-500), #fcd116); }
+.centres__taux { font-variant-numeric: tabular-nums; min-width: 4.2em; text-align: end; }
+@media (max-width: 560px) { .centres__ligne { grid-template-columns: 1fr auto; } .centres__barre { grid-column: 1 / -1; order: 3; } }

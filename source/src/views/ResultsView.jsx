@@ -35,6 +35,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
   const [saisie, setSaisie] = useState('')
   const requete = useDeferredValue(saisie) // garde la frappe fluide
   const [serie, setSerie] = useState('ALL')
+  const [centre, setCentre] = useState('ALL') // filtre « centre d'examen »
   const [statut, setStatut] = useState('ALL')
   const [selection, setSelection] = useState(null) // candidat ouvert dans la fenêtre
   const [etabOuvert, setEtabOuvert] = useState(null) // établissement dont on regarde la fiche
@@ -80,6 +81,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
   // On change d'examen : on repart de zéro côté filtres.
   useEffect(() => {
     setSerie('ALL')
+    setCentre('ALL')
   }, [session.id])
 
   // ---------- 1. Candidats issus d'une recherche ----------
@@ -109,13 +111,13 @@ export default function ResultsView({ config, session, onSession, island, onIsla
   }, [url, tentative])
 
   // ---------- 2. Liste finale à afficher ----------
-  const filtres = { island, series: serie, status: statut }
-  const filtreActif = island !== 'all' || serie !== 'ALL' || statut !== 'ALL'
+  const filtres = { island, series: serie, status: statut, center: centre }
+  const filtreActif = island !== 'all' || serie !== 'ALL' || statut !== 'ALL' || centre !== 'ALL'
   const liste = useMemo(() => {
     if (!recherche || shard?.url !== plan.url) return []
     return shard.candidats.filter((c) => matchesFilters(c, filtres) && plan.filtre(c))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recherche, shard, plan, island, serie, statut])
+  }, [recherche, shard, plan, island, serie, statut, centre])
   const pret = !recherche || (!chargement && !erreur && shard?.url === plan.url)
 
   const [visibles, setVisibles] = useState(PAGE)
@@ -158,6 +160,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
     setSaisie('')
     setSerie('ALL')
     setStatut('ALL')
+    setCentre('ALL')
     onIsland('all')
   }
 
@@ -271,7 +274,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
           <details className="filters-box" open={filtreActif}>
             <summary>
               <Icon name="sliders" size={16} /> {t('results.filter')}
-              {filtreActif && <span className="filters-box__badge">{[statut !== 'ALL', serie !== 'ALL', island !== 'all'].filter(Boolean).length}</span>}
+              {filtreActif && <span className="filters-box__badge">{[statut !== 'ALL', serie !== 'ALL', island !== 'all', centre !== 'ALL'].filter(Boolean).length}</span>}
             </summary>
             <section className="filters" aria-label="Filtres">
               <div className="filters__group">
@@ -296,6 +299,19 @@ export default function ResultsView({ config, session, onSession, island, onIsla
                   </button>
                 </div>
               </div>
+
+              {/* Centre d'examen : la liste vient des statistiques de la session (un centre par ligne). */}
+              {statsSession?.centres?.length > 0 && (
+                <div className="filters__group">
+                  <label className="filters__label" htmlFor="filtre-centre">{t('filter.center')}</label>
+                  <select id="filtre-centre" className="select" value={centre} onChange={(e) => setCentre(e.target.value)}>
+                    <option value="ALL">{t('filter.allCenters')}</option>
+                    {[...statsSession.centres].sort((a, b) => a.nom.localeCompare(b.nom, 'fr')).map((c) => (
+                      <option key={c.nom} value={c.nom}>{c.nom}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="filters__row">
                 {session.series.length > 0 && (
@@ -347,6 +363,11 @@ export default function ResultsView({ config, session, onSession, island, onIsla
                 {serie !== 'ALL' && (
                   <button type="button" className="filtre-puce" onClick={() => setSerie('ALL')}>
                     {t('filter.series')} {serie} <Icon name="close" size={12} />
+                  </button>
+                )}
+                {centre !== 'ALL' && (
+                  <button type="button" className="filtre-puce" onClick={() => setCentre('ALL')}>
+                    {centre} <Icon name="close" size={12} />
                   </button>
                 )}
                 {island !== 'all' && (

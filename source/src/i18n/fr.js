@@ -38,6 +38,10 @@ export default {
   'search.hint': 'Les accents ne comptent pas : « zainaba » trouve « Zaïnaba ».',
 
   'filter.island': 'Île',
+  'filter.center': 'Centre d’examen',
+  'filter.allCenters': 'Tous les centres',
+  'centres.title': 'Centres d’examen',
+  'centres.sub': 'Réussite dans chaque centre où les épreuves se sont déroulées',
   'filter.allIslands': 'Toutes les îles',
   'filter.series': 'Série',
   'filter.allSeries': 'Toutes',
@@ -109,6 +113,7 @@ export default {
   'etab.below': '{n} points en dessous de la moyenne nationale ({nat} %)',
   'etab.equal': 'Égal à la moyenne nationale ({nat} %)',
   'etab.rank': 'N° {n} sur {total} établissements classés',
+  'etab.rankCenter': 'N° {n} sur {total} centres d’examen',
   'etab.rankIsland': 'N° {n} sur {total} à {ile}',
   'etab.note': 'Chiffres agrégés de la session : aucun nom de candidat n’est affiché.',
   'rank.more': 'Voir toutes les statistiques',
