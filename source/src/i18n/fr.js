@@ -180,6 +180,9 @@ export default {
   'verify.demo': 'Démonstration : en production, le code sera une signature numérique émise par l’ONEC, impossible à falsifier.',
   'verify.back': 'Retour aux résultats',
 
+  'footer.discover': 'Découvrir',
+  'about.discover': 'Découvrir la présentation',
+  'about.discoverSub': 'Une visite animée de Ndeze Natidja : la vitesse, la sécurité, la vie privée.',
   'about.title': 'À propos',
   'about.demoTitle': 'Une démonstration',
   'about.demoBody':

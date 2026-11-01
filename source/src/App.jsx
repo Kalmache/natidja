@@ -7,7 +7,7 @@
 //  3. choisir quelle « vue » afficher selon l'adresse (#/stats, #/about...) ;
 //  4. afficher l'écran d'ouverture animé (Splash) pendant le chargement.
 // ============================================================================
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import { I18nProvider, LANGS, useI18n } from './i18n/index.jsx'
 import { brancherRetourNatif } from './lib/retour.js'
 import { isNativeApp } from './lib/verify.js'
@@ -23,6 +23,8 @@ import AboutView from './views/AboutView.jsx'
 import VerifyView from './views/VerifyView.jsx'
 import LegalView, { PAGES_LEGALES } from './views/LegalView.jsx'
 import SettingsView from './views/SettingsView.jsx'
+// La page « Découvrir » (vitrine animée) n'est téléchargée QUE quand on l'ouvre : l'accueil reste léger.
+const DiscoverView = lazy(() => import('./views/DiscoverView.jsx'))
 
 // Démarre le téléchargement des données TOUT DE SUITE (avant même que React
 // n'ait fini d'afficher la page) : pendant que le Splash s'anime, les
@@ -121,7 +123,7 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
   const onSplashDone = useCallback(() => {}, [])
 
   const session = config?.sessions.find((s) => s.id === sessionId)
-  const vue = route[0] === 'stats' ? 'stats' : route[0] === 'about' ? 'about' : route[0] === 'verif' ? 'verif' : route[0] === 'legal' ? 'legal' : route[0] === 'settings' ? 'settings' : 'results'
+  const vue = route[0] === 'stats' ? 'stats' : route[0] === 'about' ? 'about' : route[0] === 'verif' ? 'verif' : route[0] === 'legal' ? 'legal' : route[0] === 'settings' ? 'settings' : route[0] === 'decouvrir' ? 'decouvrir' : 'results'
 
   // ----- Glisser pour changer de page -----
   // Sur une page légale : on circule entre les pages légales. Sinon : entre les 4 onglets.
@@ -156,7 +158,7 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
       <Splash onDone={onSplashDone} />
 
       <Header
-        view={vue === 'verif' || vue === 'legal' ? 'about' : vue}
+        view={vue === 'verif' || vue === 'legal' || vue === 'decouvrir' ? 'about' : vue}
         theme={theme}
         onTheme={onTheme}
         palette={palette}
@@ -185,6 +187,10 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
           <div className="page"><div className="skeleton skeleton--hero" /></div>
         ) : vue === 'stats' ? (
           <StatsView session={session} classement={config.classement} />
+        ) : vue === 'decouvrir' ? (
+          <Suspense fallback={<div className="page"><div className="skeleton skeleton--hero" /></div>}>
+            <DiscoverView />
+          </Suspense>
         ) : vue === 'about' ? (
           <AboutView />
         ) : vue === 'settings' ? (
@@ -210,7 +216,7 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
       </main>
 
       <Footer />
-      <BottomNav view={vue === 'verif' || vue === 'legal' ? 'about' : vue} />
+      <BottomNav view={vue === 'verif' || vue === 'legal' || vue === 'decouvrir' ? 'about' : vue} />
     </div>
   )
 }

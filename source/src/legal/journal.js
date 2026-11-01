@@ -5,6 +5,16 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.2.0',
+    date: '01/11/2026',
+    titre: 'La page « Découvrir »',
+    points: [
+      'Nouvelle page de présentation plein écran (À propos → Découvrir la présentation, ou lien « Découvrir » en bas de page) : chiffres animés, démonstration de la recherche sur un téléphone, hors-ligne, sécurité, vie privée, palettes, circuit de publication',
+      'Chargée à la demande : elle n’alourdit pas l’ouverture de l’application, et les animations se calment si l’appareil demande moins de mouvement',
+      'Un bouton « Demander une démonstration » prépare directement l’e-mail',
+    ],
+  },
+  {
     version: '3.1.1',
     date: '01/11/2026',
     titre: 'Des statistiques qui apportent du nouveau',

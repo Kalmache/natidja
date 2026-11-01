@@ -100,3 +100,28 @@ export function redigerDemandeInformations({ version = '', date = new Date() } =
   ].join('\n')
   return { objet, corps, lien: lienMail(objet, corps) }
 }
+
+/**
+ * E-mail « Demander une démonstration » (page Découvrir) : s'ouvre déjà rédigé dans la messagerie.
+ */
+export function redigerDemandeDemonstration({ version = '', date = new Date() } = {}) {
+  const jour = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(date)
+  const objet = 'Demande de démonstration – Ndeze Natidja'
+  const corps = [
+    'Madame, Monsieur,',
+    '',
+    `J’ai découvert l’application « Ndeze Natidja »${version ? ` (version ${nettoyer(version, 20)})` : ''}, œuvre de ${EDITOR.person} (${EDITOR.name}), et je souhaiterais assister à une démonstration.`,
+    '',
+    `Organisme : ${A_COMPLETER('nom de l’organisme')}`,
+    `Demandeur : ${A_COMPLETER('vos nom, prénom et fonction')}`,
+    `Téléphone : ${A_COMPLETER('numéro pour vous joindre')}`,
+    '',
+    'Disponibilités souhaitées pour la démonstration : [à compléter]',
+    '',
+    'Je vous remercie par avance de votre réponse et vous prie d’agréer, Madame, Monsieur, l’expression de mes salutations distinguées.',
+    '',
+    A_COMPLETER('vos nom et prénom'),
+    `Fait le ${jour}`,
+  ].join('\n')
+  return { objet, corps, lien: lienMail(objet, corps) }
+}

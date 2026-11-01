@@ -147,6 +147,7 @@ export function Footer() {
         <nav className="footer__legal" aria-label="Pages légales">
           {PAGES_LEGALES.map((p) => <a key={p} href={`#/legal/${p}`}>{t(`legal.${p}`)}</a>)}
           <a href="#/verif">{t('footer.verify')}</a>
+          <a href="#/decouvrir">{t('footer.discover')}</a>
         </nav>
         <p className="footer__small">v{VERSION} · {t('demo.short')}</p>
       </div>

@@ -1,6 +1,6 @@
 // Tests de la rédaction automatique de l'e-mail de demande d'autorisation.
 import { describe, expect, it } from 'vitest'
-import { redigerDemandeAutorisation, redigerDemandeInformations, TYPES_DEMANDE } from '../src/legal/autorisation.js'
+import { redigerDemandeAutorisation, redigerDemandeDemonstration, redigerDemandeInformations, TYPES_DEMANDE } from '../src/legal/autorisation.js'
 
 const date = new Date(2026, 9, 31)
 const exemple = { type: 'usage', organisme: 'Ministère de l’Éducation Nationale', nom: 'Amina Said', fonction: 'Directrice de cabinet', precisions: 'Usage national pour la session juin 2026.', version: '2.6.0', date }
@@ -82,5 +82,18 @@ describe('e-mail « Demander des informations » (Espace responsable)', () => {
     expect(params.get('body')).toBe(mail.corps.replace(/\n/g, '\r\n'))
     expect([...params.keys()]).toEqual(['subject', 'body'])
     expect(mail.lien).not.toMatch(/[\r\n]/)
+  })
+})
+
+describe('e-mail « Demander une démonstration »', () => {
+  const mail = redigerDemandeDemonstration({ version: '3.2.0', date })
+  it('s’ouvre déjà rédigé, adressé à l’éditeur, avec des repères à compléter', () => {
+    expect(mail.objet).toBe('Demande de démonstration – Ndeze Natidja')
+    expect(mail.corps).toContain('assister à une démonstration')
+    expect(mail.corps).toContain('version 3.2.0')
+    expect(mail.corps).toContain('[nom de l’organisme — à compléter]')
+    expect(mail.corps).toContain('salutations distinguées')
+    expect(mail.lien.startsWith('mailto:contact@mmbt.fr?subject=')).toBe(true)
+    expect([...new URLSearchParams(mail.lien.split('?')[1]).keys()]).toEqual(['subject', 'body'])
   })
 })

@@ -178,6 +178,9 @@ export default {
   'verify.demo': 'نسخة تجريبية: في الإنتاج سيكون الرمز توقيعاً رقمياً صادراً عن المكتب الوطني يستحيل تزويره.',
   'verify.back': 'العودة إلى النتائج',
 
+  'footer.discover': 'اكتشف',
+  'about.discover': 'اكتشف العرض',
+  'about.discoverSub': 'جولة متحركة في ندزي ناتيجا: السرعة والأمان والخصوصية.',
   'about.title': 'حول الموقع',
   'about.demoTitle': 'نسخة تجريبية',
   'about.demoBody':
