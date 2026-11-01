@@ -5,6 +5,14 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '2.8.1',
+    date: '01/11/2026',
+    titre: 'E-mail prêt à envoyer',
+    points: [
+      'Réglages, Espace responsable : le bouton « Demander des informations » ouvre un e-mail déjà rédigé (objet, texte officiel, questions posées) ; il ne reste qu’à compléter son nom et son organisme',
+    ],
+  },
+  {
     version: '2.8.0',
     date: '01/11/2026',
     titre: 'Choisir l’année et la session',
