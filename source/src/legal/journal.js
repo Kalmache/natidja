@@ -5,6 +5,16 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.13.0',
+    date: '01/11/2026',
+    titre: 'Un comparateur refait : le duel',
+    points: [
+      'Plus de listes déroulantes : le comparateur affiche deux grandes cartes (verte et orange) avec le taux de réussite ; toucher une carte ouvre une liste avec recherche pour changer d’élément',
+      'Les barres deviennent des « papillons » : le premier élément part du centre vers la gauche, le second vers la droite, avec les valeurs collées aux barres ; lisible sur grand écran comme sur téléphone',
+      'Toujours possible d’arriver depuis la fiche d’un établissement (« Comparer avec… ») : le duel s’ouvre avec un adversaire proche en taux de réussite',
+    ],
+  },
+  {
     version: '3.12.0',
     date: '01/11/2026',
     titre: 'L’accueil retrouve l’effet de la page Découvrir',
