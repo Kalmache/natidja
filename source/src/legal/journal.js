@@ -5,6 +5,15 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.4.2',
+    date: '01/11/2026',
+    titre: 'La carte des îles devient cliquable',
+    points: [
+      'Toucher une île sur la page Statistiques ouvre sa fiche : taux de réussite, écart avec la moyenne nationale, répartition des résultats et réussite par série',
+      '134 tests automatiques',
+    ],
+  },
+  {
     version: '3.4.1',
     date: '01/11/2026',
     titre: 'Page Découvrir : plus compacte sur téléphone',

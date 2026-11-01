@@ -50,3 +50,12 @@ describe('classement : écart avec la moyenne nationale', () => {
     expect(ecart(45.7, 45.7)).toBe('0,0')
   })
 })
+
+describe('fiche d’une île (touchée sur la carte)', () => {
+  it('prend la forme d’une fiche d’établissement, avec le taux et la réussite par série', async () => {
+    const { ficheIle } = await import('../src/lib/classement.js')
+    const f = ficheIle({ nom: 'Mwali', total: 100, ADMIS: 40, SECOND_GROUPE: 20, series: { D: { total: 60, ADMIS: 30 }, C: { total: 40, ADMIS: 10 } } })
+    expect([f.nom, f.total, f.admis, f.second, f.ajournes, f.taux]).toEqual(['Mwali', 100, 40, 20, 40, 40])
+    expect(f.series.map((s) => [s.serie, s.taux])).toEqual([['D', 50], ['C', 25]])
+  })
+})
