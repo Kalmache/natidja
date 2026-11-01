@@ -59,3 +59,14 @@ describe('fiche d’une île (touchée sur la carte)', () => {
     expect(f.series.map((s) => [s.serie, s.taux])).toEqual([['D', 50], ['C', 25]])
   })
 })
+
+describe('comparer deux fiches', () => {
+  it('donne l’écart en points et qui est devant', async () => {
+    const { comparer, ficheNationale } = await import('../src/lib/classement.js')
+    expect(comparer({ taux: 52.4 }, { taux: 47.1 })).toEqual({ ecartPoints: 5.3, devant: 'a' })
+    expect(comparer({ taux: 40 }, { taux: 45 })).toEqual({ ecartPoints: -5, devant: 'b' })
+    expect(comparer({ taux: 50 }, { taux: 50 })).toEqual({ ecartPoints: 0, devant: null })
+    const f = ficheNationale({ total: 200, parStatut: { ADMIS: 90, SECOND_GROUPE: 30 }, parMention: { BIEN: 10 }, parSerie: { D: { total: 100, ADMIS: 40 } } }, 'BAC 2025')
+    expect([f.nom, f.taux, f.ajournes, f.mentions.BIEN, f.series[0].taux]).toEqual(['BAC 2025', 45, 80, 10, 40])
+  })
+})

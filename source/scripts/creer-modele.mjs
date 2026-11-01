@@ -37,7 +37,7 @@ feuille.views = [{ state: 'frozen', ySplit: 1 }]
 
 // Ligne d'exemple (grisée) : ignorée à l'import car elle commence par « (exemple) ».
 const exemple = {
-  tableNumber: `(exemple) ${session.examType}-26-00001`, lastName: 'EXEMPLE', firstName: 'Prénom', birthDate: '15/03/2007', birthPlace: 'Moroni',
+  tableNumber: `(exemple) ${session.examType}-26-00001`, lastName: 'EXEMPLE', firstName: 'Prénom', birthDate: '15/03/2007', birthPlace: 'Moroni', gender: 'F',
   series: session.series[0] ?? '', center: 'Centre Lycée de Moroni', school: 'Lycée de Moroni',
   island: 'Ngazidja', status: 'Admis', mention: 'Bien', average: 13.5,
 }

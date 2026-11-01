@@ -156,3 +156,14 @@ describe('fichiers produits pour le site', () => {
     }
   })
 })
+
+describe('colonne « Sexe » (accord de l’attestation)', () => {
+  it('lit F / M et leurs écritures courantes ; vide = neutre ; incompris = null', async () => {
+    const { lireSexe } = await import('../scripts/lib/resultats.mjs')
+    expect(['F', 'féminin', 'Fille', 'femme'].map(lireSexe)).toEqual(['F', 'F', 'F', 'F'])
+    expect(['M', 'Masculin', 'Garçon', 'H'].map(lireSexe)).toEqual(['M', 'M', 'M', 'M'])
+    expect(lireSexe('')).toBe('')
+    expect(lireSexe(undefined)).toBe('')
+    expect(lireSexe('xyz')).toBeNull()
+  })
+})

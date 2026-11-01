@@ -8,7 +8,7 @@
 // ============================================================================
 
 /** Champs qui ne doivent JAMAIS figurer dans les fichiers publics. */
-export const CHAMPS_PRIVES = ['birthDate', 'birthPlace', 'average', 'mention', 'grades']
+export const CHAMPS_PRIVES = ['birthDate', 'birthPlace', 'gender', 'average', 'mention', 'grades']
 
 /** @returns {{ publique: object, privee: object }} */
 export function separer(candidat) {

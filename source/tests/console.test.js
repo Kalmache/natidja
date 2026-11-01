@@ -31,7 +31,7 @@ function csvDepuis(candidats) {
   const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
   const lignes = [COLONNES.map((c) => q(c.titre)).join(';')]
   for (const c of candidats) {
-    lignes.push([c.tableNumber, c.lastName, c.firstName, c.birthDate?.split('-').reverse().join('/'), c.birthPlace, c.series, c.center, c.school, c.island, LIBELLES_STATUT[c.status], c.mention ? LIBELLES_MENTION[c.mention] : '', String(c.average).replace('.', ',')].map(q).join(';'))
+    lignes.push([c.tableNumber, c.lastName, c.firstName, c.birthDate?.split('-').reverse().join('/'), c.birthPlace, c.gender, c.series, c.center, c.school, c.island, LIBELLES_STATUT[c.status], c.mention ? LIBELLES_MENTION[c.mention] : '', String(c.average).replace('.', ',')].map(q).join(';'))
   }
   return Buffer.from(lignes.join('\r\n') + '\r\n', 'utf8')
 }

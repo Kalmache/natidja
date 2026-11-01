@@ -185,9 +185,9 @@ export default function CandidateModal({ candidat: candidatPublic, session, serv
   const partagerCarte = async () => {
     setCarteEnCours(true)
     try {
-      const blob = await creerCarteReussite({ candidat, session, textes: { admis: t('att.admisCarte'), mention: t('att.mention') } })
+      const blob = await creerCarteReussite({ candidat, session, textes: { admis: candidat.gender ? t(`att.admisCarte.${candidat.gender}`) : t('att.admisCarte'), mention: t('att.mention') } })
       const titre = t('app.name')
-      const texte = t('att.shareCard')
+      const texte = candidat.gender ? t(`att.shareCard.${candidat.gender}`) : t('att.shareCard')
       const fichier = new File([blob], 'ma-reussite.png', { type: 'image/png' })
       if (navigator.canShare?.({ files: [fichier] })) {
         await navigator.share({ files: [fichier], title: titre, text: texte }) // navigateur de téléphone
@@ -216,10 +216,12 @@ export default function CandidateModal({ candidat: candidatPublic, session, serv
   }
 
   const prenom = titleCase(candidat.firstName)
+  // Texte accordé selon le sexe (F → « admise », M → « admis ») ; sexe inconnu → forme neutre « admis(e) ».
+  const tg = (cle) => (candidat.gender ? t(`${cle}.${candidat.gender}`) : t(cle))
   const titres = {
-    ADMIS: [t('att.admis'), t('att.admisSub')],
-    SECOND_GROUPE: [t('att.second'), t('att.secondSub')],
-    AJOURNE: [t('att.ajourne'), t('att.ajourneSub')],
+    ADMIS: [tg('att.admis'), tg('att.admisSub')],
+    SECOND_GROUPE: [tg('att.second'), tg('att.secondSub')],
+    AJOURNE: [tg('att.ajourne'), t('att.ajourneSub')],
   }[statut]
 
   const details = [

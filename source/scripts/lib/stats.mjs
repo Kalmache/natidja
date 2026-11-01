@@ -28,6 +28,7 @@ export function calculerStats(candidats, session) {
     stats.parIle[c.islandId] ??= { nom: c.island, total: 0 }
     stats.parIle[c.islandId].total++
     inc(stats.parIle[c.islandId], c.status)
+    if (c.mention && c.mention !== 'SANS') inc((stats.parIle[c.islandId].mentions ??= {}), c.mention)
     if (c.series) {
       // Réussite par série dans cette île (pour la fiche de l'île).
       const si = ((stats.parIle[c.islandId].series ??= {})[c.series] ??= { total: 0 })
@@ -59,11 +60,12 @@ function regrouper(candidats, champ, exclureLibres) {
   for (const c of candidats) {
     const nom = c[champ]
     if (!nom || (exclureLibres && estCandidatLibre(nom))) continue
-    const e = groupes.get(nom) ?? { total: 0, admis: 0, second: 0, iles: {}, series: {} }
+    const e = groupes.get(nom) ?? { total: 0, admis: 0, second: 0, iles: {}, series: {}, mentions: {} }
     e.total++
     if (c.status === 'ADMIS') e.admis++
     if (c.status === 'SECOND_GROUPE') e.second++
     e.iles[c.island] = (e.iles[c.island] ?? 0) + 1
+    if (c.mention && c.mention !== 'SANS') e.mentions[c.mention] = (e.mentions[c.mention] ?? 0) + 1
     if (c.series) {
       const s = (e.series[c.series] ??= { total: 0, admis: 0 })
       s.total++
@@ -79,6 +81,7 @@ function regrouper(candidats, champ, exclureLibres) {
     second: e.second,
     ajournes: e.total - e.admis - e.second,
     taux: Math.round((e.admis / e.total) * 1000) / 10, // en %, une décimale
+    mentions: e.mentions,
     series: Object.entries(e.series)
       .map(([serie, s]) => ({ serie, total: s.total, admis: s.admis, taux: Math.round((s.admis / s.total) * 1000) / 10 }))
       .sort((a, b) => b.taux - a.taux || a.serie.localeCompare(b.serie)),

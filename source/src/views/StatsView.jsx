@@ -14,7 +14,8 @@ import { useI18n } from '../i18n/index.jsx'
 import { loadStats } from '../lib/data.js'
 import ClassementComparaison from '../components/ClassementComparaison.jsx'
 import MeilleursParIle from '../components/MeilleursParIle.jsx'
-import { ficheIle } from '../lib/classement.js'
+import { ficheIle, ficheNationale } from '../lib/classement.js'
+import Comparateur from '../components/Comparateur.jsx'
 import RapportStatistiques from '../components/RapportStatistiques.jsx'
 import CentresExamen from '../components/CentresExamen.jsx'
 import EtablissementModal from '../components/EtablissementModal.jsx'
@@ -26,10 +27,11 @@ const ORDRE_MENTIONS = ['PASSABLE', 'ASSEZ_BIEN', 'BIEN', 'TRES_BIEN']
 // Module natif d'impression (application Android) ; sur le web : window.print().
 const ImpressionNative = registerPlugin('ImpressionNative')
 
-export default function StatsView({ session, classement: reglage }) {
+export default function StatsView({ session, sessions = [], classement: reglage }) {
   const { t } = useI18n()
   const [stats, setStats] = useState(null)
   const [erreur, setErreur] = useState(false)
+  const [annees, setAnnees] = useState([]) // fiches nationales des autres années du MÊME examen (pour « Comparer »)
   const [etabOuvert, setEtabOuvert] = useState(null) // établissement dont on regarde la fiche
   const fermerEtab = useCallback(() => setEtabOuvert(null), [])
   // Toucher un chiffre clé fait glisser jusqu'au graphique qui le détaille, qui s'illumine un instant.
@@ -62,6 +64,16 @@ export default function StatsView({ session, classement: reglage }) {
       /* impression annulée : rien à faire */
     }
   }
+
+  // Autres années du même examen (Bac 2025, Bac 2026…) : chargées seulement s'il y en a, pour l'onglet « Années ».
+  useEffect(() => {
+    const memes = sessions.filter((s) => s.examType === session.examType)
+    if (memes.length < 2) return setAnnees([])
+    let actif = true
+    Promise.all(memes.map((s) => loadStats(s.id).then((st) => (st ? ficheNationale(st, `${s.examType} ${s.year}`) : null)).catch(() => null)))
+      .then((fiches) => actif && setAnnees(fiches.filter(Boolean)))
+    return () => { actif = false }
+  }, [sessions, session.examType])
 
   if (erreur) {
     return (
@@ -162,6 +174,18 @@ export default function StatsView({ session, classement: reglage }) {
             <CentresExamen centres={stats.centres} onOuvrir={(c) => setEtabOuvert({ ...c, _type: 'centre' })} />
           </section>
         )}
+
+        <section className="panel panel--wide" id="stats-comparer">
+          <Comparateur
+            minCandidats={rang.minCandidats}
+            groupes={{
+              etablissements: { titre: t('cmp.tabEtab'), liste: [...(stats.etablissements ?? [])].sort((x, y) => x.nom.localeCompare(y.nom, 'fr')) },
+              iles: { titre: t('cmp.tabIle'), liste: iles.map(ficheIle) },
+              centres: { titre: t('cmp.tabCentre'), liste: [...(stats.centres ?? [])].sort((x, y) => x.nom.localeCompare(y.nom, 'fr')) },
+              annees: { titre: t('cmp.tabYear'), liste: annees },
+            }}
+          />
+        </section>
 
         <section className="panel panel--wide" id="stats-mention">
           <h2>{t('stats.byMention')}</h2>
