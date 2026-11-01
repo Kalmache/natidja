@@ -194,6 +194,7 @@ export default {
   'id.tablePh': 'Ex. BAC-26-00142',
   'id.birth': 'Date de naissance',
   'id.birthPh': 'JJ/MM/AAAA',
+  'id.demoFill': 'Démonstration : remplir pour moi',
   'id.submit': 'Afficher mon attestation',
   'id.error': 'Ces informations ne correspondent pas à ce candidat. Vérifiez et réessayez.',
   'id.locked': 'Trop d’essais. Patientez quelques secondes.',
