@@ -421,7 +421,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
       )}
 
       {selection && (
-        <CandidateModal candidat={selection} session={session} onClose={fermerFiche} />
+        <CandidateModal candidat={selection} session={session} service={config.attestationService?.url} onClose={fermerFiche} />
       )}
       {etabOuvert && (
         <EtablissementModal

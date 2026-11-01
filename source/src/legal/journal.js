@@ -5,6 +5,17 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.6.0',
+    date: '01/11/2026',
+    titre: 'Service d’attestation : la protection réelle est prête',
+    points: [
+      'Un petit service séparé garde la moyenne, la date et le lieu de naissance, la mention et les notes hors des fichiers publics, et ne les remet qu’avec le bon numéro de table et la bonne date de naissance',
+      'Les essais sont limités (5 par numéro puis pause de 15 minutes, 30 échecs par adresse) et la réponse est identique que le numéro existe ou non',
+      'La commande « npm run separer » prépare les deux jeux de fichiers (public et privé) sans toucher aux originaux',
+      'Désactivé tant qu’il n’est pas hébergé : le site fonctionne comme avant. 144 tests automatiques',
+    ],
+  },
+  {
     version: '3.5.0',
     date: '01/11/2026',
     titre: 'La page Découvrir en arabe',

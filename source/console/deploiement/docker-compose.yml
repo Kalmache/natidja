@@ -26,6 +26,25 @@ services:
     security_opt: [no-new-privileges:true]
     networks: [interne]
 
+  # Service d'attestation : garde la moyenne et la date de naissance HORS du site public.
+  # Facultatif : ne démarre que si vous le choisissez (docker compose --profile attestation up -d).
+  attestation:
+    profiles: [attestation]
+    build:
+      context: ../..
+      dockerfile: attestation/deploiement/Dockerfile
+    restart: unless-stopped
+    environment:
+      ORIGINE_AUTORISEE: ${SITE_PUBLIC_URL:-}   # ex. https://natidja.mmbt.fr (seule origine autorisée par CORS)
+    volumes:
+      - ./prive:/prive:ro        # fichiers « <session>.json » produits par `npm run separer`
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [interne]
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -34,6 +53,7 @@ services:
       - "443:443"
     environment:
       CONSOLE_DOMAINE: ${CONSOLE_DOMAINE:?Renseignez CONSOLE_DOMAINE dans le fichier .env}
+      ATTESTATION_DOMAINE: ${ATTESTATION_DOMAINE:-attestation.invalide}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data         # certificats HTTPS

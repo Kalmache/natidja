@@ -11,3 +11,14 @@
 		-Server
 	}
 }
+
+# Service d'attestation (FACULTATIF). Si vous ne l'utilisez pas, supprimez ce bloc entier
+# (sinon Caddy essaie d'obtenir un certificat pour un nom qui n'existe pas et le note dans ses journaux).
+{$ATTESTATION_DOMAINE} {
+	encode zstd gzip
+	reverse_proxy attestation:8790
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+}
