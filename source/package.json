@@ -1,6 +1,6 @@
 {
   "name": "ndeze-natidja",
-  "version": "3.7.1",
+  "version": "3.8.0",
   "private": true,
   "type": "module",
   "description": "Consultation des résultats d'examens (Bac, BEPC) – Union des Comores",
@@ -25,7 +25,8 @@
     "android:sync": "npm run build:app && cap sync android",
     "preview": "vite preview",
     "test": "vitest run",
-    "dates-demo": "node scripts/ajouter-dates-demo.mjs"
+    "dates-demo": "node scripts/ajouter-dates-demo.mjs",
+    "sexe-demo": "node scripts/ajouter-sexe-demo.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",

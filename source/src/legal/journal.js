@@ -5,6 +5,19 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.8.0',
+    date: '01/11/2026',
+    titre: 'Comparer, et des attestations accordées',
+    points: [
+      'Nouvelle section « Comparer » dans les statistiques : deux établissements, deux îles ou deux centres côte à côte (taux de réussite et écart, répartition des résultats, mentions, réussite par série) ; un avertissement s’affiche quand un groupe est trop petit pour être fiable',
+      'Onglet « Années » : dès que deux années d’un même examen sont publiées, on peut les comparer',
+      'Les statistiques comptent désormais les mentions par établissement, par île et par centre',
+      'L’attestation s’accorde : « Déclarée admise » pour une fille, « Déclaré admis » pour un garçon (en arabe aussi), et l’image de réussite partagée suit la même règle',
+      'Nouvelle colonne facultative « Sexe » (F ou M) dans le fichier Excel ; sans elle, l’attestation garde la forme neutre « admis(e) ». Le sexe fait partie des informations réservées à l’attestation',
+      '146 tests automatiques',
+    ],
+  },
+  {
     version: '3.7.1',
     date: '01/11/2026',
     titre: 'Mode démonstration : voir l’attestation sans connaître les données',

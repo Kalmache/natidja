@@ -186,7 +186,7 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
         ) : !session ? (
           <div className="page"><div className="skeleton skeleton--hero" /></div>
         ) : vue === 'stats' ? (
-          <StatsView session={session} classement={config.classement} />
+          <StatsView session={session} sessions={config.sessions} classement={config.classement} />
         ) : vue === 'decouvrir' ? (
           <Suspense fallback={<div className="page"><div className="skeleton skeleton--hero" /></div>}>
             <DiscoverView />

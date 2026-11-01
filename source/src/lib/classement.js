@@ -60,8 +60,37 @@ export function ficheIle(ile) {
     second,
     ajournes: ile.total - admis - second,
     taux: Math.round((admis / ile.total) * 1000) / 10,
+    mentions: ile.mentions ?? {},
     series: Object.entries(ile.series ?? {})
       .map(([serie, s]) => ({ serie, total: s.total, admis: s.ADMIS ?? 0, taux: Math.round(((s.ADMIS ?? 0) / s.total) * 1000) / 10 }))
       .sort((a, b) => b.taux - a.taux || a.serie.localeCompare(b.serie)),
   }
+}
+
+/**
+ * Transforme les statistiques NATIONALES d'une session (stats.json) en « fiche » comparable,
+ * pour comparer deux années entre elles.
+ */
+export function ficheNationale(stats, nom) {
+  const admis = stats.parStatut?.ADMIS ?? 0
+  const second = stats.parStatut?.SECOND_GROUPE ?? 0
+  return {
+    nom,
+    ile: '',
+    total: stats.total,
+    admis,
+    second,
+    ajournes: stats.total - admis - second,
+    taux: Math.round((admis / stats.total) * 1000) / 10,
+    mentions: stats.parMention ?? {},
+    series: Object.entries(stats.parSerie ?? {})
+      .map(([serie, s]) => ({ serie, total: s.total, admis: s.ADMIS ?? 0, taux: Math.round(((s.ADMIS ?? 0) / s.total) * 1000) / 10 }))
+      .sort((a, b) => b.taux - a.taux || a.serie.localeCompare(b.serie)),
+  }
+}
+
+/** Compare deux fiches : taux de chacune, écart en points, et qui est devant (null si égalité). */
+export function comparer(a, b) {
+  const ecartPoints = Math.round((a.taux - b.taux) * 10) / 10
+  return { ecartPoints, devant: ecartPoints === 0 ? null : ecartPoints > 0 ? 'a' : 'b' }
 }

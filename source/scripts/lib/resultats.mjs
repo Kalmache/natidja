@@ -30,6 +30,7 @@ export const COLONNES = [
   { champ: 'birthDate', titre: 'Date de naissance', requis: true, largeur: 16,
     alias: ['date naissance', 'date de naiss', 'ne le', 'nee le', 'ne e le', 'naissance', 'date n'] },
   { champ: 'birthPlace', titre: 'Lieu de naissance', largeur: 22, alias: ['village', 'village lieu de naissance', 'ne a'] },
+  { champ: 'gender', titre: 'Sexe', largeur: 8, alias: ['genre', 'sexe m f', 'm f', 'f m', 'h f'] },
   { champ: 'series', titre: 'Série', largeur: 9, alias: ['serie bac', 'filiere'] },
   { champ: 'center', titre: 'Centre d’examen', largeur: 38, alias: ['centre', 'centre d examen'] },
   { champ: 'school', titre: 'Établissement', largeur: 38, alias: ['ecole', 'etablissement scolaire', 'lycee'] },
@@ -267,6 +268,10 @@ export function transformer({ entete, lignes }, session, config) {
     else if (statut === 'ADMIS' && moyenne < 10) avert(numero, 'Moyenne', `Admis avec une moyenne inférieure à 10 (${moyenne}) : à vérifier.`)
     else if (statut === 'AJOURNE' && moyenne >= 12) avert(numero, 'Moyenne', `Ajourné avec une moyenne élevée (${moyenne}) : à vérifier.`)
 
+    // --- Sexe (facultatif : sert à écrire « admise » ou « admis » dans l'attestation)
+    const sexe = lireSexe(lire('gender'))
+    if (sexe === null) avert(numero, 'Sexe', `Sexe non compris : « ${texte('gender')} » (attendu : F ou M). L'attestation utilisera la forme neutre « admis(e) ».`)
+
     // --- Notes par matière (facultatif)
     const grades = []
     for (const n of notes) {
@@ -286,6 +291,7 @@ export function transformer({ entete, lignes }, session, config) {
       firstName: prenom,
       birthDate: naissance,
       birthPlace: texte('birthPlace'),
+      ...(sexe ? { gender: sexe } : {}),
       series: serie,
       center: texte('center'),
       school: texte('school'),
@@ -301,6 +307,18 @@ export function transformer({ entete, lignes }, session, config) {
 
   if (!candidats.length && !erreurs.length) err(0, '', 'Aucun candidat trouvé dans le fichier.')
   return { candidats, erreurs, avertissements }
+}
+
+/**
+ * Lit la colonne « Sexe » : « F », « Féminin », « Fille »… → 'F' ; « M », « Masculin », « Garçon »… → 'M'.
+ * Sert uniquement à accorder l'attestation (« admise » / « admis »). Vide ou illisible → '' (texte neutre « admis(e) »).
+ */
+export function lireSexe(brut) {
+  const v = normalize(String(brut ?? '')).toLowerCase() // normalize() renvoie des majuscules sans accents
+  if (!v) return ''
+  if (['f', 'fem', 'feminin', 'femme', 'fille', 'female'].includes(v)) return 'F'
+  if (['m', 'h', 'masc', 'masculin', 'homme', 'garcon', 'male'].includes(v)) return 'M'
+  return null // écrit mais incompris : l'import le signale
 }
 
 // --------------------------------------------------------------------------
