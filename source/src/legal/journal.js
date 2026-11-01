@@ -5,6 +5,15 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.1.0',
+    date: '01/11/2026',
+    titre: 'Le podium des établissements',
+    points: [
+      'Le classement des établissements prend la forme d’un podium : le premier au centre sur la marche la plus haute, le deuxième et le troisième de chaque côté, les suivants listés dessous',
+      'Même podium sur l’accueil (5 établissements) et sur la page Statistiques (10) ; les marches montent à l’ouverture (désactivé si l’appareil demande moins d’animations)',
+    ],
+  },
+  {
     version: '3.0.0',
     date: '01/11/2026',
     titre: 'Vie privée : un accueil sans liste de noms',
