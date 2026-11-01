@@ -129,9 +129,9 @@ async function ecranPropositions() {
     bandeau(),
     !liste.length ? h('p', { class: 'doux' }, 'Aucune proposition pour le moment.') :
       h('div', { class: 'carte' }, h('table', null,
-        h('thead', null, h('tr', null, ['Date', 'Examen', 'Déposée par', 'Candidats', 'Statut', ''].map((t) => h('th', null, t)))),
+        h('thead', null, h('tr', null, ['Date', 'Examen', 'Déposée par', 'Validée par', 'Candidats', 'Statut', ''].map((t) => h('th', null, t)))),
         h('tbody', null, liste.map((p) => h('tr', null,
-          h('td', null, date(p.creeLe)), h('td', null, p.session), h('td', null, qui(p.auteur)), h('td', null, p.resume.apres.total), h('td', null, badge(p.statut)),
+          h('td', null, date(p.creeLe)), h('td', null, p.session), h('td', null, qui(p.auteur)), h('td', null, decision(p)), h('td', null, p.resume.apres.total), h('td', null, badge(p.statut)),
           h('td', null, h('button', { class: 'btn', onclick: () => { vue = { onglet: 'detail', id: p.id }; message = null; afficher() } }, 'Ouvrir'))))))))
 }
 

@@ -552,3 +552,40 @@ describe('journal d’audit', () => {
     expect(c.audit.verifier().ok).toBe(true)
   })
 })
+
+describe('journal d’audit : plusieurs écrivains', () => {
+  it('deux programmes (serveur + commande manuelle) écrivant dans le même journal gardent une chaîne valide', async () => {
+    const { Audit } = await import('../console/lib/audit.mjs')
+    const dossier = mkdtempSync(join(tmpdir(), 'audit-'))
+    const fichier = join(dossier, 'audit.jsonl')
+    const serveur = new Audit(fichier) // le serveur démarre : journal vide
+    const commande = new Audit(fichier) // la commande `utilisateurs.mjs` est lancée à la main
+    commande.ajouter({ utilisateur: 'cli', action: 'utilisateur_cree' })
+    commande.ajouter({ utilisateur: 'cli', action: 'utilisateur_cree' })
+    serveur.ajouter({ utilisateur: 'amina', action: 'connexion_ok' }) // le serveur a un compteur périmé en mémoire
+    commande.ajouter({ utilisateur: 'cli', action: 'utilisateur_affichage' })
+    const v = serveur.verifier()
+    expect(v.ok).toBe(true)
+    expect(v.lignes).toBe(4)
+  })
+
+  it('archiver conserve l’ancien journal et démarre une chaîne valide qui y renvoie', async () => {
+    const { Audit } = await import('../console/lib/audit.mjs')
+    const { readdirSync: lister } = await import('node:fs')
+    const dossier = mkdtempSync(join(tmpdir(), 'audit-'))
+    const fichier = join(dossier, 'audit.jsonl')
+    const a = new Audit(fichier)
+    a.ajouter({ action: 'un' }); a.ajouter({ action: 'deux' })
+    // On casse volontairement la numérotation (comme l'ancien défaut) : le journal doit être jugé rompu.
+    const lignes = readFileSync(fichier, 'utf8').trim().split('\n').map((l) => JSON.parse(l))
+    lignes[1].n = 5
+    writeFileSync(fichier, lignes.map((l) => JSON.stringify(l)).join('\n') + '\n')
+    expect(new Audit(fichier).verifier().ok).toBe(false)
+    const r = new Audit(fichier).archiver('test')
+    expect(r.verification.ok).toBe(false)
+    const b = new Audit(fichier)
+    expect(b.verifier()).toMatchObject({ ok: true, lignes: 1 })
+    expect(b.lire()[0].details).toMatchObject({ ancienFichier: expect.stringContaining('archive-'), lignes: 2, chaineValide: false })
+    expect(lister(dossier).some((f) => f.includes('archive-'))).toBe(true) // rien n'a été supprimé
+  })
+})
