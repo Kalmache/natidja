@@ -5,6 +5,17 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.3.0',
+    date: '01/11/2026',
+    titre: 'Centres d’examen et mises à jour fiables',
+    points: [
+      'Nouveau filtre « Centre d’examen » dans la recherche : on ne voit que les candidats d’un centre',
+      'Nouvelle section « Centres d’examen » dans les statistiques : taux de réussite de chaque centre, avec sa fiche détaillée',
+      'Dans l’application Android, les mises à jour s’affichent dès le premier lancement (l’ancienne version ne reste plus en mémoire)',
+      '133 tests automatiques',
+    ],
+  },
+  {
     version: '3.2.0',
     date: '01/11/2026',
     titre: 'La page « Découvrir »',

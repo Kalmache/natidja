@@ -17,26 +17,12 @@ export function calculerStats(candidats, session) {
     parIle: {}, // { ngazidja: { nom, total, ADMIS, ... } }
     parSerie: {}, // { A1: { total, ADMIS, ... } }
     moyenneGenerale: 0,
+    centres: [], // statistiques par centre d'examen (même forme que les établissements)
     etablissements: [], // classement par taux de réussite (candidats libres exclus), voir plus bas
   }
-  const parEtablissement = new Map() // nom → { total, admis, iles: { id → nombre } }
   let sommeMoyennes = 0
   let avecMoyenne = 0
   for (const c of candidats) {
-    // Classement des établissements : les candidats libres n'appartiennent à aucun établissement.
-    if (c.school && !estCandidatLibre(c.school)) {
-      const e = parEtablissement.get(c.school) ?? { total: 0, admis: 0, second: 0, iles: {}, series: {} }
-      e.total++
-      if (c.status === 'ADMIS') e.admis++
-      if (c.status === 'SECOND_GROUPE') e.second++
-      e.iles[c.island] = (e.iles[c.island] ?? 0) + 1
-      if (c.series) {
-        const s = (e.series[c.series] ??= { total: 0, admis: 0 })
-        s.total++
-        if (c.status === 'ADMIS') s.admis++
-      }
-      parEtablissement.set(c.school, e)
-    }
     inc(stats.parStatut, c.status)
     if (c.mention && c.mention !== 'SANS') inc(stats.parMention, c.mention)
     stats.parIle[c.islandId] ??= { nom: c.island, total: 0 }
@@ -52,8 +38,34 @@ export function calculerStats(candidats, session) {
       avecMoyenne++
     }
   }
-  // Du meilleur au moins bon taux ; à égalité, l'établissement qui présente le plus de candidats, puis l'ordre alphabétique.
-  stats.etablissements = [...parEtablissement].map(([nom, e]) => ({
+  // Classement des établissements (candidats libres exclus) et statistiques par centre d'examen.
+  stats.etablissements = regrouper(candidats, 'school', true)
+  stats.centres = regrouper(candidats, 'center', false)
+  stats.moyenneGenerale = avecMoyenne ? Math.round((sommeMoyennes / avecMoyenne) * 100) / 100 : 0
+  return stats
+}
+
+// Regroupe les candidats par « champ » (school ou center) et calcule, pour chaque groupe,
+// le taux de réussite, la répartition des résultats et la réussite par série.
+// Du meilleur au moins bon taux ; à égalité, le groupe qui présente le plus de candidats, puis l'ordre alphabétique.
+function regrouper(candidats, champ, exclureLibres) {
+  const groupes = new Map() // nom → { total, admis, second, iles: { île → nombre }, series: {...} }
+  for (const c of candidats) {
+    const nom = c[champ]
+    if (!nom || (exclureLibres && estCandidatLibre(nom))) continue
+    const e = groupes.get(nom) ?? { total: 0, admis: 0, second: 0, iles: {}, series: {} }
+    e.total++
+    if (c.status === 'ADMIS') e.admis++
+    if (c.status === 'SECOND_GROUPE') e.second++
+    e.iles[c.island] = (e.iles[c.island] ?? 0) + 1
+    if (c.series) {
+      const s = (e.series[c.series] ??= { total: 0, admis: 0 })
+      s.total++
+      if (c.status === 'ADMIS') s.admis++
+    }
+    groupes.set(nom, e)
+  }
+  return [...groupes].map(([nom, e]) => ({
     nom,
     ile: Object.entries(e.iles).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '',
     total: e.total,
@@ -61,11 +73,8 @@ export function calculerStats(candidats, session) {
     second: e.second,
     ajournes: e.total - e.admis - e.second,
     taux: Math.round((e.admis / e.total) * 1000) / 10, // en %, une décimale
-    // Résultats par série dans cet établissement (pour la fiche détaillée), du meilleur au moins bon taux.
     series: Object.entries(e.series)
       .map(([serie, s]) => ({ serie, total: s.total, admis: s.admis, taux: Math.round((s.admis / s.total) * 1000) / 10 }))
       .sort((a, b) => b.taux - a.taux || a.serie.localeCompare(b.serie)),
   })).sort((a, b) => b.taux - a.taux || b.total - a.total || a.nom.localeCompare(b.nom, 'fr'))
-  stats.moyenneGenerale = avecMoyenne ? Math.round((sommeMoyennes / avecMoyenne) * 100) / 100 : 0
-  return stats
 }

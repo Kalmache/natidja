@@ -88,10 +88,11 @@ export function buildQuery(saisie, shardKeys = {}, sessionId) {
 }
 
 /** Vrai si le candidat respecte les filtres choisis (île, série, statut). */
-export function matchesFilters(candidat, { island = 'all', series = 'ALL', status = 'ALL', mention = 'ALL' }) {
+export function matchesFilters(candidat, { island = 'all', series = 'ALL', status = 'ALL', mention = 'ALL', center = 'ALL' }) {
   if (island !== 'all' && candidat.islandId !== island) return false
   if (series !== 'ALL' && candidat.series !== series) return false
   if (status !== 'ALL' && candidat.status !== status) return false
   if (mention !== 'ALL' && candidat.mention !== mention) return false
+  if (center !== 'ALL' && candidat.center !== center) return false
   return true
 }

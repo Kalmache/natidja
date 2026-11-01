@@ -14,7 +14,7 @@ import { classes, ecart } from '../lib/classement.js'
 const fr = (n) => Number(n).toFixed(1).replace('.', ',')
 const part = (n, total) => (total ? (n / total) * 100 : 0)
 
-export default function EtablissementModal({ etablissement: e, etablissements, minCandidats = 20, nationale, onClose }) {
+export default function EtablissementModal({ etablissement: e, etablissements, minCandidats = 20, nationale, centre = false, onClose }) {
   const { t } = useI18n()
   const boutonFermer = useRef(null)
   const degrade = 'etab-degrade-' + useId().replace(/:/g, '') // identifiant UNIQUE du dégradé de l'anneau
@@ -134,7 +134,7 @@ export default function EtablissementModal({ etablissement: e, etablissements, m
 
           {rang > 0 && (
             <section className="etab__bloc etab__places">
-              <p><Icon name="chart" size={16} /> {t('etab.rank', { n: rang, total: classes_.length })}</p>
+              <p><Icon name="chart" size={16} /> {t(centre ? 'etab.rankCenter' : 'etab.rank', { n: rang, total: classes_.length })}</p>
               {memeIle.length > 1 && <p><Icon name="pin" size={16} /> {t('etab.rankIsland', { n: rangIle, total: memeIle.length, ile: e.ile })}</p>}
             </section>
           )}
