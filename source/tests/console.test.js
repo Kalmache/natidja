@@ -8,7 +8,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, 
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { creerConsole } from '../console/serveur.mjs'
-import { creerUtilisateur } from '../console/utilisateurs.mjs'
+import { creerUtilisateur, definirAffichage } from '../console/utilisateurs.mjs'
 import { hacherMotDePasse, totp } from '../console/lib/securite.mjs'
 import { COLONNES, LIBELLES_MENTION, LIBELLES_STATUT, construireFichiers, majConfig } from '../scripts/lib/resultats.mjs'
 import { calculerStats } from '../scripts/lib/stats.mjs'
@@ -304,6 +304,23 @@ describe('approbation et publication', () => {
     expect(d.json.statut).toBe('proposee')
     expect(d.json.echantillon).toHaveLength(10)
     await cl.appel('POST', `/api/propositions/${id}/annuler`, {})
+  })
+
+  it('le nom d’affichage (titre lisible) apparaît partout, sans changer l’identifiant de connexion', async () => {
+    definirAffichage(c.stockage, 'amina', '  Directeur   Kabir Illiassa ')
+    const { cl, id } = await nouvelleProposition()
+    const d = await cl.appel('GET', `/api/propositions/${id}`)
+    expect(d.json.auteur.nom).toBe('amina') // l'identifiant technique reste la référence
+    expect(d.json.auteur.affichage).toBe('Directeur Kabir Illiassa') // espaces nettoyés
+    const liste = await cl.appel('GET', '/api/propositions')
+    expect(liste.json.find((p) => p.id === id).auteur.affichage).toBe('Directeur Kabir Illiassa')
+    expect((await cl.appel('GET', '/api/etat')).json.utilisateur.affichage).toBe('Directeur Kabir Illiassa')
+    await cl.appel('POST', `/api/propositions/${id}/annuler`, {})
+    // Texte vide = on retire l'affichage ; les caractères dangereux sont refusés.
+    definirAffichage(c.stockage, 'amina', '')
+    expect(c.stockage.trouver('amina').affichage).toBeUndefined()
+    expect(() => definirAffichage(c.stockage, 'amina', '<script>x</script>')).toThrow()
+    expect(() => definirAffichage(c.stockage, 'amina', 'x'.repeat(61))).toThrow()
   })
 
   it('le résumé liste précisément les lignes modifiées (champ, avant → après)', async () => {

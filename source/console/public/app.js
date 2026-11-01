@@ -49,6 +49,8 @@ async function recharger() {
   etat = { etape: r.json?.etape ?? 'aucune', csrf: r.json?.csrf ?? null, utilisateur: r.json?.utilisateur ?? null }
   afficher()
 }
+// Nom montré à l'écran : le titre lisible s'il existe (ex. « Directeur Kabir Illiassa »), sinon l'identifiant.
+const qui = (p) => p?.affichage || p?.nom || '—'
 const dire = (type, texte) => { message = { type, texte }; afficher() }
 const roles = () => etat.utilisateur?.roles ?? []
 const date = (iso) => (iso ? new Date(iso).toLocaleString('fr-FR') : '—')
@@ -111,7 +113,7 @@ function formulaireMotDePasse({ force }) {
 function enTete() {
   return h('header', { class: 'entete' },
     h('strong', null, 'Console de publication · Ndeze Natidja'),
-    h('div', { class: 'qui' }, `${etat.utilisateur.nom} (${roles().join(', ')})`,
+    h('div', { class: 'qui' }, `${qui(etat.utilisateur)} (${roles().join(', ')})`,
       h('button', { class: 'btn', onclick: async () => { await api('POST', '/api/deconnexion', {}); etat = { etape: 'aucune', csrf: null, utilisateur: null }; message = null; afficher() } }, 'Se déconnecter')))
 }
 function onglets() {
@@ -129,7 +131,7 @@ async function ecranPropositions() {
       h('div', { class: 'carte' }, h('table', null,
         h('thead', null, h('tr', null, ['Date', 'Examen', 'Déposée par', 'Candidats', 'Statut', ''].map((t) => h('th', null, t)))),
         h('tbody', null, liste.map((p) => h('tr', null,
-          h('td', null, date(p.creeLe)), h('td', null, p.session), h('td', null, p.auteur.nom), h('td', null, p.resume.apres.total), h('td', null, badge(p.statut)),
+          h('td', null, date(p.creeLe)), h('td', null, p.session), h('td', null, qui(p.auteur)), h('td', null, p.resume.apres.total), h('td', null, badge(p.statut)),
           h('td', null, h('button', { class: 'btn', onclick: () => { vue = { onglet: 'detail', id: p.id }; message = null; afficher() } }, 'Ouvrir'))))))))
 }
 
@@ -258,7 +260,7 @@ async function ecranDetail() {
   return h('div', null,
     h('p', null, h('button', { class: 'btn', onclick: () => { vue = { onglet: 'propositions', id: null }; message = null; afficher() } }, '← Retour')),
     h('h2', null, `Proposition du ${date(p.creeLe)} `, badge(p.statut)), bandeau(),
-    h('p', { class: 'doux' }, `Examen ${p.session} · déposée par ${p.auteur.nom} · fichier « ${p.fichier.nom} » (${Math.round(p.fichier.taille / 1024)} Ko) · empreinte ${p.fichier.sha256.slice(0, 12)}…`),
+    h('p', { class: 'doux' }, `Examen ${p.session} · déposée par ${qui(p.auteur)} · fichier « ${p.fichier.nom} » (${Math.round(p.fichier.taille / 1024)} Ko) · empreinte ${p.fichier.sha256.slice(0, 12)}…`),
     p.baseObsolete && actif && h('div', { class: 'message alerte' }, 'Une autre publication a eu lieu depuis le dépôt de ce fichier : l’approbation demandera une confirmation explicite.'),
     (p.resume.alertes ?? []).map((t) => h('div', { class: 'message alerte' }, t)),
     h('div', { class: 'carte' }, h('h3', null, 'Ce qui va changer'),
@@ -271,8 +273,8 @@ async function ecranDetail() {
       p.donneesPurgees ? h('p', { class: 'doux' }, 'Données purgées (durée de conservation dépassée).') :
         h('table', null, h('thead', null, h('tr', null, ['N° de table', 'Nom', 'Île', 'Résultat', 'Moyenne'].map((t) => h('th', null, t)))),
           h('tbody', null, p.echantillon.map((c) => h('tr', null, h('td', null, c.tableNumber), h('td', null, c.nom), h('td', null, c.ile), h('td', null, RESULTATS[c.resultat] ?? c.resultat), h('td', null, c.moyenne)))))),
-    p.approbation && h('p', { class: 'doux' }, `Approuvée par ${p.approbation.par.nom} le ${date(p.approbation.le)}${p.approbation.publierA ? ` · publication prévue le ${date(p.approbation.publierA)}` : ''}`),
-    p.refus && h('div', { class: 'message erreur' }, `Refusée par ${p.refus.par.nom} le ${date(p.refus.le)} : ${p.refus.motif}`),
+    p.approbation && h('p', { class: 'doux' }, `Approuvée par ${qui(p.approbation.par)} le ${date(p.approbation.le)}${p.approbation.publierA ? ` · publication prévue le ${date(p.approbation.publierA)}` : ''}`),
+    p.refus && h('div', { class: 'message erreur' }, `Refusée par ${qui(p.refus.par)} le ${date(p.refus.le)} : ${p.refus.motif}`),
     p.erreurPublication && h('div', { class: 'message erreur' }, `Échec de la publication : ${p.erreurPublication}`),
     p.publieLe && h('div', { class: 'message succes' }, `Publiée le ${date(p.publieLe)}.`),
     p.publieLe && miseEnLigne(p, monRole, agir),

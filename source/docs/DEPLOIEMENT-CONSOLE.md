@@ -188,6 +188,14 @@ docker compose exec console node console/utilisateurs.mjs creer --nom zaid --rol
 
 Chaque commande affiche **une seule fois** un mot de passe temporaire et un QR code. **Remettez-les en main propre** à la personne : elle scanne le QR avec une application d'authentification (Google Authenticator, Microsoft Authenticator, Aegis, FreeOTP), puis se connecte et **choisit son propre mot de passe**.
 
+**Nom d'affichage.** Pour que l'écran indique « Directeur Kabir Illiassa » au lieu de l'identifiant, ajoutez `--affichage "Directeur Kabir Illiassa"` à la création, ou, pour un compte existant :
+
+```bash
+docker compose exec console node console/utilisateurs.mjs affichage --nom amina --texte "Directeur Kabir Illiassa"
+```
+
+Ce titre ne sert qu'à l'affichage (liste des propositions, « déposée par », « approuvée par »). L'identifiant de connexion reste la référence pour la règle des deux personnes et pour le journal d'audit. Un texte vide (`--texte ""`) retire le titre.
+
 Autres commandes : `lister`, `reinitialiser --nom X`, `desactiver --nom X` (à utiliser dès qu'une personne quitte son poste).
 
 ---
