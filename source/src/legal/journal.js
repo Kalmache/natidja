@@ -5,6 +5,16 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.4.1',
+    date: '01/11/2026',
+    titre: 'Page Découvrir : plus compacte sur téléphone',
+    points: [
+      'Le petit bouton de défilement reste visible sur téléphone',
+      'Moins de vide autour du téléphone d’exemple et entre les sections',
+      'Le téléphone d’exemple ne chevauche plus le texte au défilement',
+    ],
+  },
+  {
     version: '3.4.0',
     date: '01/11/2026',
     titre: 'Rapport des statistiques en PDF',
