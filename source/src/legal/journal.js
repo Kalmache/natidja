@@ -5,6 +5,20 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.0.0',
+    date: '01/11/2026',
+    titre: 'Vie privée : un accueil sans liste de noms',
+    points: [
+      'L’accueil ne montre plus aucun nom : des statistiques et le classement des meilleurs établissements (par taux de réussite, candidats libres exclus, réglable par l’autorité organisatrice)',
+      'La recherche affiche le résultat juste sous la barre ; la carte du candidat se limite au nom, au résultat et à l’établissement',
+      'L’attestation (numéro de table, mention, moyenne, date de naissance) s’ouvre après vérification de l’identité : numéro de table et date de naissance',
+      'Nouveau bouton « Partager ma réussite » : une image sobre, sans numéro ni date de naissance, à la place d’une capture de l’attestation',
+      'Les cartes de chiffres mènent aux statistiques ; il n’est plus possible de parcourir une liste de candidats sans avoir cherché',
+      'Recherche : message d’aide en arabe pour écrire le nom en lettres latines ; bouton « Actualiser les résultats » dans les Réglages ; lieu de naissance sur la page de vérification',
+      '121 tests automatiques',
+    ],
+  },
+  {
     version: '2.8.1',
     date: '01/11/2026',
     titre: 'E-mail prêt à envoyer',

@@ -15,17 +15,73 @@ import { useI18n } from '../i18n/index.jsx'
 import { MENTIONS, dateNaissance, note, titleCase } from '../lib/format.js'
 import { registerPlugin } from '@capacitor/core'
 import { Share } from '@capacitor/share'
+import { Directory, Filesystem } from '@capacitor/filesystem'
+import { creerCarteReussite } from '../lib/carteReussite.js'
 import { isNativeApp, verificationCode, verificationUrl } from '../lib/verify.js'
+import { identiteCorrespond } from '../lib/identite.js'
 
 // Module natif d'impression (voir android/.../ImpressionPlugin.java). Il n'existe
 // que dans l'application Android ; sur le web on utilise window.print().
 const ImpressionNative = registerPlugin('ImpressionNative')
+
+/**
+ * Vérification d'identité AVANT d'afficher l'attestation (moyenne, date de naissance...).
+ * La personne saisit son numéro de table ET sa date de naissance : les informations qu'elle est
+ * seule, avec l'administration, à connaître ensemble.
+ *
+ * ⚠️ Étape 1 (démonstration) : la comparaison se fait sur l'appareil, donc c'est une protection
+ * d'AFFICHAGE : les fichiers publiés contiennent encore ces détails. La protection réelle suppose
+ * que la comparaison se fasse sur un serveur (voir docs/CONFIDENTIALITE.md).
+ */
+function VerificationIdentite({ candidat, onValide, onClose }) {
+  const { t } = useI18n()
+  const [numero, setNumero] = useState('')
+  const [naissance, setNaissance] = useState('')
+  const [erreur, setErreur] = useState(false)
+  const [essais, setEssais] = useState(0)
+  const [bloque, setBloque] = useState(false)
+
+  const verifier = (e) => {
+    e.preventDefault()
+    if (bloque) return
+    if (identiteCorrespond(candidat, numero, naissance)) return onValide()
+    setErreur(true)
+    if (essais + 1 >= 5) {
+      // Trop d'essais : courte pause (freine les essais au hasard).
+      setBloque(true)
+      setTimeout(() => { setBloque(false); setEssais(0) }, 20_000)
+    } else setEssais(essais + 1)
+  }
+
+  return (
+    <form className="gate" onSubmit={verifier}>
+      <button type="button" className="btn btn--icon gate__close" onClick={onClose} aria-label={t('att.close')}>
+        <Icon name="close" size={18} />
+      </button>
+      <span className="gate__lock" aria-hidden="true"><Icon name="lock" size={28} /></span>
+      <h2>{t('id.title')}</h2>
+      <p className="gate__who">{candidat.lastName} {titleCase(candidat.firstName)}</p>
+      <p className="gate__intro">{t('id.intro')}</p>
+      <label>
+        <span>{t('id.table')}</span>
+        <input type="text" value={numero} onChange={(e) => setNumero(e.target.value)} placeholder={t('id.tablePh')} autoComplete="off" autoCapitalize="characters" spellCheck="false" autoFocus required />
+      </label>
+      <label>
+        <span>{t('id.birth')}</span>
+        <input type="text" inputMode="numeric" value={naissance} onChange={(e) => setNaissance(e.target.value)} placeholder={t('id.birthPh')} autoComplete="off" required />
+      </label>
+      {erreur && <p className="gate__error" role="alert">{bloque ? t('id.locked') : t('id.error')}</p>}
+      <button type="submit" className="btn btn--primary" disabled={bloque}>{t('id.submit')}</button>
+    </form>
+  )
+}
 
 export default function CandidateModal({ candidat, session, onClose }) {
   const { t } = useI18n()
   const [code, setCode] = useState('')
   const [copie, setCopie] = useState(false)
   const boutonFermer = useRef(null)
+  const [identifie, setIdentifie] = useState(false) // vrai une fois l'identité confirmée
   const statut = candidat.status
 
   // Calcul du code de vérification (asynchrone car il utilise la cryptographie).
@@ -85,6 +141,44 @@ export default function CandidateModal({ candidat, session, onClose }) {
     }
   }
 
+  /**
+   * « Partager ma réussite » : une image sobre (nom, Admis(e), mention, établissement) à poster
+   * sur les réseaux, à la place d'une capture de l'attestation qui montre numéro et date de naissance.
+   */
+  const [carteEnCours, setCarteEnCours] = useState(false)
+  const partagerCarte = async () => {
+    setCarteEnCours(true)
+    try {
+      const blob = await creerCarteReussite({ candidat, session, textes: { admis: t('att.admisCarte'), mention: t('att.mention') } })
+      const titre = t('app.name')
+      const texte = t('att.shareCard')
+      const fichier = new File([blob], 'ma-reussite.png', { type: 'image/png' })
+      if (navigator.canShare?.({ files: [fichier] })) {
+        await navigator.share({ files: [fichier], title: titre, text: texte }) // navigateur de téléphone
+      } else if (isNativeApp()) {
+        // Application Android : on écrit l'image dans le cache, puis on ouvre la boîte de partage d'Android.
+        const base64 = await new Promise((ok, ko) => {
+          const lecteur = new FileReader()
+          lecteur.onload = () => ok(String(lecteur.result).split(',')[1])
+          lecteur.onerror = ko
+          lecteur.readAsDataURL(blob)
+        })
+        const { uri } = await Filesystem.writeFile({ path: 'ma-reussite.png', data: base64, directory: Directory.Cache })
+        await Share.share({ title: titre, text: texte, files: [uri], dialogTitle: t('att.shareCardBtn') })
+      } else {
+        // Ordinateur : on télécharge l'image.
+        const adresse = URL.createObjectURL(blob)
+        const a = Object.assign(document.createElement('a'), { href: adresse, download: 'ma-reussite.png' })
+        a.click()
+        setTimeout(() => URL.revokeObjectURL(adresse), 4000)
+      }
+    } catch {
+      /* partage annulé : rien à faire */
+    } finally {
+      setCarteEnCours(false)
+    }
+  }
+
   const prenom = titleCase(candidat.firstName)
   const titres = {
     ADMIS: [t('att.admis'), t('att.admisSub')],
@@ -108,9 +202,13 @@ export default function CandidateModal({ candidat, session, onClose }) {
   return createPortal(
     <div className="modal" role="dialog" aria-modal="true" aria-label={t('att.title')}>
       <div className="modal__backdrop" onClick={onClose} />
-      {statut === 'ADMIS' && <Confetti intensite={candidat.mention === 'TRES_BIEN' ? 1.6 : 1} />}
+      {identifie && statut === 'ADMIS' && <Confetti intensite={candidat.mention === 'TRES_BIEN' ? 1.6 : 1} />}
 
       <div className="modal__panel">
+        {!identifie ? (
+          <VerificationIdentite candidat={candidat} onValide={() => setIdentifie(true)} onClose={onClose} />
+        ) : (
+        <>
         <div className="modal__bar no-print">
           {/* Application : impression Android (avec « Enregistrer en PDF »).
               Web : fenêtre d'impression du navigateur. */}
@@ -121,6 +219,11 @@ export default function CandidateModal({ candidat, session, onClose }) {
             <Icon name={copie ? 'check' : 'share'} size={16} />
             {copie ? t('att.copied') : t('att.share')}
           </button>
+          {statut === 'ADMIS' && (
+            <button type="button" className="btn btn--ghost" onClick={partagerCarte} disabled={carteEnCours}>
+              <Icon name="share" size={16} /> {t('att.shareCardBtn')}
+            </button>
+          )}
           <button
             type="button"
             ref={boutonFermer}
@@ -218,6 +321,8 @@ export default function CandidateModal({ candidat, session, onClose }) {
             </div>
           </footer>
         </article>
+        </>
+        )}
       </div>
     </div>,
     document.body,

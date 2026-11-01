@@ -138,7 +138,7 @@ describe('fichiers produits pour le site', () => {
   it('range un candidat dans le fichier de CHAQUE mot de son nom (recherche prénom d’abord)', () => {
     const c = transformer({ entete: ENTETE, lignes: [ok()] }, bac, config).candidats
     const f = construireFichiers(c, config.shardKeys)
-    expect([...f.keys()].sort()).toEqual(['initial.json', 'noms/FA.json', 'noms/SA.json', 'numeros/900.json'])
+    expect([...f.keys()].sort()).toEqual(['noms/FA.json', 'noms/SA.json', 'numeros/900.json'])
   })
 
   it('RECONSTRUIT À L’IDENTIQUE les fichiers actuellement publiés (3 500 candidats × 2 examens)', () => {
@@ -150,7 +150,8 @@ describe('fichiers produits pour le site', () => {
         expect(existsSync(dir + chemin)).toBe(true)
         expect(readFileSync(dir + chemin, 'utf8') === contenu).toBe(true)
       }
-      expect(produits.size).toBe(1 + readdirSync(dir + 'numeros').length + readdirSync(dir + 'noms').length)
+      expect(produits.size).toBe(readdirSync(dir + 'numeros').length + readdirSync(dir + 'noms').length)
+      expect(existsSync(dir + 'initial.json')).toBe(false) // plus de liste de candidats offerte à tout visiteur
       expect(majConfig(config, s.id, cands, new Date(config.updatedAt))).toEqual(config)
     }
   })

@@ -29,7 +29,7 @@ Poids **compressés** (gzip niveau 6, comme le fait Apache), session `bac-2026` 
 | Élément | Poids | Quand |
 |---|---|---|
 | Application (page, scripts, style, mode hors-ligne) | 100,3 Ko | **une seule fois** par appareil |
-| Accueil (configuration + 120 premiers candidats) | 4,0 Ko | à chaque visite |
+| Accueil (configuration + statistiques, **sans liste de candidats**) | mesure à refaire (`npm run capacite`) | à chaque visite |
 | Une recherche (fichier moyen sur 67) | 4,2 Ko (max 11,2 Ko) | à chaque recherche |
 | **Première visite** (2 recherches) | **≈ 113 Ko, ≈ 11 requêtes** | |
 | **Visite suivante** (2 recherches) | **≈ 12 Ko, ≈ 4 requêtes** | |

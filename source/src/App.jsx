@@ -12,7 +12,7 @@ import { I18nProvider, LANGS, useI18n } from './i18n/index.jsx'
 import { brancherRetourNatif } from './lib/retour.js'
 import { isNativeApp } from './lib/verify.js'
 import { navigate, useClavier, useHashRoute, usePersistedState, useSwipe } from './hooks.js'
-import { loadConfig, loadInitial } from './lib/data.js'
+import { loadConfig, loadStats } from './lib/data.js'
 import Splash from './components/Splash.jsx'
 import { libelleSession } from './components/SessionPicker.jsx'
 import Icon from './components/Icon.jsx'
@@ -28,7 +28,7 @@ import SettingsView from './views/SettingsView.jsx'
 // n'ait fini d'afficher la page) : pendant que le Splash s'anime, les
 // premiers résultats arrivent.
 const demarrage = loadConfig()
-demarrage.then((c) => c.defaultSessionId && loadInitial(c.defaultSessionId)).catch(() => {})
+demarrage.then((c) => c.defaultSessionId && loadStats(c.defaultSessionId)).catch(() => {})
 
 const THEME_PAR_DEFAUT = window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 
@@ -184,7 +184,7 @@ function Shell({ theme, onTheme, onSetTheme, palette, onPalette, lang, onLang })
         ) : !session ? (
           <div className="page"><div className="skeleton skeleton--hero" /></div>
         ) : vue === 'stats' ? (
-          <StatsView session={session} onIsland={setIle} />
+          <StatsView session={session} classement={config.classement} />
         ) : vue === 'about' ? (
           <AboutView />
         ) : vue === 'settings' ? (

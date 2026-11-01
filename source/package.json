@@ -1,6 +1,6 @@
 {
   "name": "ndeze-natidja",
-  "version": "2.8.1",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
   "description": "Consultation des résultats d'examens (Bac, BEPC) – Union des Comores",
@@ -29,6 +29,7 @@
     "@capacitor/android": "^8.6.0",
     "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.6.0",
+    "@capacitor/filesystem": "^8.1.5",
     "@capacitor/share": "^8.0.3",
     "exceljs": "^4.4.0",
     "qrcode-generator": "^2.0.4",

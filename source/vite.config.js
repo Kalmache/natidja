@@ -95,6 +95,19 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
+            // La liste des examens et les statistiques (petits fichiers qui disent CE QUI EST PUBLIÉ) :
+            // d'abord le réseau pour avoir la version à jour ; si le réseau est lent (3 s) ou absent,
+            // on prend la copie gardée, donc le mode hors-ligne continue de marcher.
+            urlPattern: /\/data\/(exams\.json|[^/]+\/stats\.json)$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'config-resultats',
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 7 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+          {
             // Chaque fichier de résultats consulté est gardé 7 jours.
             // "StaleWhileRevalidate" = on affiche tout de suite la copie
             // locale, et on la met à jour en arrière-plan.

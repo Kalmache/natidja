@@ -1,29 +1,31 @@
 // ============================================================================
-// ResultsView.jsx – la page d'accueil : en-tête vedette + recherche + liste
+// ResultsView.jsx – la page d'accueil : en-tête vedette + recherche + résultats
 // ----------------------------------------------------------------------------
-// Deux sources de candidats :
-//   1. `initial.json` (120 candidats, ~15 Ko) affiché IMMÉDIATEMENT quand rien
-//      n'est tapé → la page n'est jamais vide.
-//   2. Un « shard » (≈ 30 Ko) téléchargé dès que la saisie est assez longue,
-//      choisi par buildQuery() (voir src/lib/search.js).
+// RESPECT DE LA VIE PRIVÉE : tant que personne n'a cherché quoi que ce soit, l'accueil
+// n'affiche AUCUN nom : seulement des statistiques et le classement des établissements.
+// Les candidats n'apparaissent que lorsqu'on tape un nom ou un numéro, et seulement avec le
+// strict nécessaire (nom, résultat, établissement). Le détail s'ouvre après vérification
+// de l'identité (voir CandidateModal).
+//
+// Source des candidats : un « shard » (petit fichier d'environ 4 Ko) téléchargé dès que la
+// saisie est assez longue, choisi par buildQuery() (voir src/lib/search.js).
 // ============================================================================
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { surRetour } from '../lib/retour.js'
 import Icon from '../components/Icon.jsx'
 import Stat from '../components/Stat.jsx'
 import SessionPicker from '../components/SessionPicker.jsx'
+import Classement from '../components/Classement.jsx'
 import CandidateCard from '../components/CandidateCard.jsx'
 import CandidateModal from '../components/CandidateModal.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { buildQuery, matchesFilters } from '../lib/search.js'
-import { loadInitial, loadShard, loadStats } from '../lib/data.js'
-import { consommerFiltre } from '../lib/demande.js'
+import { loadShard, loadStats } from '../lib/data.js'
 import { navigate, prefersReducedMotion } from '../hooks.js'
 
 const PAGE = 60 // nombre de cartes affichées avant « Afficher plus »
 const STATUTS = ['ALL', 'ADMIS', 'SECOND_GROUPE', 'AJOURNE']
-const MENTIONS = ['ALL', 'PASSABLE', 'ASSEZ_BIEN', 'BIEN', 'TRES_BIEN']
-const PARCOURS_VIDE = (session) => ({ session, items: [], suivant: 0, fini: false, charge: false, erreur: false })
+const ARABE = /[؀-ۿ]/ // lettres arabes : les noms sont enregistrés en lettres latines
 
 export default function ResultsView({ config, session, onSession, island, onIsland, islands }) {
   const { t } = useI18n()
@@ -33,8 +35,6 @@ export default function ResultsView({ config, session, onSession, island, onIsla
   const requete = useDeferredValue(saisie) // garde la frappe fluide
   const [serie, setSerie] = useState('ALL')
   const [statut, setStatut] = useState('ALL')
-  const [mention, setMention] = useState('ALL')
-  const refResultats = useRef(null) // début de la liste : cible du défilement automatique
   const [selection, setSelection] = useState(null) // candidat ouvert dans la fenêtre
 
   // ---------- Fiche d'un candidat et bouton RETOUR ----------
@@ -68,35 +68,25 @@ export default function ResultsView({ config, session, onSession, island, onIsla
   useEffect(() => {
     // Appelé quand l'utilisateur recule : si l'entrée « fiche » a disparu,
     // on ferme la fiche.
-    const surRetour = () => {
+    const surRetourNavigateur = () => {
       if (!window.history.state?.fiche) setSelection(null)
     }
-    window.addEventListener('popstate', surRetour)
-    return () => window.removeEventListener('popstate', surRetour)
+    window.addEventListener('popstate', surRetourNavigateur)
+    return () => window.removeEventListener('popstate', surRetourNavigateur)
   }, [])
 
-  // ---------- 1. Candidats affichés au démarrage ----------
-  const [apercu, setApercu] = useState([])
-  const [apercuCharge, setApercuCharge] = useState(false)
+  // On change d'examen : on repart de zéro côté filtres.
   useEffect(() => {
-    let actif = true
-    setApercuCharge(false)
-    loadInitial(session.id)
-      .then((liste) => actif && setApercu(liste))
-      .catch(() => {})
-      .finally(() => actif && setApercuCharge(true))
     setSerie('ALL')
-    return () => {
-      actif = false
-    }
   }, [session.id])
 
-  // ---------- 2. Candidats issus d'une recherche ----------
+  // ---------- 1. Candidats issus d'une recherche ----------
   const plan = useMemo(
     () => buildQuery(requete, config.shardKeys, session.id),
     [requete, config.shardKeys, session.id],
   )
-  const url = plan.etat === 'pret' ? plan.url : null
+  const recherche = plan.etat === 'pret' // vrai dès que la saisie permet une vraie recherche
+  const url = recherche ? plan.url : null
   const [shard, setShard] = useState(null) // { url, candidats }
   const [chargement, setChargement] = useState(false)
   const [erreur, setErreur] = useState(false)
@@ -116,60 +106,32 @@ export default function ResultsView({ config, session, onSession, island, onIsla
     }
   }, [url, tentative])
 
-  // ---------- 3. Liste finale à afficher ----------
-  const filtres = { island, series: serie, status: statut, mention }
-  // « recherche » = une vraie recherche est lancée (saisie assez longue).
-  // Tant que la saisie est trop courte, on garde l'aperçu des candidats.
-  const recherche = plan.etat === 'pret'
-
-  // ---------- 3 bis. PARCOURS : filtrer sans rien taper ----------
-  // L'aperçu ne contient que 120 candidats. Quand on touche « Admis », « Bien »,
-  // une île... sans taper de nom, il faut parcourir TOUS les résultats. On le
-  // fait par petits fichiers (≈ 4 Ko chacun), dans l'ordre des numéros de table,
-  // et seulement autant qu'il en faut pour remplir l'écran : « Afficher plus »
-  // en charge d'autres. Rien n'est téléchargé tant qu'aucun filtre n'est actif.
-  const filtreActif = island !== 'all' || serie !== 'ALL' || statut !== 'ALL' || mention !== 'ALL'
-  const parcoursActif = filtreActif && !recherche
-  const [parcoursBrut, setParcours] = useState(() => PARCOURS_VIDE(session.id))
-  const parcours = parcoursBrut.session === session.id ? parcoursBrut : PARCOURS_VIDE(session.id)
-
+  // ---------- 2. Liste finale à afficher ----------
+  const filtres = { island, series: serie, status: statut }
+  const filtreActif = island !== 'all' || serie !== 'ALL' || statut !== 'ALL'
   const liste = useMemo(() => {
-    if (parcoursActif) return parcours.items.filter((c) => matchesFilters(c, filtres))
-    if (!recherche) return apercu.filter((c) => matchesFilters(c, filtres))
-    if (shard?.url !== plan.url) return []
+    if (!recherche || shard?.url !== plan.url) return []
     return shard.candidats.filter((c) => matchesFilters(c, filtres) && plan.filtre(c))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parcoursActif, parcours.items, recherche, apercu, shard, plan, island, serie, statut, mention])
+  }, [recherche, shard, plan, island, serie, statut])
+  const pret = !recherche || (!chargement && !erreur && shard?.url === plan.url)
 
   const [visibles, setVisibles] = useState(PAGE)
-  const manque = parcoursActif && !parcours.fini && !parcours.erreur && liste.length < visibles
+  useEffect(() => setVisibles(PAGE), [requete, island, serie, statut, session.id])
+
+  // ---------- 3. Classement des établissements (accueil sans recherche) ----------
+  // Le ministère décide s'il est affiché et combien d'établissements : réglage « classement » de exams.json.
+  const classement = { visible: false, top: 5, minCandidats: 20, ...config.classement }
+  const [statsSession, setStatsSession] = useState(null)
   useEffect(() => {
-    if (!manque || parcours.charge) return
-    const session_ = session.id
-    const rang = parcours.suivant
-    setParcours((p) => ({ ...(p.session === session_ ? p : PARCOURS_VIDE(session_)), charge: true }))
-    loadStats(session_)
-      .then(async (st) => {
-        const cle = st?.fichiersNumeros?.[rang]
-        const candidats = cle === undefined ? null : await loadShard(`./data/${session_}/numeros/${cle}.json`)
-        setParcours((p) => {
-          if (p.session !== session_ || p.suivant !== rang) return p // la situation a changé entre-temps
-          return candidats === null
-            ? { ...p, fini: true, charge: false }
-            : { ...p, items: [...p.items, ...candidats], suivant: rang + 1, charge: false }
-        })
-      })
-      .catch(() => setParcours((p) => (p.session === session_ ? { ...p, charge: false, erreur: true } : p)))
-  }, [manque, parcours.charge, parcours.suivant, session.id])
-
-  const pret = parcoursActif
-    ? liste.length > 0 || parcours.fini || parcours.erreur
-    : recherche
-      ? !chargement && !erreur && shard?.url === plan.url
-      : apercuCharge
-  const erreurAffichee = parcoursActif ? parcours.erreur : erreur
-
-  useEffect(() => setVisibles(PAGE), [requete, island, serie, statut, mention, session.id])
+    if (!classement.visible) return undefined
+    let actif = true
+    setStatsSession(null)
+    loadStats(session.id).then((s) => actif && setStatsSession(s)).catch(() => {})
+    return () => {
+      actif = false
+    }
+  }, [session.id, classement.visible])
 
   // ---------- Raccourcis clavier : ← → pour changer d'île ----------
   const changerIle = useCallback(
@@ -194,34 +156,8 @@ export default function ResultsView({ config, session, onSession, island, onIsla
     setSaisie('')
     setSerie('ALL')
     setStatut('ALL')
-    setMention('ALL')
     onIsland('all')
   }
-
-  // ---------- Aller directement aux résultats concernés ----------
-  // Appelé quand on touche une carte de chiffres (ici ou sur la page Statistiques) :
-  // on applique le filtre demandé, puis on fait glisser l'écran jusqu'à la liste.
-  const allerAuxResultats = useCallback(() => {
-    refResultats.current?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' })
-  }, [])
-  const appliquerFiltre = useCallback(
-    (f = {}) => {
-      setSaisie('')
-      setSerie(f.serie ?? 'ALL')
-      setStatut(f.statut ?? 'ALL')
-      setMention(f.mention ?? 'ALL')
-      onIsland(f.island ?? 'all')
-      // Petit délai : on laisse d'abord l'écran se mettre à jour (et l'éventuel
-      // changement de page finir de remonter en haut) avant de glisser vers la liste.
-      setTimeout(allerAuxResultats, 160)
-    },
-    [onIsland, allerAuxResultats],
-  )
-  // Arrivée depuis la page Statistiques : une demande de filtre peut nous attendre.
-  useEffect(() => {
-    const demande = consommerFiltre()
-    if (demande) appliquerFiltre(demande)
-  }, [appliquerFiltre])
 
   // ---------- Chiffres clés ----------
   const stats = session.stats
@@ -229,15 +165,16 @@ export default function ResultsView({ config, session, onSession, island, onIsla
   const series = ['ALL', ...session.series]
 
   // Message d'aide sous la barre de recherche
-  const aide =
-    plan.etat === 'trop-court'
+  const aide = ARABE.test(saisie)
+    ? t('search.latin')
+    : plan.etat === 'trop-court'
       ? t(/\d/.test(saisie) ? 'search.needDigits' : 'search.needLetters', { n: plan.manque })
       : t('search.hint')
 
   return (
     <>
       {/* ================= HÉROS ================= */}
-      <section className="hero">
+      <section className={`hero ${recherche ? 'hero--compact' : ''}`}>
         <div className="hero__aurora" aria-hidden="true">
           <i /><i /><i />
         </div>
@@ -251,7 +188,6 @@ export default function ResultsView({ config, session, onSession, island, onIsla
               onSession(id)
               setSaisie('')
               setStatut('ALL')
-              setMention('ALL')
             }}
           />
 
@@ -297,183 +233,168 @@ export default function ResultsView({ config, session, onSession, island, onIsla
               </button>
             )}
           </form>
-          <p className={`hero__hint ${plan.etat === 'trop-court' ? 'is-warn' : ''}`} aria-live="polite">
+          <p className={`hero__hint ${plan.etat === 'trop-court' || ARABE.test(saisie) ? 'is-warn' : ''}`} aria-live="polite">
             {aide}
           </p>
         </div>
       </section>
 
-      {/* ================= CHIFFRES CLÉS ================= */}
-      <section className="kpis" aria-label="Chiffres clés">
-        <Stat value={stats.total} label={t('kpi.candidates')} onClick={() => appliquerFiltre({})} />
-        <Stat value={stats.admitted} label={t('kpi.admitted')} tone="ok" onClick={() => appliquerFiltre({ statut: 'ADMIS' })} />
-        <Stat value={stats.oralSecondGroup} label={t('kpi.second')} tone="warn" onClick={() => appliquerFiltre({ statut: 'SECOND_GROUPE' })} />
-        <Stat value={taux} decimals={1} suffix=" %" label={t('kpi.rate')} tone="accent" onClick={() => navigate('/stats')} />
-      </section>
+      {/* ================= ACCUEIL : statistiques (aucun nom de candidat) ================= */}
+      {!recherche && (
+        <>
+          <section className="kpis" aria-label="Chiffres clés">
+            {/* Toucher une carte mène aux statistiques détaillées (jamais à une liste de noms). */}
+            <Stat value={stats.total} label={t('kpi.candidates')} onClick={() => navigate('/stats')} />
+            <Stat value={stats.admitted} label={t('kpi.admitted')} tone="ok" onClick={() => navigate('/stats')} />
+            <Stat value={stats.oralSecondGroup} label={t('kpi.second')} tone="warn" onClick={() => navigate('/stats')} />
+            <Stat value={taux} decimals={1} suffix=" %" label={t('kpi.rate')} tone="accent" onClick={() => navigate('/stats')} />
+          </section>
 
-      {/* ================= FILTRES ================= */}
-      <section className="filters" aria-label="Filtres">
-        <div className="filters__group">
-          <span className="filters__label">{t('filter.island')}</span>
-          <div className="pills">
-            <button type="button" className="pill pill--nav" onClick={() => changerIle(-1)} aria-label={t('filter.prev')}>
-              <Icon name="chevronL" size={16} className="flip-rtl" />
-            </button>
-            {islands.map((i) => (
-              <button
-                key={i.id}
-                type="button"
-                className={`pill ${i.id === island ? 'is-active' : ''}`}
-                aria-pressed={i.id === island}
-                onClick={() => onIsland(i.id)}
-              >
-                {i.id === 'all' ? t('filter.allIslands') : i.name.split(' (')[0]}
-              </button>
-            ))}
-            <button type="button" className="pill pill--nav" onClick={() => changerIle(1)} aria-label={t('filter.next')}>
-              <Icon name="chevronR" size={16} className="flip-rtl" />
-            </button>
-          </div>
-        </div>
+          {classement.visible && (
+            <Classement
+              etablissements={statsSession?.etablissements}
+              top={classement.top}
+              minCandidats={classement.minCandidats}
+              chargement={!statsSession}
+              onPlus={() => navigate('/stats')}
+            />
+          )}
+        </>
+      )}
 
-        <div className="filters__row">
-          {session.series.length > 0 && (
-            <div className="filters__group">
-              <span className="filters__label">{t('filter.series')}</span>
-              <div className="pills">
-                {series.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    className={`pill pill--sm ${s === serie ? 'is-active' : ''}`}
-                    aria-pressed={s === serie}
-                    onClick={() => setSerie(s)}
-                  >
-                    {s === 'ALL' ? t('filter.allSeries') : s}
+      {/* ================= RECHERCHE : filtres puis résultats ================= */}
+      {recherche && (
+        <>
+          <details className="filters-box" open={filtreActif}>
+            <summary>
+              <Icon name="sliders" size={16} /> {t('results.filter')}
+              {filtreActif && <span className="filters-box__badge">{[statut !== 'ALL', serie !== 'ALL', island !== 'all'].filter(Boolean).length}</span>}
+            </summary>
+            <section className="filters" aria-label="Filtres">
+              <div className="filters__group">
+                <span className="filters__label">{t('filter.island')}</span>
+                <div className="pills">
+                  <button type="button" className="pill pill--nav" onClick={() => changerIle(-1)} aria-label={t('filter.prev')}>
+                    <Icon name="chevronL" size={16} className="flip-rtl" />
                   </button>
+                  {islands.map((i) => (
+                    <button
+                      key={i.id}
+                      type="button"
+                      className={`pill ${i.id === island ? 'is-active' : ''}`}
+                      aria-pressed={i.id === island}
+                      onClick={() => onIsland(i.id)}
+                    >
+                      {i.id === 'all' ? t('filter.allIslands') : i.name.split(' (')[0]}
+                    </button>
+                  ))}
+                  <button type="button" className="pill pill--nav" onClick={() => changerIle(1)} aria-label={t('filter.next')}>
+                    <Icon name="chevronR" size={16} className="flip-rtl" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="filters__row">
+                {session.series.length > 0 && (
+                  <div className="filters__group">
+                    <span className="filters__label">{t('filter.series')}</span>
+                    <div className="pills">
+                      {series.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          className={`pill pill--sm ${s === serie ? 'is-active' : ''}`}
+                          aria-pressed={s === serie}
+                          onClick={() => setSerie(s)}
+                        >
+                          {s === 'ALL' ? t('filter.allSeries') : s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="filters__group">
+                  <span className="filters__label">{t('filter.status')}</span>
+                  <div className="pills">
+                    {STATUTS.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        className={`pill pill--sm pill--${s} ${s === statut ? 'is-active' : ''}`}
+                        aria-pressed={s === statut}
+                        onClick={() => setStatut(s)}
+                      >
+                        {s === 'ALL' ? t('filter.allStatus') : t(`status.${s}`)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          </details>
+
+          <section className="results" aria-live="polite" aria-busy={!pret}>
+            {filtreActif && (
+              <div className="filtre-puces" aria-label={t('results.active')}>
+                {statut !== 'ALL' && (
+                  <button type="button" className="filtre-puce" onClick={() => setStatut('ALL')}>
+                    {t(`status.${statut}`)} <Icon name="close" size={12} />
+                  </button>
+                )}
+                {serie !== 'ALL' && (
+                  <button type="button" className="filtre-puce" onClick={() => setSerie('ALL')}>
+                    {t('filter.series')} {serie} <Icon name="close" size={12} />
+                  </button>
+                )}
+                {island !== 'all' && (
+                  <button type="button" className="filtre-puce" onClick={() => onIsland('all')}>
+                    {(islands.find((i) => i.id === island)?.name ?? island).split(' (')[0]} <Icon name="close" size={12} />
+                  </button>
+                )}
+              </div>
+            )}
+            {erreur ? (
+              <div className="notice notice--error">
+                <Icon name="alert" /> <span>{t('results.error')}</span>
+                <button type="button" className="btn btn--sm" onClick={() => setTentative((n) => n + 1)}>
+                  <Icon name="refresh" size={14} /> {t('results.retry')}
+                </button>
+              </div>
+            ) : !pret ? (
+              <div className="grid" aria-hidden="true">
+                {Array.from({ length: 3 }, (_, i) => (
+                  <div key={i} className="card card--skeleton" />
                 ))}
               </div>
-            </div>
-          )}
-          <div className="filters__group">
-            <span className="filters__label">{t('filter.mention')}</span>
-            <div className="pills">
-              {MENTIONS.map((m) => (
-                <button
-                  key={m}
-                  type="button"
-                  className={`pill pill--sm ${m === mention ? 'is-active' : ''}`}
-                  aria-pressed={m === mention}
-                  onClick={() => setMention(m)}
-                >
-                  {m === 'ALL' ? t('filter.allMentions') : t(`mention.${m}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="filters__group">
-            <span className="filters__label">{t('filter.status')}</span>
-            <div className="pills">
-              {STATUTS.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  className={`pill pill--sm pill--${s} ${s === statut ? 'is-active' : ''}`}
-                  aria-pressed={s === statut}
-                  onClick={() => setStatut(s)}
-                >
-                  {s === 'ALL' ? t('filter.allStatus') : t(`status.${s}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= RÉSULTATS ================= */}
-      <section className="results" ref={refResultats} aria-live="polite" aria-busy={!pret}>
-        {filtreActif && (
-          <div className="filtre-puces" aria-label={t('results.active')}>
-            {statut !== 'ALL' && (
-              <button type="button" className="filtre-puce" onClick={() => setStatut('ALL')}>
-                {t(`status.${statut}`)} <Icon name="close" size={12} />
-              </button>
-            )}
-            {mention !== 'ALL' && (
-              <button type="button" className="filtre-puce" onClick={() => setMention('ALL')}>
-                {t(`mention.${mention}`)} <Icon name="close" size={12} />
-              </button>
-            )}
-            {serie !== 'ALL' && (
-              <button type="button" className="filtre-puce" onClick={() => setSerie('ALL')}>
-                {t('filter.series')} {serie} <Icon name="close" size={12} />
-              </button>
-            )}
-            {island !== 'all' && (
-              <button type="button" className="filtre-puce" onClick={() => onIsland('all')}>
-                {(islands.find((i) => i.id === island)?.name ?? island).split(' (')[0]} <Icon name="close" size={12} />
-              </button>
-            )}
-            <button type="button" className="filtre-puce filtre-puce--clear" onClick={reinitialiser}>
-              {t('results.reset')}
-            </button>
-          </div>
-        )}
-        {erreurAffichee ? (
-          <div className="notice notice--error">
-            <Icon name="alert" /> <span>{t('results.error')}</span>
-            <button
-              type="button"
-              className="btn btn--sm"
-              onClick={() =>
-                parcoursActif ? setParcours((p) => ({ ...p, erreur: false })) : setTentative((n) => n + 1)
-              }
-            >
-              <Icon name="refresh" size={14} /> {t('results.retry')}
-            </button>
-          </div>
-        ) : !pret ? (
-          <div className="grid" aria-hidden="true">
-            {Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="card card--skeleton" />
-            ))}
-          </div>
-        ) : liste.length === 0 ? (
-          <div className="empty">
-            <div className="empty__emoji" aria-hidden="true">🔎</div>
-            <h3>{t('results.empty')}</h3>
-            <p>{t('results.emptyHint')}</p>
-            <button type="button" className="btn" onClick={reinitialiser}>
-              {t('results.reset')}
-            </button>
-          </div>
-        ) : (
-          <>
-            <p className="results__count">
-              {parcoursActif
-                ? parcours.fini
-                  ? t('results.count', { n: liste.length })
-                  : t('results.countPartial', { n: liste.length })
-                : recherche
-                  ? t('results.count', { n: liste.length })
-                  : t('results.preview', { total: stats.total.toLocaleString('fr-FR') })}
-            </p>
-            <div className="grid">
-              {liste.slice(0, visibles).map((c, i) => (
-                <CandidateCard key={c.id} candidat={c} index={i} onOpen={ouvrirFiche} />
-              ))}
-            </div>
-            {(liste.length > visibles || (parcoursActif && !parcours.fini)) && (
-              <div className="results__more">
-                <button type="button" className="btn" onClick={() => setVisibles((v) => v + PAGE)}>
-                  {t('results.more')}
-                  {liste.length > visibles ? ` (${liste.length - visibles})` : parcours.charge ? ` · ${t('results.loadingMore')}` : ''}
+            ) : liste.length === 0 ? (
+              <div className="empty">
+                <div className="empty__emoji" aria-hidden="true">🔎</div>
+                <h3>{t('results.empty')}</h3>
+                <p>{t('results.emptyHint')}</p>
+                <button type="button" className="btn" onClick={reinitialiser}>
+                  {t('results.reset')}
                 </button>
               </div>
+            ) : (
+              <>
+                <p className="results__count">{t('results.count', { n: liste.length })}</p>
+                <div className="grid">
+                  {liste.slice(0, visibles).map((c, i) => (
+                    <CandidateCard key={c.id} candidat={c} index={i} onOpen={ouvrirFiche} />
+                  ))}
+                </div>
+                {liste.length > visibles && (
+                  <div className="results__more">
+                    <button type="button" className="btn" onClick={() => setVisibles((v) => v + PAGE)}>
+                      {t('results.more')} ({liste.length - visibles})
+                    </button>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
-      </section>
+          </section>
+        </>
+      )}
 
       {selection && (
         <CandidateModal candidat={selection} session={session} onClose={fermerFiche} />
