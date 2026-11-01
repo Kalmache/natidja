@@ -291,7 +291,7 @@ button { cursor: pointer; }
 .splash__aurora { position: absolute; inset: -20%; background: conic-gradient(from 0deg at 50% 50%, transparent, color-mix(in srgb, var(--flag-yellow) 20%, transparent), transparent 30%, color-mix(in srgb, var(--flag-blue) 28%, transparent), transparent 60%, color-mix(in srgb, var(--p-400) 25%, transparent), transparent); filter: blur(60px); animation: spin 14s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .splash__content { position: relative; display: grid; justify-items: center; gap: 14px; padding: 24px; text-align: center; }
-.splash__flag { width: min(280px, 64vw); height: calc(min(280px, 64vw) * 0.6); filter: drop-shadow(0 18px 30px rgb(0 0 0 / 0.45)); animation: flagIn 1s var(--ease) both; }
+.splash__flag { width: min(280px, 64vw); height: calc(min(280px, 64vw) * 0.6); filter: drop-shadow(0 18px 30px rgb(0 0 0 / 0.45)); animation: flagIn 1s var(--ease) both; margin-bottom: 40px; /* de l'air entre le drapeau (et son mât) et le titre : rien ne touche l'écriture */ }
 @keyframes flagIn { from { opacity: 0; transform: translateY(24px) scale(0.9) rotate(-2deg); } }
 .flag--animated .flag__band { transform: translateX(-320px); animation: bandIn 0.75s var(--ease) forwards; animation-delay: calc(0.15s + var(--i) * 0.11s); }
 @keyframes bandIn { to { transform: translateX(0); } }
@@ -875,6 +875,6 @@ html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-event
 @keyframes fw-vent { from { transform: translateY(calc(var(--a) * -1)); } to { transform: translateY(var(--a)); } }
 @keyframes fw-lumiere { from { opacity: 0; } to { opacity: 0.26; } }
 /* Mât à gauche (écran d'ouverture) */
-.fw--mat::before { content: ''; position: absolute; z-index: 2; top: -9%; bottom: -78%; inset-inline-start: -9px; width: 7px; border-radius: 6px; background: linear-gradient(90deg, #e8eee9, #8a9a92 55%, #5f6f67); box-shadow: 0 6px 14px rgb(0 0 0 / 0.35); }
+.fw--mat::before { content: ''; position: absolute; z-index: 2; top: -9%; bottom: -20%; inset-inline-start: -9px; width: 7px; border-radius: 6px; background: linear-gradient(90deg, #e8eee9, #8a9a92 55%, #5f6f67); box-shadow: 0 6px 14px rgb(0 0 0 / 0.35); }
 .fw--mat::after { content: ''; position: absolute; z-index: 3; top: -13%; inset-inline-start: -11px; width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff3b0, #f0b41a 60%, #b27f08); }
 @media (prefers-reduced-motion: reduce) { .fw__t, .fw__t::after { animation: none; } .fw__t::after { opacity: 0.1; } }
