@@ -5,6 +5,16 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.4.0',
+    date: '01/11/2026',
+    titre: 'Rapport des statistiques en PDF',
+    points: [
+      'Nouveau bouton « Télécharger le rapport (PDF) » sur la page Statistiques : synthèse nationale, réussite par île, par série, mentions, centres d’examen et établissements, mise en page pour A4',
+      'Le rapport ne contient que des totaux et des taux : aucun nom de candidat, aucune date de naissance',
+      'Sur Android, le bouton ouvre l’impression d’où l’on choisit « Enregistrer au format PDF »',
+    ],
+  },
+  {
     version: '3.3.0',
     date: '01/11/2026',
     titre: 'Centres d’examen et mises à jour fiables',
