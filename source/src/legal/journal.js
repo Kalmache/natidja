@@ -5,6 +5,15 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.5.0',
+    date: '01/11/2026',
+    titre: 'La page Découvrir en arabe',
+    points: [
+      'La page de présentation « Découvrir » suit la langue choisie : français ou arabe (lecture de droite à gauche)',
+      'Tous les textes, chiffres, légendes et boutons sont traduits ; le téléphone d’exemple affiche l’application dans la langue choisie',
+    ],
+  },
+  {
     version: '3.4.2',
     date: '01/11/2026',
     titre: 'La carte des îles devient cliquable',

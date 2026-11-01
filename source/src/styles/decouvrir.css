@@ -219,3 +219,10 @@
   .d-app__saisie { width: 6.1em; } .d-app__carte { opacity: 1; } .d-etape::after { transform: scaleX(1); }
   .d-cles__resultat { opacity: 1; } .d-signal__ok { opacity: 1; }
 }
+
+/* ---------- arabe : pas d'espacement négatif entre les lettres (il casse la liaison des lettres) ---------- */
+.decouvrir:lang(ar), .decouvrir:lang(ar) * { letter-spacing: 0 !important; }
+.decouvrir:lang(ar) .d-titre, .decouvrir:lang(ar) .d-h2 { line-height: 1.25; }
+
+/* La saisie « tapée » se lit toujours de gauche à droite (c'est un nom latin), même en arabe. */
+.d-app__recherche { direction: ltr; }
