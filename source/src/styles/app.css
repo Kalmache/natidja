@@ -150,6 +150,7 @@ button { cursor: pointer; }
 .pill:hover { border-color: var(--p-400); color: var(--text); }
 .pill.is-active { background: var(--p-600); border-color: var(--p-600); color: #fff; box-shadow: 0 4px 12px -2px color-mix(in srgb, var(--p-600) 60%, transparent); }
 .pill--sm { padding: 5px 12px; font-size: 0.8rem; }
+@media (pointer: coarse) { .pill { min-height: 40px; } } /* boutons faciles à toucher au doigt */
 .pill--nav { padding: 7px 9px; display: grid; place-items: center; }
 .pill--ADMIS.is-active { background: var(--ok-strong); border-color: var(--ok-strong); }
 .pill--SECOND_GROUPE.is-active { background: var(--warn-strong); border-color: var(--warn-strong); }

@@ -8,7 +8,6 @@ import Icon from '../components/Icon.jsx'
 import Stat from '../components/Stat.jsx'
 import IslandMap from '../components/IslandMap.jsx'
 import { Donut, Legend, StackedBars } from '../components/Charts.jsx'
-import { registerPlugin } from '@capacitor/core'
 import { isNativeApp } from '../lib/verify.js'
 import { useI18n } from '../i18n/index.jsx'
 import { loadStats } from '../lib/data.js'
@@ -26,7 +25,7 @@ import { prefersReducedMotion } from '../hooks.js'
 const ORDRE_STATUTS = ['ADMIS', 'SECOND_GROUPE', 'AJOURNE']
 
 // Module natif d'impression (application Android) ; sur le web : window.print().
-const ImpressionNative = registerPlugin('ImpressionNative')
+import { ImpressionNative } from '../lib/impressionNative.js'
 
 export default function StatsView({ session, sessions = [], classement: reglage }) {
   const { t } = useI18n()

@@ -203,6 +203,7 @@ export default {
   'results.empty': 'لا يوجد مترشح مطابق',
   'results.emptyHint': 'تحقق من الإملاء أو جرّب رقم الطاولة.',
   'results.reset': 'إعادة ضبط الفلاتر',
+  'results.clear': 'مسح البحث',
   'results.error': 'الشبكة غير مستقرة أو غير متاحة.',
   'results.retry': 'إعادة المحاولة',
   'results.more': 'عرض المزيد',

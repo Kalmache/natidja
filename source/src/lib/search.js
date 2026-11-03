@@ -29,6 +29,23 @@ export function normalize(texte) {
 }
 
 /**
+ * Mots d'un nom, en recollant une lettre seule au mot suivant.
+ * Aux Comores, beaucoup de noms s'écrivent avec une apostrophe : « M'madi », « M'colo », « N'tsoudjou ».
+ * normalize() les coupe en « M MADI » ; on garde donc aussi la forme collée « MMADI ».
+ *   avecVariantes = false (ce que tape l'utilisateur) : "M MADI" → ["MMADI"]
+ *   avecVariantes = true  (le nom du candidat)        : "M MADI" → ["M", "MADI", "MMADI"]
+ */
+export function motsNom(texte, avecVariantes = false) {
+  const mots = normalize(texte).split(' ').filter(Boolean)
+  const colles = []
+  for (let i = 0; i < mots.length; i++) {
+    if (mots[i].length === 1 && i + 1 < mots.length) { colles.push(mots[i] + mots[i + 1]); i++ }
+    else colles.push(mots[i])
+  }
+  return avecVariantes ? [...new Set([...mots, ...colles])] : colles
+}
+
+/**
  * Analyse ce que tape l'utilisateur et décide quoi faire.
  *
  * @param {string} saisie    le texte de la barre de recherche
@@ -69,7 +86,7 @@ export function buildQuery(saisie, shardKeys = {}, sessionId) {
   }
 
   // ---- Cas 2 : uniquement des lettres → recherche par NOM / PRÉNOM ----
-  const mots = texte.split(' ')
+  const mots = motsNom(texte) // « m'madi » → ["MMADI"]
   if (mots[0].length < lettres) {
     return { etat: 'trop-court', manque: lettres - mots[0].length }
   }
@@ -79,9 +96,7 @@ export function buildQuery(saisie, shardKeys = {}, sessionId) {
     // Chaque mot tapé doit être le DÉBUT d'un mot du nom ou du prénom,
     // dans n'importe quel ordre ("zainaba att" trouve ATTOUMANE Zaïnaba).
     filtre: (candidat) => {
-      const motsCandidat = normalize(
-        `${candidat.lastName} ${candidat.firstName}`,
-      ).split(' ')
+      const motsCandidat = motsNom(`${candidat.lastName} ${candidat.firstName}`, true)
       return mots.every((m) => motsCandidat.some((mc) => mc.startsWith(m)))
     },
   }
