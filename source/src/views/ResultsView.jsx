@@ -411,7 +411,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
                 <h3>{t('results.empty')}</h3>
                 <p>{t('results.emptyHint')}</p>
                 <button type="button" className="btn" onClick={reinitialiser}>
-                  {t('results.reset')}
+                  {serie !== 'ALL' || statut !== 'ALL' || centre !== 'ALL' || island !== 'all' ? t('results.reset') : t('results.clear')}
                 </button>
               </div>
             ) : (

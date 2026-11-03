@@ -14,7 +14,6 @@ import Ballons from './Ballons.jsx'
 import QrCode from './QrCode.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { MENTIONS, dateNaissance, note, titleCase } from '../lib/format.js'
-import { registerPlugin } from '@capacitor/core'
 import { Share } from '@capacitor/share'
 import { Directory, Filesystem } from '@capacitor/filesystem'
 import { creerCarteReussite } from '../lib/carteReussite.js'
@@ -24,7 +23,7 @@ import { demanderAttestation } from '../lib/attestationService.js'
 
 // Module natif d'impression (voir android/.../ImpressionPlugin.java). Il n'existe
 // que dans l'application Android ; sur le web on utilise window.print().
-const ImpressionNative = registerPlugin('ImpressionNative')
+import { ImpressionNative } from '../lib/impressionNative.js'
 
 /**
  * Vérification d'identité AVANT d'afficher l'attestation (moyenne, date de naissance...).

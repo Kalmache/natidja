@@ -5,6 +5,17 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.14.0',
+    date: '03/11/2026',
+    titre: 'Les noms avec apostrophe se trouvent enfin',
+    points: [
+      'Les noms comme « M’madi », « M’colo » ou « N’tsoudjou » se trouvent maintenant, qu’on les tape avec l’apostrophe, avec un espace ou tout attachés (« mmadi »)',
+      'Quand on scanne le QR code d’une attestation, le résultat s’affiche tout de suite, sans l’écran d’ouverture',
+      'Sur téléphone, les boutons de filtre (îles, établissements, centres) sont plus grands et plus faciles à toucher',
+      'Quand une recherche ne trouve rien, le bouton propose d’« Effacer la recherche » (et non de réinitialiser des filtres qui ne sont pas utilisés)',
+    ],
+  },
+  {
     version: '3.13.3',
     date: '03/11/2026',
     titre: 'Un bel aperçu quand on partage le lien',
