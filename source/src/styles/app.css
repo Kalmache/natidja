@@ -877,7 +877,11 @@ html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-event
 @media (max-width: 820px) { .footer { padding-bottom: calc(96px + var(--safe-bottom)); } }
 
 /* ---- Drapeau qui flotte au vent (voir FlagWave dans Flag.jsx) ---- */
-.fw { position: relative; display: grid; grid-template-columns: repeat(var(--n), 1fr); aspect-ratio: 5 / 3; }
+/* direction: ltr = le drapeau reste toujours dans le même sens. Sans cela, en arabe (page de droite à
+   gauche), la grille de bandes se retourne alors que chaque bande affiche toujours « son » morceau
+   de l'image : les morceaux se retrouvent dans le désordre (drapeau brouillé). Un drapeau n'a pas
+   de sens de lecture : le triangle vert reste côté mât, à gauche, dans toutes les langues. */
+.fw { position: relative; display: grid; grid-template-columns: repeat(var(--n), 1fr); aspect-ratio: 5 / 3; direction: ltr; }
 .fw__t {
   display: block; position: relative; will-change: transform;
   width: calc(100% + 0.7px); /* léger recouvrement : pas de fine ligne entre deux bandes */
