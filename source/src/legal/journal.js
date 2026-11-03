@@ -5,6 +5,14 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.13.3',
+    date: '03/11/2026',
+    titre: 'Un bel aperçu quand on partage le lien',
+    points: [
+      'Quand on partage le lien de Ndeze Natidja (WhatsApp, Telegram, Facebook, SMS…), une carte apparaît avec le drapeau, le titre, une courte phrase et une image de l’application sur téléphone',
+    ],
+  },
+  {
     version: '3.13.2',
     date: '03/11/2026',
     titre: 'Le drapeau reste à l’endroit en arabe',
