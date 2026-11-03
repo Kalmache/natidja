@@ -5,6 +5,14 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.13.2',
+    date: '03/11/2026',
+    titre: 'Le drapeau reste à l’endroit en arabe',
+    points: [
+      'En arabe, le drapeau des Comores s’affichait brouillé (morceaux dans le désordre, triangle vert au mauvais endroit) : il garde désormais le même sens dans toutes les langues, triangle vert côté mât.',
+    ],
+  },
+  {
     version: '3.13.1',
     date: '01/11/2026',
     titre: 'Maore, avec son nom comorien',
