@@ -122,6 +122,14 @@ function onglets() {
 }
 const bandeau = () => message && h('div', { class: `message ${message.type}`, role: 'alert' }, message.texte)
 
+// Qui a pris la décision sur une proposition (colonne « Validée par » de la liste).
+function decision(p) {
+  if (p.approbation) return qui(p.approbation.par)
+  if (p.refus) return h('span', { class: 'doux' }, `Refusée par ${qui(p.refus.par)}`)
+  if (p.annulation) return h('span', { class: 'doux' }, `Annulée par ${qui(p.annulation.par)}`)
+  return h('span', { class: 'doux' }, 'en attente')
+}
+
 async function ecranPropositions() {
   const r = await api('GET', '/api/propositions')
   const liste = r.json ?? []
@@ -346,7 +354,12 @@ async function afficher() {
   else if (etat.etape === 'totp') contenu = ecranTotp()
   else if (etat.etape === 'mdp') contenu = formulaireMotDePasse({ force: true })
   else {
-    const corps = vue.onglet === 'detail' ? await ecranDetail() : vue.onglet === 'nouvelle' ? ecranNouvelle() : vue.onglet === 'sessions' ? await ecranSessions() : vue.onglet === 'journal' ? await ecranJournal() : vue.onglet === 'compte' ? ecranCompte() : await ecranPropositions()
+    let corps
+    try { corps = vue.onglet === 'detail' ? await ecranDetail() : vue.onglet === 'nouvelle' ? ecranNouvelle() : vue.onglet === 'sessions' ? await ecranSessions() : vue.onglet === 'journal' ? await ecranJournal() : vue.onglet === 'compte' ? ecranCompte() : await ecranPropositions()
+    } catch (erreur) {
+      // Sans ce filet, un défaut d'affichage laissait l'écran figé, sans aucun message (c'est arrivé : liste des propositions).
+      corps = h('div', { class: 'message erreur' }, `L’affichage a rencontré une erreur (${erreur.message}). Rechargez la page ; si cela continue, prévenez le développeur.`)
+    }
     if (mien !== compteur) return // un affichage plus récent a pris le relais
     if (etat.etape !== 'ok') return afficher()
     contenu = h('div', null, enTete(), onglets(), h('main', null, corps))
