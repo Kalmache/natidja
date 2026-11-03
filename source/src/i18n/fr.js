@@ -205,6 +205,7 @@ export default {
   'results.empty': 'Aucun candidat ne correspond',
   'results.emptyHint': 'Vérifiez l’orthographe ou essayez avec votre numéro de table.',
   'results.reset': 'Réinitialiser les filtres',
+  'results.clear': 'Effacer la recherche',
   'results.error': 'Réseau instable ou indisponible.',
   'results.retry': 'Réessayer',
   'results.more': 'Afficher plus',

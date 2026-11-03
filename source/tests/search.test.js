@@ -58,6 +58,26 @@ describe('buildQuery', () => {
   })
 })
 
+describe("noms avec apostrophe (M'madi, M'colo…)", () => {
+  const mmadi = { lastName: "M'MADI", firstName: 'Ahmed', tableNumber: 'BAC-26-00999' }
+  it.each(["m'madi", 'm madi', 'mmadi', 'M’Madi ahmed', 'madi', 'ahmed m madi'])("« %s » retrouve M'MADI Ahmed", (saisie) => {
+    const q = buildQuery(saisie, { numberDigits: 3, nameLetters: 2 }, 'bac-2026')
+    expect(q.etat).toBe('pret')
+    expect(q.filtre(mmadi)).toBe(true)
+  })
+  it("« m'madi » cherche dans le fichier MM, où l'import range bien le candidat", async () => {
+    const q = buildQuery("m'madi", { numberDigits: 3, nameLetters: 2 }, 'bac-2026')
+    expect(q.url).toBe('./data/bac-2026/noms/MM.json')
+    const { construireFichiers } = await import('../scripts/lib/resultats.mjs')
+    const fichiers = construireFichiers([mmadi], { numberDigits: 3, nameLetters: 2 })
+    expect([...fichiers.keys()].sort()).toEqual(['noms/AH.json', 'noms/MA.json', 'noms/MM.json', 'numeros/009.json'])
+  })
+  it('une lettre seule au bout de la saisie (frappe en cours) reste un début de mot', () => {
+    const q = buildQuery('halidi a', { numberDigits: 3, nameLetters: 2 }, 'bac-2026')
+    expect(q.filtre({ lastName: 'HALIDI', firstName: 'Ansoir' })).toBe(true)
+  })
+})
+
 describe('matchesFilters', () => {
   it('sans filtre, tout passe', () => {
     expect(matchesFilters(zainaba, {})).toBe(true)

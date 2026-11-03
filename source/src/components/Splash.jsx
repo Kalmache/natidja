@@ -33,7 +33,9 @@ const dejaVu = () => {
 
 export default function Splash({ onDone }) {
   const { t } = useI18n()
-  const [visible] = useState(() => !prefersReducedMotion() && !dejaVu())
+  // Pas d'écran d'ouverture quand on arrive par un QR code de vérification : la personne
+  // (un employeur, une école…) veut le résultat tout de suite, pas une animation de 6 secondes.
+  const [visible] = useState(() => !prefersReducedMotion() && !dejaVu() && !/^#\/verif\//.test(window.location.hash))
   const [sortie, setSortie] = useState(false) // fondu de sortie en cours
   const [fini, setFini] = useState(false) // fondu terminé : on retire l'écran de la page
 

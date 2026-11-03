@@ -14,7 +14,7 @@
 import { readFileSync } from 'node:fs'
 import { extname } from 'node:path'
 import ExcelJS from 'exceljs'
-import { normalize } from '../../src/lib/search.js'
+import { normalize, motsNom } from '../../src/lib/search.js'
 import { lireDate } from '../../src/lib/dates.js'
 
 // --------------------------------------------------------------------------
@@ -345,7 +345,8 @@ export function construireFichiers(candidats, shardKeys = {}) {
     ajouter(`numeros/${dernier.slice(0, chiffres)}.json`, c)
     // Fichiers des noms : 2 premières lettres de CHAQUE mot du nom et du prénom.
     const cles = new Set(
-      normalize(`${c.lastName} ${c.firstName}`).split(' ').filter((m) => m.length >= lettres).map((m) => m.slice(0, lettres)),
+      // (avec la forme collée des noms à apostrophe : « M'MADI » est aussi rangé sous « MM »)
+      motsNom(`${c.lastName} ${c.firstName}`, true).filter((m) => m.length >= lettres).map((m) => m.slice(0, lettres)),
     )
     for (const cle of cles) ajouter(`noms/${cle}.json`, c)
   }
