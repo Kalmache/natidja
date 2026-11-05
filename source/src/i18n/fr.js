@@ -368,6 +368,7 @@ export default {
   'splash.loading': 'Chargement des résultats…',
 
   'signature.by': 'Conçu par',
+  'footer.autres': 'Découvrir les autres applis utiles pour les Comores (colis, artisans, pêcheurs) sur mmbt.fr',
   'footer.contact': 'Contact',
   'demo.short': 'Version de démonstration · données fictives',
   'legal.mentions': 'Mentions légales',

@@ -366,6 +366,7 @@ export default {
   'splash.loading': 'جارٍ تحميل النتائج…',
 
   'signature.by': 'من تصميم',
+  'footer.autres': 'اكتشفوا تطبيقات مفيدة أخرى لجزر القمر (الطرود، الحرفيون، الصيادون) على mmbt.fr',
   'footer.contact': 'للتواصل',
   'demo.short': 'نسخة تجريبية · بيانات وهمية',
   'legal.mentions': 'الإشعارات القانونية',

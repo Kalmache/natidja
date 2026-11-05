@@ -138,6 +138,10 @@ export function Footer() {
           <Signature link /> · {EDITOR.year} ·{' '}
           <a href={EDITOR.website} target="_blank" rel="noopener noreferrer">{EDITOR.websiteLabel}</a>
         </p>
+        {/* Lien discret vers les autres applis de M.M.B.T */}
+        <p className="footer__autres">
+          <a href={EDITOR.website} target="_blank" rel="noopener noreferrer">{t('footer.autres')}</a>
+        </p>
         <p className="footer__contact">
           {t('footer.contact')} : <a href={`mailto:${EDITOR.email}`}>{EDITOR.email}</a>
           {reseaux.map(([nom, url]) => (

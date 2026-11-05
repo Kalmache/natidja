@@ -5,6 +5,14 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.14.1',
+    date: '05/11/2026',
+    titre: 'Les autres applis de M.M.B.T',
+    points: [
+      'En bas de page, un petit lien mène aux autres applis utiles pour les Comores (colis, artisans, pêcheurs) sur mmbt.fr',
+    ],
+  },
+  {
     version: '3.14.0',
     date: '03/11/2026',
     titre: 'Les noms avec apostrophe se trouvent enfin',
