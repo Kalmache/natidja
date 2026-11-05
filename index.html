@@ -47,7 +47,7 @@
 
     <!-- Aucune information transmise aux autres sites quand on clique un lien -->
     <meta name="referrer" content="no-referrer" />
-    <script type="module" crossorigin src="./assets/index-BVpjNmRu.js"></script>
+    <script type="module" crossorigin src="./assets/index-C9iJd1yf.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-B3ayi3ul.css">
   <link rel="manifest" href="./manifest.webmanifest"></head>
   <body>
@@ -58,5 +58,22 @@
         l'activer dans votre navigateur.
       </p>
     </noscript>
+    <!-- Petit guide de première visite, en français ou en arabe (une seule fois par téléphone, voir petit-guide.js) -->
+    <script>
+      window.PETIT_GUIDE = {
+        cle: 'natidja',
+        couleur: '#047857',
+        pret: function () { return !document.querySelector('.splash'); },
+        lien: { cible: 'footer.footer', place: 'dedans' },
+        etapes: [
+          { cible: 'form.search', texte: { fr: 'Tapez votre <b>numéro de table</b> ou votre <b>nom</b> pour voir votre résultat.', ar: 'اكتب <b>رقم الطاولة</b> أو <b>اسمك</b> لترى نتيجتك.' } },
+          { cible: '.segmented, .session-picker', texte: { fr: 'Choisissez l\'examen : <b>Bac</b> ou <b>BEPC</b>.', ar: 'اختر الامتحان: <b>البكالوريا</b> أو <b>شهادة التعليم المتوسط</b>.' } },
+          { cible: '.bottomnav, header .nav', texte: { fr: 'Ici, passez aux <b>Statistiques</b> du pays, à la page <b>À propos</b> et aux <b>Réglages</b>.', ar: 'من هنا تنتقل إلى <b>الإحصائيات</b> و<b>حول التطبيق</b> و<b>الإعدادات</b>.' } },
+          { cible: '.btn--lang', texte: { fr: 'Touchez ce bouton pour lire l\'appli en <b>arabe</b>.', ar: 'اضغط هنا لقراءة التطبيق <b>بالفرنسية</b>.' } },
+          { cible: '.tools .btn--icon:not(.btn--lang)', texte: { fr: 'Ici, passez en mode <b>sombre</b> ou <b>clair</b>.', ar: 'من هنا تختار الوضع <b>الداكن</b> أو <b>الفاتح</b>.' } }
+        ]
+      }
+    </script>
+    <script src="./petit-guide.js" defer></script>
   </body>
 </html>
