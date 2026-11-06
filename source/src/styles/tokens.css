@@ -58,26 +58,29 @@
   --safe-right: max(env(safe-area-inset-right, 0px), var(--safe-area-inset-right, 0px));
 }
 
-/* ---------- 3. Thème clair ---------- */
+/* ---------- 3. Thème clair : « Ivoire et émeraude » (les mêmes teintes que mmbt.fr) ----------
+   Au lieu d'un blanc pur et de gris froids, des tons crème : fond ivoire, cartes ivoire clair,
+   bordures légèrement dorées, textes vert très foncé. Le vert émeraude de l'application
+   (--p-…) ne change pas. Pour revenir au blanc, remettre les anciennes valeurs de cette liste. */
 :root,
 :root[data-theme='light'] {
   color-scheme: light;
-  --bg: #f4f7f6;
-  --bg-grad: radial-gradient(1200px 500px at 10% -10%, color-mix(in srgb, var(--p-200) 55%, transparent), transparent 60%),
-             radial-gradient(900px 400px at 100% 0%, color-mix(in srgb, var(--flag-yellow) 14%, transparent), transparent 60%);
-  --surface: #ffffff;
-  --surface-2: #f1f5f4;
-  --border: #e2e8e6;
-  --border-strong: #cbd5d1;
-  --text: #0f1f1a;
-  --text-2: #3f524b;
-  --text-3: #64756f;
-  --shadow-sm: 0 1px 2px rgb(15 31 26 / 0.06), 0 1px 3px rgb(15 31 26 / 0.05);
-  --shadow: 0 8px 24px -8px rgb(15 31 26 / 0.16), 0 2px 6px rgb(15 31 26 / 0.06);
-  --shadow-lg: 0 24px 60px -16px rgb(15 31 26 / 0.3);
-  --glass: rgb(255 255 255 / 0.78);
+  --bg: #f6f1e6;
+  --bg-grad: radial-gradient(1200px 500px at 10% -10%, rgb(239 230 207 / 0.95), transparent 60%),
+             radial-gradient(900px 400px at 100% 0%, rgb(184 150 46 / 0.14), transparent 60%);
+  --surface: #fffdf7;
+  --surface-2: #f6f0e0;
+  --border: #e6dfcb;
+  --border-strong: #d3c9ac;
+  --text: #10221a;
+  --text-2: #2c3d33;
+  --text-3: #55645b;
+  --shadow-sm: 0 1px 2px rgb(60 45 10 / 0.07), 0 1px 3px rgb(60 45 10 / 0.06);
+  --shadow: 0 8px 24px -8px rgb(60 45 10 / 0.18), 0 2px 6px rgb(60 45 10 / 0.06);
+  --shadow-lg: 0 24px 60px -16px rgb(40 30 5 / 0.32);
+  --glass: rgb(255 253 247 / 0.8);
   --sea-1: #bfe3ee; --sea-2: #8ec9dc;
-  --island-base: #e9efe4;
+  --island-base: #efe6cf;
   --accent-text: var(--p-700);
 }
 
