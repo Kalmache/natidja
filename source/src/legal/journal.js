@@ -5,6 +5,14 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.14.3',
+    date: '06/11/2026',
+    titre: 'Thème clair « Ivoire et émeraude »',
+    points: [
+      'Le thème clair abandonne le blanc pur et les gris froids pour des tons ivoire (fond crème, cartes ivoire clair, bordures légèrement dorées, textes vert très foncé), les mêmes que sur mmbt.fr. Le vert de l’application et le thème sombre ne changent pas. L’attestation reste une feuille blanche pour l’impression',
+    ],
+  },
+  {
     version: '3.14.1',
     date: '05/11/2026',
     titre: 'Les autres applis de M.M.B.T',
