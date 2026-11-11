@@ -20,7 +20,7 @@ import MentionsInteractives from '../components/MentionsInteractives.jsx'
 import RapportStatistiques from '../components/RapportStatistiques.jsx'
 import CentresExamen from '../components/CentresExamen.jsx'
 import EtablissementModal from '../components/EtablissementModal.jsx'
-import { prefersReducedMotion } from '../hooks.js'
+import { doucement, prefersReducedMotion } from '../hooks.js'
 
 const ORDRE_STATUTS = ['ADMIS', 'SECOND_GROUPE', 'AJOURNE']
 
@@ -35,7 +35,7 @@ export default function StatsView({ session, sessions = [], classement: reglage 
   const [duel, setDuel] = useState(null) // { type, nom, n } : « Comparer avec… » demandé depuis une fiche
   const [situer, setSituer] = useState(null) // idem pour « Me situer »
   const [etabOuvert, setEtabOuvert] = useState(null) // établissement dont on regarde la fiche
-  const fermerEtab = useCallback(() => setEtabOuvert(null), [])
+  const fermerEtab = useCallback(() => doucement(() => setEtabOuvert(null)), [])
   // Toucher un chiffre clé fait glisser jusqu'au graphique qui le détaille, qui s'illumine un instant.
   const aller = useCallback((id) => {
     const el = document.getElementById(id)

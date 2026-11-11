@@ -23,7 +23,7 @@ import EtablissementModal from '../components/EtablissementModal.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { buildQuery, matchesFilters } from '../lib/search.js'
 import { loadShard, loadStats } from '../lib/data.js'
-import { navigate, prefersReducedMotion } from '../hooks.js'
+import { doucement, navigate, prefersReducedMotion } from '../hooks.js'
 
 const PAGE = 60 // nombre de cartes affichées avant « Afficher plus »
 const STATUTS = ['ALL', 'ADMIS', 'SECOND_GROUPE', 'AJOURNE']
@@ -57,7 +57,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
     // Fermeture par la croix ou Échap : on « recule » nous-mêmes d'une entrée,
     // ce qui déclenche popstate ci-dessous et ferme la fiche proprement.
     if (window.history.state?.fiche) window.history.back()
-    else setSelection(null)
+    else doucement(() => setSelection(null))
   }, [])
 
   // Bouton Retour d'Android : tant qu'une fiche est ouverte, il la referme.
@@ -73,7 +73,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
     // Appelé quand l'utilisateur recule : si l'entrée « fiche » a disparu,
     // on ferme la fiche.
     const surRetourNavigateur = () => {
-      if (!window.history.state?.fiche) setSelection(null)
+      if (!window.history.state?.fiche) doucement(() => setSelection(null))
     }
     window.addEventListener('popstate', surRetourNavigateur)
     return () => window.removeEventListener('popstate', surRetourNavigateur)
@@ -444,7 +444,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
           etablissements={statsSession?.etablissements}
           minCandidats={classement.minCandidats}
           nationale={stats.total ? (stats.admitted / stats.total) * 100 : 0}
-          onClose={() => setEtabOuvert(null)}
+          onClose={() => doucement(() => setEtabOuvert(null))}
         />
       )}
     </>
