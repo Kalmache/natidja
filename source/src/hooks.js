@@ -12,6 +12,32 @@ export const prefersReducedMotion = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 /**
+ * Passage « doux comme de la soie » : ferme une fiche (fenêtre .modal) en
+ * fondu au lieu de la faire disparaître d'un coup.
+ * 1. on fait une copie de la fenêtre encore affichée ;
+ * 2. on applique le changement (React retire la vraie fenêtre) ;
+ * 3. la copie, posée par-dessus et intouchable, s'efface doucement puis est
+ *    supprimée (classe .modal--sortie dans app.css).
+ * « Moins d'animations » demandé : changement immédiat.
+ */
+export const doucement = (changement) => {
+  const fenetre = typeof document !== 'undefined' && !prefersReducedMotion() && document.querySelector('.modal:not(.modal--sortie)')
+  if (fenetre) {
+    const copie = fenetre.cloneNode(true)
+    copie.classList.add('modal--sortie')
+    copie.setAttribute('aria-hidden', 'true')
+    copie.inert = true
+    const panneau = fenetre.querySelector('.modal__panel')
+    const copiePanneau = copie.querySelector('.modal__panel')
+    if (panneau && copiePanneau) copiePanneau.scrollTop = 0
+    document.body.appendChild(copie)
+    if (panneau && copiePanneau) copiePanneau.scrollTop = panneau.scrollTop // garde la même position de lecture
+    setTimeout(() => copie.remove(), 450)
+  }
+  changement()
+}
+
+/**
  * Comme useState, mais la valeur est mémorisée dans le navigateur
  * (localStorage) pour être retrouvée à la prochaine visite.
  * `valide` empêche d'accepter une valeur trafiquée/inattendue.

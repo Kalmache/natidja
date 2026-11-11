@@ -5,6 +5,14 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.14.4',
+    date: '11/11/2026',
+    titre: 'Navigation plus douce',
+    points: [
+      'Les pages arrivent plus lentement, en fondu, et les fiches (candidat, établissement) s’effacent en douceur quand on les ferme, au lieu de disparaître d’un coup',
+    ],
+  },
+  {
     version: '3.14.3',
     date: '06/11/2026',
     titre: 'Thème clair « Ivoire et émeraude »',
