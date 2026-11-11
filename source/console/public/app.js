@@ -74,8 +74,59 @@ function ecranConnexion() {
   h('label', { for: 'nom' }, 'Identifiant'), nom,
   h('label', { for: 'mdp' }, 'Mot de passe'), mdp,
   h('p', null, h('button', { class: 'btn primaire', type: 'submit' }, 'Continuer')),
-  h('p', { class: 'doux' }, 'Une seconde étape vous demandera le code à 6 chiffres de votre application d’authentification.'))
+  h('p', { class: 'doux' }, 'Une seconde étape vous demandera le code à 6 chiffres de votre application d’authentification.'),
+  h('p', null, h('button', { class: 'lien', type: 'button', onclick: () => { ecranCourant = 'oubli'; message = null; afficher() } }, 'Mot de passe oublié ?')))
   return form
+}
+
+// ---------------------------------------------------------------- mot de passe oublié
+// 1. On donne son identifiant → un lien (valable 30 min, une seule fois) part par e-mail.
+// 2. Le lien ouvre l'écran « nouveau mot de passe » ; le code à 6 chiffres reste demandé.
+let ecranCourant = null // null | 'oubli'
+const jetonReinit = () => ((typeof location !== 'undefined' ? location.hash : '').match(/^#reinit=([A-Za-z0-9_-]{20,100})$/) ?? [])[1] ?? null
+const retourConnexion = (msg) => { ecranCourant = null; message = msg ?? null; afficher() }
+
+function ecranOubli() {
+  const nom = h('input', { type: 'text', id: 'nom-oubli', autocomplete: 'username', required: true, autocapitalize: 'none', value: dernierNom })
+  const bouton = h('button', { class: 'btn primaire', type: 'submit' }, 'Recevoir un lien par e-mail')
+  return h('form', { class: 'carte connexion', onsubmit: async (e) => {
+    e.preventDefault()
+    bouton.disabled = true // évite les doubles clics
+    dernierNom = nom.value
+    const r = await api('POST', '/api/mot-de-passe-oublie', { nom: nom.value })
+    retourConnexion({ type: r.ok ? 'succes' : 'erreur', texte: r.ok ? `${r.json.message} Pensez à regarder les courriers indésirables.` : (r.json?.erreur ?? 'Demande impossible pour le moment.') })
+  } },
+  h('h1', null, 'Mot de passe oublié'),
+  h('p', { class: 'doux' }, 'Indiquez votre identifiant. Un lien pour choisir un nouveau mot de passe sera envoyé à l’adresse e-mail enregistrée pour votre compte (ou au gestionnaire de la console, qui vous le transmettra).'),
+  h('label', { for: 'nom-oubli' }, 'Identifiant'), nom,
+  h('p', null, bouton, h('button', { class: 'btn', type: 'button', onclick: () => retourConnexion() }, 'Retour à la connexion')),
+  h('p', { class: 'doux' }, 'Vous avez aussi perdu votre téléphone (application d’authentification) ? Le gestionnaire doit réinitialiser votre compte sur le serveur.'))
+}
+
+function ecranReinitialisation(jeton) {
+  const nouveau = h('input', { type: 'password', id: 'nouveau-r', autocomplete: 'new-password', required: true, minlength: '12', maxlength: '200' })
+  const confirmation = h('input', { type: 'password', id: 'confirmation-r', autocomplete: 'new-password', required: true, minlength: '12', maxlength: '200' })
+  const code = h('input', { type: 'text', id: 'code-r', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', pattern: '[0-9]{6}', required: true })
+  const erreur = h('div') // l'erreur s'affiche ici, sans effacer ce qui est saisi
+  const bouton = h('button', { class: 'btn primaire', type: 'submit' }, 'Enregistrer mon nouveau mot de passe')
+  const quitter = () => history.replaceState(null, '', location.pathname) // le lien disparaît de l'adresse
+  return h('form', { class: 'carte connexion', onsubmit: async (e) => {
+    e.preventDefault()
+    if (nouveau.value !== confirmation.value) return erreur.replaceChildren(h('div', { class: 'message erreur', role: 'alert' }, 'Les deux mots de passe ne sont pas identiques.'))
+    bouton.disabled = true
+    const r = await api('POST', '/api/reinitialisation', { jeton, nouveau: nouveau.value, confirmation: confirmation.value, code: code.value })
+    bouton.disabled = false
+    if (r.ok) { quitter(); return retourConnexion({ type: 'succes', texte: 'Mot de passe changé. Connectez-vous avec le nouveau.' }) }
+    if (r.statut === 410) { quitter(); return retourConnexion({ type: 'erreur', texte: r.json?.erreur ?? 'Ce lien n’est plus valable.' }) }
+    erreur.replaceChildren(h('div', { class: 'message erreur', role: 'alert' }, r.json?.erreur ?? 'Changement impossible.'))
+  } },
+  h('h1', null, 'Nouveau mot de passe'),
+  h('p', { class: 'doux' }, 'Choisissez un mot de passe personnel : 12 caractères minimum, avec au moins 3 sortes de caractères (minuscules, majuscules, chiffres, symboles). Une phrase courte est idéale, par exemple « Mango-Mitsamiouli-2026 ».'),
+  erreur,
+  h('label', { for: 'nouveau-r' }, 'Nouveau mot de passe'), nouveau,
+  h('label', { for: 'confirmation-r' }, 'Confirmer le mot de passe'), confirmation,
+  h('label', { for: 'code-r' }, 'Code à 6 chiffres de votre application d’authentification'), code,
+  h('p', null, bouton, h('button', { class: 'btn', type: 'button', onclick: () => { quitter(); retourConnexion() } }, 'Annuler')))
 }
 
 function ecranTotp() {
@@ -350,7 +401,9 @@ let compteur = 0
 async function afficher() {
   const mien = ++compteur
   let contenu
-  if (etat.etape === 'aucune') contenu = ecranConnexion()
+  if (etat.etape === 'aucune' && jetonReinit()) contenu = ecranReinitialisation(jetonReinit())
+  else if (etat.etape === 'aucune' && ecranCourant === 'oubli') contenu = ecranOubli()
+  else if (etat.etape === 'aucune') contenu = ecranConnexion()
   else if (etat.etape === 'totp') contenu = ecranTotp()
   else if (etat.etape === 'mdp') contenu = formulaireMotDePasse({ force: true })
   else {
@@ -367,4 +420,6 @@ async function afficher() {
   if (mien === compteur) racine.replaceChildren(contenu)
 }
 
+// Lien « Mot de passe oublié » ouvert dans un onglet déjà sur la console : on affiche le bon écran.
+if (typeof window !== 'undefined') window.addEventListener('hashchange', () => { if (jetonReinit()) { message = null; afficher() } })
 recharger()

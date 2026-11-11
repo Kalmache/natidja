@@ -1,4 +1,4 @@
-// Petit guide de première visite (M.M.B.T, 2026).
+// Petit guide de première visite (MMBT, 2026).
 // Des bulles « Suivant / Passer » montrent les choses importantes de l'écran, une seule fois par téléphone.
 // Le lien « Revoir le petit guide » le relance. Sans ce script, l'appli marche exactement pareil.
 // Réglages : chaque page met avant ce fichier un objet window.PETIT_GUIDE = {
@@ -134,6 +134,9 @@
   }
   function demarrer() {
     poserLien();
+    // Si le visiteur change de page pendant le guide, on le referme doucement :
+    // les bulles parleraient sinon d'éléments qui ne sont plus à l'écran.
+    window.addEventListener('hashchange', function () { if (bulle) fermer(); });
     var t = 0;
     new MutationObserver(function () { clearTimeout(t); t = setTimeout(poserLien, 200); }).observe(document.body, { childList: true, subtree: true });
     if (vu()) return;

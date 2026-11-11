@@ -23,6 +23,7 @@ import EtablissementModal from '../components/EtablissementModal.jsx'
 import { useI18n } from '../i18n/index.jsx'
 import { buildQuery, matchesFilters } from '../lib/search.js'
 import { loadShard, loadStats } from '../lib/data.js'
+import { dateSessionLangue } from '../lib/format.js'
 import { doucement, navigate, prefersReducedMotion } from '../hooks.js'
 
 const PAGE = 60 // nombre de cartes affichées avant « Afficher plus »
@@ -30,7 +31,7 @@ const STATUTS = ['ALL', 'ADMIS', 'SECOND_GROUPE', 'AJOURNE']
 const ARABE = /[؀-ۿ]/ // lettres arabes : les noms sont enregistrés en lettres latines
 
 export default function ResultsView({ config, session, onSession, island, onIsland, islands }) {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
 
   // ---------- État de l'écran ----------
   const [saisie, setSaisie] = useState('')
@@ -110,6 +111,14 @@ export default function ResultsView({ config, session, onSession, island, onIsla
       actif = false
     }
   }, [url, tentative])
+
+  // Dès que la connexion revient, on relance la recherche qui avait échoué (sans clic).
+  useEffect(() => {
+    if (!erreur) return undefined
+    const relancer = () => setTentative((n) => n + 1)
+    window.addEventListener('online', relancer)
+    return () => window.removeEventListener('online', relancer)
+  }, [erreur])
 
   // ---------- 2. Liste finale à afficher ----------
   const filtres = { island, series: serie, status: statut, center: centre }
@@ -198,7 +207,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
             }}
           />
 
-          <p className="hero__eyebrow">{t('hero.eyebrow', { session: `${session.sessionDate}` })}</p>
+          <p className="hero__eyebrow">{t('hero.eyebrow', { session: dateSessionLangue(session.sessionDate, lang) })}</p>
           <h1 className="hero__title">{t('hero.title')}</h1>
           <p className="hero__subtitle">{t('hero.subtitle')}</p>
 
@@ -394,7 +403,7 @@ export default function ResultsView({ config, session, onSession, island, onIsla
             )}
             {erreur ? (
               <div className="notice notice--error">
-                <Icon name="alert" /> <span>{t('results.error')}</span>
+                <Icon name="alert" /> <span>{typeof navigator !== 'undefined' && navigator.onLine === false ? t('results.offline') : t('results.error')}</span>
                 <button type="button" className="btn btn--sm" onClick={() => setTentative((n) => n + 1)}>
                   <Icon name="refresh" size={14} /> {t('results.retry')}
                 </button>

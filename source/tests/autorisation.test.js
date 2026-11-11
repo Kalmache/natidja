@@ -11,7 +11,7 @@ describe('e-mail de demande d’autorisation', () => {
     expect(objet).toBe('Demande d’autorisation – Ndeze Natidja – Utiliser l’application')
     expect(corps).toContain('Madame, Monsieur,')
     expect(corps).toContain('version 2.6.0')
-    expect(corps).toContain('Maabadi Ben Tamou (M.M.B.T)')
+    expect(corps).toContain('Maabadi Ben Tamou (MMBT)')
     expect(corps).toContain('Organisme : Ministère de l’Éducation Nationale')
     expect(corps).toContain('Demandeur : Amina Said, Directrice de cabinet')
     expect(corps).toContain('Usage national pour la session juin 2026.')

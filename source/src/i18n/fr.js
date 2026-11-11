@@ -173,7 +173,7 @@ export default {
   'rapport.synthese': 'Synthèse nationale',
   'rapport.etablissements': 'Résultats par établissement',
   'rapport.edite': 'rapport édité le {date}',
-  'rapport.pied': 'Données agrégées (totaux et taux) – aucune information personnelle. Ndeze Natidja · M.M.B.T · mmbt.fr',
+  'rapport.pied': 'Données agrégées (totaux et taux) – aucune information personnelle. Ndeze Natidja · MMBT · mmbt.fr',
   'centres.sub': 'Réussite dans chaque centre où les épreuves se sont déroulées',
   'filter.allIslands': 'Toutes les îles',
   'filter.series': 'Série',
@@ -207,6 +207,7 @@ export default {
   'results.reset': 'Réinitialiser les filtres',
   'results.clear': 'Effacer la recherche',
   'results.error': 'Réseau instable ou indisponible.',
+  'results.offline': 'Pas de connexion : ce résultat n’a pas encore été consulté sur cet appareil. Il s’affichera dès le retour du réseau.',
   'results.retry': 'Réessayer',
   'results.more': 'Afficher plus',
 

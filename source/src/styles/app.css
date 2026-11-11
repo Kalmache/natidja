@@ -64,6 +64,8 @@ button { cursor: pointer; }
 .notice--error { border-color: color-mix(in srgb, var(--bad) 40%, transparent); background: color-mix(in srgb, var(--bad) 8%, var(--surface)); color: var(--bad-strong); }
 .notice--warn { border-color: color-mix(in srgb, var(--warn) 45%, transparent); background: color-mix(in srgb, var(--warn) 9%, var(--surface)); }
 .notice .btn { margin-inline-start: auto; }
+/* Téléphone : le message d'erreur garde toute la largeur, le bouton « Réessayer » passe dessous. */
+@media (max-width: 520px) { .notice--error { flex-wrap: wrap; } .notice--error > span { flex: 1 1 calc(100% - 40px); } }
 
 .skeleton, .card--skeleton { position: relative; overflow: hidden; background: var(--surface-2); border-radius: var(--radius); }
 .skeleton::after, .card--skeleton::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 20%, color-mix(in srgb, var(--surface) 70%, transparent) 50%, transparent 80%); transform: translateX(-100%); animation: shimmer 1.4s infinite; }
@@ -192,6 +194,13 @@ button { cursor: pointer; }
 .modal__bar .btn { background: rgb(255 255 255 / 0.95); color: #0f1f1a; }
 .modal__bar .btn--icon { margin-inline-start: auto; }
 [dir='rtl'] .modal__bar { flex-direction: row-reverse; }
+/* Téléphone : les boutons ne débordent plus de l'écran. Ligne 1 : Imprimer, Partager, fermer ;
+   ligne 2 : « Partager ma réussite » sur toute la largeur. */
+@media (max-width: 560px) {
+  .modal__bar { flex-wrap: wrap; row-gap: 8px; }
+  .modal__bar .btn { white-space: nowrap; }
+  .modal__bar .modal__bar-reussite { order: 5; flex: 1 1 100%; justify-content: center; }
+}
 @keyframes fade { from { opacity: 0; } }
 @keyframes pop { from { opacity: 0; transform: translateY(24px) scale(0.96); } }
 .confetti { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 250; pointer-events: none; }
@@ -355,7 +364,7 @@ button { cursor: pointer; }
 }
 
 /* ---------- 12. SIGNATURE, PIED DE PAGE SIGNÉ, PAGES LÉGALES ---------- */
-/* Signature « Conçu par M.M.B.T » : le nom scintille aux couleurs du drapeau. */
+/* Signature « Conçu par MMBT » : le nom scintille aux couleurs du drapeau. */
 .signature { display: inline-flex; align-items: baseline; gap: 0.35em; }
 .signature__by { opacity: 0.8; font-weight: 600; }
 .signature a { text-decoration: none; }
@@ -385,6 +394,8 @@ button { cursor: pointer; }
 .footer a { color: var(--accent-text); text-decoration: none; font-weight: 700; }
 .footer a:hover { text-decoration: underline; }
 .footer__legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin-top: 4px; font-size: 0.82rem; }
+/* Au doigt : liens du bas plus faciles à toucher (zone de 40 px de haut, sans changer leur aspect). */
+@media (pointer: coarse) { .footer__legal { gap: 0 14px; } .footer__legal a { display: inline-flex; align-items: center; min-height: 40px; } }
 .footer__small { font-size: 0.72rem; opacity: 0.8; }
 .footer__autres { font-size: 0.82rem; max-width: 34rem; line-height: 1.45; }
 .footer__autres a { font-weight: 600; }

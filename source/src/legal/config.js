@@ -8,7 +8,7 @@
 // vous en avez un) et vos liens de réseaux sociaux.
 // ============================================================================
 export const EDITOR = {
-  name: 'M.M.B.T',
+  name: 'MMBT',
   person: 'Maabadi Ben Tamou', // éditeur à titre personnel (nom déjà publié sur mmbt.fr)
   website: 'https://mmbt.fr',
   websiteLabel: 'mmbt.fr',

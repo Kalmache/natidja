@@ -171,7 +171,7 @@ export default {
   'rapport.synthese': 'الحصيلة الوطنية',
   'rapport.etablissements': 'النتائج حسب المؤسسة',
   'rapport.edite': 'تقرير صادر بتاريخ {date}',
-  'rapport.pied': 'بيانات مجمّعة (مجاميع ونسب) – دون أي معلومة شخصية. Ndeze Natidja · M.M.B.T · mmbt.fr',
+  'rapport.pied': 'بيانات مجمّعة (مجاميع ونسب) – دون أي معلومة شخصية. Ndeze Natidja · MMBT · mmbt.fr',
   'centres.sub': 'نسبة النجاح في كل مركز أُجريت فيه الاختبارات',
   'filter.allIslands': 'كل الجزر',
   'filter.series': 'الشعبة',
@@ -205,6 +205,7 @@ export default {
   'results.reset': 'إعادة ضبط الفلاتر',
   'results.clear': 'مسح البحث',
   'results.error': 'الشبكة غير مستقرة أو غير متاحة.',
+  'results.offline': 'لا يوجد اتصال: لم تُعرض هذه النتيجة من قبل على هذا الجهاز. ستظهر فور عودة الشبكة.',
   'results.retry': 'إعادة المحاولة',
   'results.more': 'عرض المزيد',
 

@@ -138,7 +138,7 @@ export function Footer() {
           <Signature link /> · {EDITOR.year} ·{' '}
           <a href={EDITOR.website} target="_blank" rel="noopener noreferrer">{EDITOR.websiteLabel}</a>
         </p>
-        {/* Lien discret vers les autres applis de M.M.B.T */}
+        {/* Lien discret vers les autres applis de MMBT */}
         <p className="footer__autres">
           <a href={EDITOR.website} target="_blank" rel="noopener noreferrer">{t('footer.autres')}</a>
         </p>
