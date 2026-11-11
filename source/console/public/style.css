@@ -59,3 +59,14 @@ ul.liste { margin: 8px 0; padding-left: 20px; }
 .chg s { color: var(--doux); }
 .chg--critique b { color: var(--danger); }
 .chg--attention b { color: var(--alerte); }
+
+/* ---- « Mot de passe oublié ? » : un simple lien, discret ---- */
+.lien { border: 0; background: none; padding: 8px 0; color: var(--vert); font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.lien:hover { color: var(--vert-fonce); }
+
+/* ---- Navigation douce : chaque écran apparaît en fondu léger (sauf si l'appareil demande moins d'animations) ---- */
+@media (prefers-reduced-motion: no-preference) {
+  #app > * { animation: apparition 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
+  @keyframes apparition { from { opacity: 0; transform: translateY(6px); } }
+}
+.connexion { width: auto; } @media (max-width: 600px) { .connexion { margin: 24px 12px; } }

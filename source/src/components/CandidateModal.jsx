@@ -262,7 +262,7 @@ export default function CandidateModal({ candidat: candidatPublic, session, serv
             {copie ? t('att.copied') : t('att.share')}
           </button>
           {statut === 'ADMIS' && (
-            <button type="button" className="btn btn--ghost" onClick={partagerCarte} disabled={carteEnCours}>
+            <button type="button" className="btn btn--ghost modal__bar-reussite" onClick={partagerCarte} disabled={carteEnCours}>
               <Icon name="share" size={16} /> {t('att.shareCardBtn')}
             </button>
           )}

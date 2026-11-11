@@ -1,5 +1,5 @@
 // ============================================================================
-// Signature.jsx – la signature « Conçu par M.M.B.T » (réutilisée partout :
+// Signature.jsx – la signature « Conçu par MMBT » (réutilisée partout :
 // pied de page, écran d'ouverture, page Licence). Le nom scintille aux couleurs
 // du drapeau comorien ; l'animation s'arrête si « moins d'animations » est demandé.
 // ============================================================================

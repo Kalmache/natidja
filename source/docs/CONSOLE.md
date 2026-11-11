@@ -29,6 +29,7 @@ La console est l'application **réservée aux responsables des examens** : elle 
 ## 2. Mesures de sécurité en place (et vérifiées par des tests automatiques)
 
 - **Mots de passe** hachés avec scrypt (jamais stockés en clair), 12 caractères minimum, mot de passe temporaire à changer à la première connexion.
+- **Mot de passe oublié** : un lien à usage unique (valable 30 minutes, une demande toutes les 5 minutes par compte) part vers l'adresse e-mail enregistrée du compte (`node console/utilisateurs.mjs courriel --nom X --adresse a@b.km`), ou à défaut vers la boîte du gestionnaire (`CONSOLE_MAIL_RECUPERATION`, par défaut bentamou@mmbt.fr), qui le transmet. Le lien seul ne suffit pas : le **code à 6 chiffres** est exigé, et toutes les connexions ouvertes du compte sont coupées. Réponse identique que le compte existe ou non. Envoi réglé par `CONSOLE_SMTP_HOST/PORT/USER/PASS` dans `.env` (OVH : ssl0.ovh.net, 465).
 - **Double authentification** (TOTP, norme RFC 6238 ; code vérifié avec les vecteurs de test officiels), refus de **rejouer** un code déjà utilisé.
 - **Verrouillage** après 5 erreurs (15 minutes) et limite par adresse ; réponse **identique** que le compte existe ou non (pas de découverte des comptes).
 - **Sessions** : cookie `HttpOnly`, `SameSite=Strict`, `Secure` en production ; expiration après 15 min d'inactivité et 8 h au maximum ; nouvel identifiant à chaque montée en privilège.

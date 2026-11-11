@@ -10,6 +10,7 @@
 //   node console/utilisateurs.mjs affichage --nom amina --texte "Directeur Kabir Illiassa"   (titre lisible, affichage seul)
 //   node console/utilisateurs.mjs reinitialiser --nom amina     (mot de passe + double authentification)
 //   node console/utilisateurs.mjs desactiver --nom amina        (ou : activer)
+//   node console/utilisateurs.mjs courriel --nom amina --adresse amina@exemple.km   (pour « Mot de passe oublié »)
 //
 // Rôles : preparateur (dépose les fichiers) · approbateur (approuve/refuse/planifie)
 //         admin (consulte le journal d'audit). Les rôles sont volontairement SÉPARÉS.
@@ -58,6 +59,17 @@ export async function creerUtilisateur(stockage, { nom, roles, affichage }) {
   const u = { id: randomUUID(), nom, roles, hash: await hacherMotDePasse(motDePasse), totpSecret: secret, totpDernierCompteur: -1, doitChangerMdp: true, actif: true, creeLe: new Date().toISOString(), affichage: nettoyerAffichage(affichage) || undefined }
   stockage.sauver(u)
   return { utilisateur: u, motDePasse, secret, uri: uriTotp(nom, secret) }
+}
+
+/** Adresse e-mail du compte : c'est là que part le lien « Mot de passe oublié ». Vide = on la retire. */
+export function definirCourriel(stockage, nom, adresse) {
+  const u = stockage.trouver(nom)
+  if (!u) throw new Error(`Compte « ${nom} » introuvable.`)
+  const a = String(adresse ?? '').trim().toLowerCase()
+  if (a && !/^[^\s@<>"]{1,64}@[a-z0-9.-]{1,180}\.[a-z]{2,24}$/.test(a)) throw new Error('Adresse e-mail invalide.')
+  u.email = a || undefined
+  stockage.sauver(u)
+  return u
 }
 
 export async function reinitialiserUtilisateur(stockage, nom) {
@@ -109,12 +121,16 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       const u = definirAffichage(stockage, args.nom, args.texte)
       audit.ajouter({ utilisateur: 'cli', action: 'utilisateur_affichage', details: { nom: u.nom, affichage: u.affichage ?? null } })
       console.log(`\n✔ Compte « ${u.nom} » : ${u.affichage ? `affiché comme « ${u.affichage} »` : 'nom d’affichage retiré'}.\n`)
+    } else if (commande === 'courriel') {
+      const u = definirCourriel(stockage, args.nom, args.adresse)
+      audit.ajouter({ utilisateur: 'cli', action: 'utilisateur_courriel', details: { nom: u.nom, courriel: u.email ? 'enregistré' : 'retiré' } })
+      console.log(`\n✔ Compte « ${u.nom} » : ${u.email ? `liens « Mot de passe oublié » envoyés à ${u.email}` : 'adresse retirée (les liens iront à la boîte du gestionnaire)'}.\n`)
     } else if (commande === 'lister') {
       console.log('')
       for (const u of stockage.utilisateurs()) console.log(`  ${u.actif ? '●' : '○'} ${u.nom.padEnd(16)} ${u.roles.join(', ').padEnd(24)} ${(u.affichage ?? '').padEnd(28)} dernière connexion : ${u.dernierLogin ?? 'jamais'}`)
       console.log('')
     } else {
-      console.log('\nCommandes : creer --nom X --roles a,b [--affichage "Titre Nom"] · affichage --nom X --texte "Titre Nom" · lister · reinitialiser --nom X · activer|desactiver --nom X\n')
+      console.log('\nCommandes : creer --nom X --roles a,b [--affichage "Titre Nom"] · affichage --nom X --texte "Titre Nom" · courriel --nom X --adresse a@b.km · lister · reinitialiser --nom X · activer|desactiver --nom X\n')
     }
   } catch (e) {
     console.error(`\n✖ ${e.message}\n`)

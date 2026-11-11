@@ -5,6 +5,17 @@
 // ============================================================================
 export const JOURNAL = [
   {
+    version: '3.15.0',
+    date: '11/11/2026',
+    titre: 'Prête pour une démonstration',
+    points: [
+      'Sur téléphone, les boutons de l’attestation (Imprimer, Partager, Partager ma réussite) ne sortent plus de l’écran',
+      'Sans connexion, un résultat jamais consulté sur l’appareil affiche tout de suite un message clair (au lieu d’attendre 7 secondes), puis s’affiche seul dès le retour du réseau',
+      'Console des responsables : « Mot de passe oublié ? » envoie un lien par e-mail, valable 30 minutes et une seule fois ; le code à 6 chiffres reste demandé et le mot de passe doit faire 12 caractères minimum',
+      'En arabe, le mois de la session s’écrit en arabe ; les liens du bas de page sont plus faciles à toucher ; le petit guide se referme si l’on change de page ; la signature s’écrit désormais MMBT',
+    ],
+  },
+  {
     version: '3.14.4',
     date: '11/11/2026',
     titre: 'Navigation plus douce',
@@ -23,7 +34,7 @@ export const JOURNAL = [
   {
     version: '3.14.1',
     date: '05/11/2026',
-    titre: 'Les autres applis de M.M.B.T',
+    titre: 'Les autres applis de MMBT',
     points: [
       'En bas de page, un petit lien mène aux autres applis utiles pour les Comores (colis, artisans, pêcheurs) sur mmbt.fr',
     ],
@@ -411,7 +422,7 @@ export const JOURNAL = [
     date: '31/10/2026',
     titre: 'Signature, licence et pages légales',
     points: [
-      'Pied de page signé M.M.B.T avec contact, TikTok, Instagram et liens vers les pages légales',
+      'Pied de page signé MMBT avec contact, TikTok, Instagram et liens vers les pages légales',
       'Pages Mentions légales, Confidentialité, Conditions d’utilisation, Licence et Journal de bord',
       'Textes juridiques rédigés selon le droit français (propriété intellectuelle, LCEN, RGPD)',
       'Textes alignés sur ceux de mmbt.fr (éditeur à titre personnel, statistiques anonymes de l’hébergeur)',

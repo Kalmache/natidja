@@ -22,3 +22,8 @@ export const pct = (partie, total) =>
 
 /** "2006-02-25" (ainsi stockée dans les fichiers) → "25/02/2006" (affichage français). Vide si absente ou illisible. */
 export const dateNaissance = (iso) => (/^\d{4}-\d{2}-\d{2}$/.test(iso ?? '') ? iso.split('-').reverse().join('/') : '')
+
+/** « Juin 2026 » → « يونيو 2026 » quand l'appli est en arabe (le mois vient du fichier en français). */
+const MOIS_AR = { janvier: 'يناير', février: 'فبراير', fevrier: 'فبراير', mars: 'مارس', avril: 'أبريل', mai: 'مايو', juin: 'يونيو', juillet: 'يوليو', août: 'أغسطس', aout: 'أغسطس', septembre: 'سبتمبر', octobre: 'أكتوبر', novembre: 'نوفمبر', décembre: 'ديسمبر', decembre: 'ديسمبر' }
+export const dateSessionLangue = (texte = '', lang = 'fr') =>
+  lang === 'ar' ? String(texte).replace(/\p{L}+/gu, (m) => MOIS_AR[m.toLowerCase()] ?? m) : texte

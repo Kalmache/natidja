@@ -26,7 +26,8 @@ async function telecharger(url, essais = 4) {
       const type = reponse.headers.get('content-type') ?? ''
       return type.includes('json') ? await reponse.json() : null
     } catch (erreur) {
-      if (i === essais) throw erreur
+      // Téléphone hors connexion : inutile d'insister 7 secondes, on prévient tout de suite.
+      if (i === essais || (typeof navigator !== 'undefined' && navigator.onLine === false)) throw erreur
       await attendre(1000 * 2 ** (i - 1))
     }
   }

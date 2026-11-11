@@ -29,6 +29,7 @@ import {
 } from './lib/securite.mjs'
 import { analyserFichier, comparer, erreurHttp, lireCandidatsPublies, publier } from './lib/publication.mjs'
 import { synchroDepuisEnvironnement } from './lib/synchro.mjs'
+import { courrielDepuisEnvironnement } from './lib/courriel.mjs'
 import { creerSession } from '../scripts/lib/sessions.mjs'
 import { ecrireConfig } from '../scripts/lib/ecriture.mjs'
 
@@ -45,6 +46,8 @@ const PAR_DEFAUT = {
   tailleJsonMax: 64 * 1024,
   tailleFichierMax: 20 * 1024 * 1024,
   retentionJours: 30,
+  // « Mot de passe oublié » : boîte qui reçoit les liens des comptes sans adresse e-mail enregistrée
+  boiteRecuperation: 'bentamou@mmbt.fr',
 }
 
 export function creerConsole(options = {}) {
@@ -58,6 +61,8 @@ export function creerConsole(options = {}) {
   const sessions = new Map() // identifiant de session → informations
   const tentatives = new Map() // clé « u:nom » ou « i:ip » → { echecs, depuis, bloqueJusqua }
   let verrouPublication = Promise.resolve() // une seule publication à la fois
+  const reinitialisations = new Map() // identifiant du compte → { empreinte du lien, expire, essais } (« mot de passe oublié »)
+  const empreinte = (jeton) => createHash('sha256').update(jeton).digest('hex')
 
   const config = () => JSON.parse(readFileSync(join(dossierDonnees, 'exams.json'), 'utf8'))
 
@@ -241,6 +246,85 @@ export function creerConsole(options = {}) {
     session.etape = 'ok'
     journal('mdp_change', { session })
     return { etape: 'ok' }
+  })
+
+  // ---- Mot de passe oublié (étape 1) : demander un lien par e-mail
+  // Le lien part vers l'adresse ENREGISTRÉE pour le compte (jamais vers une adresse tapée ici),
+  // ou, à défaut, vers la boîte du gestionnaire (bentamou@mmbt.fr par défaut), qui le transmet.
+  // La réponse est TOUJOURS la même : on ne révèle pas quels comptes existent.
+  route('POST', '/api/mot-de-passe-oublie', 'aucune', null, async ({ corps, ip, req }) => {
+    const nom = String(corps.nom ?? '').trim().toLowerCase().slice(0, 40)
+    const reponse = { envoye: true, message: 'Si ce compte existe, un lien de réinitialisation vient d’être envoyé par e-mail. Il est valable 30 minutes.' }
+    if (!nom || bloque(`o:${nom}`) || bloque(`i:${ip}`)) return reponse
+    compterEchec(`i:${ip}`, opt.echecsIpMax) // limite les demandes en rafale depuis une même adresse
+    const u = stockage.trouver(nom)
+    if (!u?.actif) { journal('mdp_oubli_inconnu', { utilisateur: nom, ip }); return reponse }
+    // Une demande au plus toutes les 5 minutes par compte.
+    tentatives.set(`o:${nom}`, { echecs: 0, depuis: horloge(), bloqueJusqua: horloge() + 5 * 60_000 })
+    const jeton = jetonAleatoire()
+    reinitialisations.set(u.id, { empreinte: empreinte(jeton), expire: horloge() + 30 * 60_000, essais: 0 })
+    const base = opt.urlConsole || (dev ? `http://${req.headers.host}` : 'https://console.mmbt.fr')
+    const lien = `${base.replace(/\/$/, '')}/#reinit=${jeton}`
+    const destinataire = u.email || opt.boiteRecuperation
+    const texte = [
+      'Bonjour,',
+      '',
+      `Une réinitialisation du mot de passe a été demandée pour le compte « ${u.nom} »${u.affichage ? ` (${u.affichage})` : ''} de la console de publication Ndeze Natidja.`,
+      u.email ? '' : '\nCe compte n’a pas d’adresse e-mail enregistrée : transmettez ce lien à son titulaire par un canal sûr.\n',
+      'Pour choisir un nouveau mot de passe, ouvrez ce lien dans les 30 minutes :',
+      lien,
+      '',
+      'Le code à 6 chiffres de l’application d’authentification sera aussi demandé.',
+      '',
+      'Si vous n’êtes pas à l’origine de cette demande, ignorez ce message : le mot de passe actuel reste valable.',
+      '',
+      'MMBT',
+    ].join('\n')
+    try {
+      if (opt.envoyerCourriel) await opt.envoyerCourriel({ a: destinataire, sujet: 'Ndeze Natidja : réinitialiser votre mot de passe', texte })
+      else console.log(`[mot de passe oublié] aucun envoi d’e-mail réglé (CONSOLE_SMTP_HOST). Lien pour « ${u.nom} » : ${lien}`)
+      journal('mdp_oubli_envoye', { utilisateur: u.nom, roles: u.roles, ip, details: { vers: u.email ? 'adresse du compte' : 'boîte du gestionnaire' } })
+    } catch (e) {
+      console.error('Envoi de l’e-mail impossible :', e.message)
+      journal('mdp_oubli_echec_envoi', { utilisateur: u.nom, roles: u.roles, ip })
+    }
+    return reponse
+  })
+
+  // ---- Mot de passe oublié (étape 2) : nouveau mot de passe + code de l'application
+  // Le lien seul ne suffit pas : la double authentification reste exigée.
+  route('POST', '/api/reinitialisation', 'aucune', null, async ({ corps, ip }) => {
+    const jeton = String(corps.jeton ?? '')
+    const refus = () => erreurHttp(410, 'Ce lien a expiré ou a déjà servi. Demandez un nouveau lien.')
+    if (!/^[A-Za-z0-9_-]{20,100}$/.test(jeton) || bloque(`i:${ip}`)) throw refus()
+    const cherche = empreinte(jeton)
+    let u = null
+    let demande = null
+    for (const [id, d] of reinitialisations) {
+      if (egalConstant(d.empreinte, cherche)) { u = stockage.trouverId(id); demande = d; break }
+    }
+    if (!u?.actif || !demande || demande.expire < horloge()) { compterEchec(`i:${ip}`, opt.echecsIpMax); throw refus() }
+    if (corps.nouveau !== corps.confirmation) throw erreurHttp(400, 'Les deux mots de passe ne sont pas identiques.')
+    const probleme = verifierForceMotDePasse(String(corps.nouveau ?? ''), u.nom)
+    if (probleme) throw erreurHttp(400, probleme)
+    const compteur = verifierTotp(u.totpSecret, corps.code, { tempsMs: horloge(), dernierCompteur: u.totpDernierCompteur ?? -1 })
+    if (compteur === null) {
+      demande.essais++
+      compterEchec(`i:${ip}`, opt.echecsIpMax)
+      journal('mdp_reinit_echec', { utilisateur: u.nom, roles: u.roles, ip })
+      if (demande.essais >= opt.echecsMax) { reinitialisations.delete(u.id); throw erreurHttp(401, 'Trop d’erreurs : ce lien est annulé. Demandez-en un nouveau.') }
+      throw erreurHttp(401, 'Code à 6 chiffres incorrect ou expiré.')
+    }
+    if (await verifierMotDePasse(String(corps.nouveau), u.hash)) throw erreurHttp(400, 'Choisissez un mot de passe différent de l’ancien.')
+    u.hash = await hacherMotDePasse(corps.nouveau)
+    u.doitChangerMdp = false
+    u.totpDernierCompteur = compteur // ce code ne pourra plus servir
+    stockage.sauver(u)
+    reinitialisations.delete(u.id) // le lien ne sert qu'une fois
+    for (const [id, s] of sessions) if (s.userId === u.id) sessions.delete(id) // coupe toutes les connexions ouvertes
+    oublierEchecs(`u:${u.nom}`)
+    journal('mdp_reinitialise', { utilisateur: u.nom, roles: u.roles, ip })
+    return { ok: true }
   })
 
   // ---- Renouvellement du secret de la double authentification
@@ -563,6 +647,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     synchro,
     dev,
     faireConfianceProxy: process.env.CONSOLE_TRUST_PROXY === '1',
+    // « Mot de passe oublié » : adresse de la console (pour le lien) et envoi des e-mails
+    urlConsole: process.env.CONSOLE_URL ?? (process.env.CONSOLE_DOMAINE ? `https://${process.env.CONSOLE_DOMAINE}` : undefined),
+    boiteRecuperation: process.env.CONSOLE_MAIL_RECUPERATION || 'bentamou@mmbt.fr',
+    envoyerCourriel: courrielDepuisEnvironnement() ?? undefined,
   })
   c.serveur.listen(port, process.env.CONSOLE_HOST ?? '127.0.0.1', () => {
     console.log(`\n✔ Console de publication sur http://${process.env.CONSOLE_HOST ?? '127.0.0.1'}:${port}`)

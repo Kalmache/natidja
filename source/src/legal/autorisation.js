@@ -16,7 +16,7 @@ import { EDITOR } from './config.js'
 export const TYPES_DEMANDE = {
   usage: ['Utiliser l’application', 'utiliser l’application « Ndeze Natidja » au sein de mon organisation, y compris, le cas échéant, comme service officiel'],
   reproduction: ['Reprendre du code, du design ou des textes', 'reproduire, adapter ou réutiliser tout ou partie du code, du design ou des textes de l’application'],
-  signature: ['Reprendre le nom ou la signature', 'reprendre le nom « Ndeze Natidja » ou la signature « M.M.B.T »'],
+  signature: ['Reprendre le nom ou la signature', 'reprendre le nom « Ndeze Natidja » ou la signature « MMBT »'],
   partenariat: ['Partenariat ou licence d’exploitation', 'conclure un partenariat ou une licence d’exploitation relatifs à l’application'],
   autre: ['Autre demande', 'obtenir une autorisation dont la nature est précisée ci-dessous'],
 }
