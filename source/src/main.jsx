@@ -4,6 +4,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles/tokens.css'
 import './styles/app.css'
+import './styles/pied-mmbt.css'
 import App from './App.jsx'
 import { registerSW } from 'virtual:pwa-register'
 

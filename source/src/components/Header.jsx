@@ -119,42 +119,73 @@ export function BottomNav({ view }) {
   )
 }
 
+// Bas de page commun aux applis MMBT (même style que mmbt.fr, voir styles/pied-mmbt.css) :
+// un bandeau avec un seul bouton, puis 3 colonnes (Natidja / Contact / Explorer) et la ligne des pages légales.
+const ICO = {
+  lieu: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z" /><circle cx="12" cy="10" r="2.3" /></svg>,
+  mail: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2" /><path d="M3.5 7l8.5 6 8.5-6" /></svg>,
+  wa: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-4A8 8 0 1 1 8.6 19z" /><path d="M9.2 8.6c.2-.4.6-.4.8 0l.7 1.5-.6.8a5 5 0 0 0 2.9 2.9l.8-.6 1.5.7c.4.2.4.6 0 .8-1.6 1.2-4.2.3-6-1.6-1.8-1.8-2.4-3.6-.1-4.5z" /></svg>,
+  reseaux: <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="2.5" /><circle cx="18" cy="6" r="2.5" /><circle cx="18" cy="18" r="2.5" /><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6" /></svg>,
+}
+const FLECHE = <span className="pm-fleche" aria-hidden="true">↗</span>
+const WHATSAPP = 'https://wa.me/33644252825?text=' + encodeURIComponent("Bonjour Maabadi, je viens de l'appli Ndeze Natidja")
+
 export function Footer() {
   const { t } = useI18n()
-  const reseaux = [
-    ['TikTok', EDITOR.tiktok],
-    ['Instagram', EDITOR.instagram],
-  ].filter(([, url]) => url) // un lien vide n'est pas affiché
+  const explorer = [
+    [t('footer.verify'), '#/verif', false],
+    [t('footer.discover'), '#/decouvrir', false],
+    [t('pied.guide'), 'https://mmbt.fr/guide-natidja.html', true],
+    [t('pied.avis'), 'https://mmbt.fr/temoignage.php?appli=natidja', true],
+    [t('pied.autres'), EDITOR.website, true],
+  ]
+  const ext = { target: '_blank', rel: 'noopener noreferrer' }
   return (
-    <footer className="footer no-print">
-      {/* Filet animé aux couleurs du drapeau */}
+    <div className="pm no-print">
+      {/* Filet aux couleurs du drapeau comorien, la marque de Natidja */}
       <div className="footer__flagline" aria-hidden="true" />
-      <div className="footer__inner">
-        <p className="footer__org">
-          <strong>{t('footer.line')}</strong>
-          <span>{t('footer.org')}</span>
-        </p>
-        <p className="footer__made">
-          <Signature link /> · {EDITOR.year} ·{' '}
-          <a href={EDITOR.website} target="_blank" rel="noopener noreferrer">{EDITOR.websiteLabel}</a>
-        </p>
-        {/* Lien discret vers les autres applis de MMBT */}
-        <p className="footer__autres">
-          <a href={EDITOR.website} target="_blank" rel="noopener noreferrer">{t('footer.autres')}</a>
-        </p>
-        <p className="footer__contact">
-          {t('footer.contact')} : <a href={`mailto:${EDITOR.email}`}>{EDITOR.email}</a>
-          {reseaux.map(([nom, url]) => (
-            <span key={nom}> · <a href={url} target="_blank" rel="noopener noreferrer">{nom}</a></span>
-          ))}
-        </p>
-        <nav className="footer__legal" aria-label="Pages légales">
-          {PAGES_LEGALES.map((p) => <a key={p} href={`#/legal/${p}`}>{t(`legal.${p}`)}</a>)}
-          <a href="#/verif">{t('footer.verify')}</a>
-          <a href="#/decouvrir">{t('footer.discover')}</a>
-        </nav>
-        <p className="footer__small">v{VERSION} · {t('demo.short')}</p>
-      </div>
-    </footer>
+      <section className="pm-bande" aria-label={t('pied.titre')}>
+        <div className="pm-bande-in">
+          <div>
+            <p className="pm-kick">{t('pied.kick')}</p>
+            <h2>{t('pied.titre')}</h2>
+            <p>{t('pied.texte')}</p>
+          </div>
+          <a className="pm-btn" href={`mailto:${EDITOR.email}?subject=Ndeze%20Natidja`}>{t('pied.bouton')} <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+      <footer className="pm-pied">
+        <div className="pm-cols">
+          <div className="pm-col">
+            <a className="pm-marque" href="#/"><img src="icons/icon-192.png" alt="" width="34" height="34" /><span>Ndeze Natidja</span></a>
+            <p>{t('pied.phrase')}</p>
+            <p className="pm-lieu">{ICO.lieu}<span>{t('pied.lieu')}</span></p>
+            <p className="pm-note">{t('demo.short')}</p>
+          </div>
+          <div className="pm-col">
+            <h2>{t('footer.contact')}</h2>
+            <ul className="pm-contact">
+              <li><span className="pm-ico">{ICO.mail}</span><span><small>{t('pied.email')}</small><a href={`mailto:${EDITOR.email}`}>{EDITOR.email}</a></span></li>
+              <li><span className="pm-ico">{ICO.wa}</span><span><small>WhatsApp</small><a href={WHATSAPP} {...ext}>{t('pied.whatsapp')}</a></span></li>
+              <li><span className="pm-ico">{ICO.reseaux}</span><span><small>{t('pied.reseaux')}</small><a href={EDITOR.tiktok} {...ext}>TikTok</a><span className="pm-sep" aria-hidden="true">·</span><a href={EDITOR.instagram} {...ext}>Instagram</a></span></li>
+            </ul>
+          </div>
+          <div className="pm-col">
+            <h2>{t('pied.explorer')}</h2>
+            <ul className="pm-liens">
+              {explorer.map(([nom, url, dehors]) => (
+                <li key={url}><a href={url} {...(dehors ? ext : {})}>{nom}{FLECHE}</a></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div className="pm-bas">
+          <span>{t('pied.droits')} <Signature link /> · <span className="pm-version">v{VERSION}</span></span>
+          <span className="pm-legal">
+            {PAGES_LEGALES.map((p) => <a key={p} href={`#/legal/${p}`}>{t(`legal.${p}`)}</a>)}
+          </span>
+        </div>
+      </footer>
+    </div>
   )
 }

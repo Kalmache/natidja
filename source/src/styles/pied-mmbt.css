@@ -1,0 +1,77 @@
+/* ==========================================================================
+   pied-mmbt.css : le bas de page commun à toutes les applis MMBT
+   (même style que mmbt.fr : bandeau pleine largeur + pied en 3 colonnes).
+   Chaque appli donne ses propres couleurs avec ces variables :
+     --pm-accent      couleur de l'appli (icônes, petit titre, bouton)
+     --pm-sur-accent  couleur du texte sur le bouton
+     --pm-texte       texte principal
+     --pm-doux        texte secondaire
+     --pm-bord        traits fins
+     --pm-fond        fond du pied de page
+     --pm-bande       fond du bandeau
+     --pm-bouton      fond du bouton (sinon --pm-accent)
+   Aucune animation : seule la couleur change au survol.
+   ========================================================================== */
+.pm { --pm-largeur: 1120px; color: var(--pm-texte, inherit); text-align: start; line-height: 1.6; font-size: .95rem; width: 100%; box-sizing: border-box; }
+.pm *, .pm *::before, .pm *::after { box-sizing: border-box; }
+.pm a { text-decoration: none; }
+
+/* ---- Bandeau : un petit titre, un grand titre, une phrase, un seul bouton ---- */
+.pm-bande { background: var(--pm-bande, color-mix(in srgb, var(--pm-accent) 7%, transparent)); border-top: 1px solid var(--pm-bord, rgba(127,127,127,.25)); border-bottom: 1px solid var(--pm-bord, rgba(127,127,127,.25)); padding: 56px 20px; }
+.pm-bande-in { max-width: var(--pm-largeur); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+.pm-kick { margin: 0 0 10px; color: var(--pm-accent); font-size: .78rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+[dir="rtl"] .pm-kick { letter-spacing: 0; }   /* l'arabe ne s'espace pas lettre par lettre */
+.pm-bande h2 { margin: 0 0 10px; font-size: 2rem; font-weight: 600; letter-spacing: -.6px; line-height: 1.2; color: var(--pm-texte, inherit); }
+.pm-bande p:not(.pm-kick) { margin: 0; color: var(--pm-doux, inherit); max-width: 600px; }
+.pm-btn { flex: none; display: inline-block; padding: 14px 28px; border-radius: 999px; background: var(--pm-bouton, var(--pm-accent)); color: var(--pm-sur-accent, #fff) !important; font-weight: 700; white-space: nowrap; text-align: center; }
+.pm-btn:hover { filter: brightness(1.08); }
+
+/* ---- Pied : marque | contact | explorer ---- */
+/* « .pm footer.pm-pied » l'emporte sur une règle « footer { … } » propre à l'appli. */
+.pm footer.pm-pied { display: block; background: var(--pm-fond, transparent); padding: 52px 20px 26px; margin: 0; max-width: none; border: 0; text-align: start; font-size: inherit; color: inherit; box-shadow: none; position: static; }
+.pm .pm-bande { margin: 0; max-width: none; }
+.pm-cols { max-width: var(--pm-largeur); margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 48px; }
+.pm-col h2 { margin: 6px 0 16px; font-size: 1rem; font-weight: 600; color: var(--pm-texte, inherit); }
+.pm-col p { margin: 0 0 12px; color: var(--pm-doux, inherit); }
+.pm-marque { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.15rem; color: var(--pm-texte, inherit) !important; margin-bottom: 12px; }
+.pm-marque img { width: 34px; height: 34px; border-radius: 9px; object-fit: contain; }
+.pm-marque .pm-m { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--pm-accent); color: var(--pm-sur-accent, #fff); font-weight: 700; }
+.pm-col svg { width: 18px; height: 18px; flex: none; fill: none; stroke: var(--pm-accent); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.pm-lieu { display: flex; gap: 10px; align-items: flex-start; }
+.pm-lieu svg { margin-top: 3px; }
+.pm-col .pm-note { font-size: .88rem; }
+.pm-col .pm-note a { color: var(--pm-texte, inherit); text-decoration: underline; text-underline-offset: 3px; }
+.pm-contact, .pm-liens { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.pm-contact li { display: flex; gap: 12px; align-items: flex-start; }
+.pm-ico { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--pm-bord, rgba(127,127,127,.25)); flex: none; }
+.pm-contact small { display: block; color: var(--pm-doux, inherit); font-size: .8rem; line-height: 1.3; }
+.pm-contact a { color: var(--pm-texte, inherit); }
+.pm-contact .pm-sep { color: var(--pm-doux, inherit); margin: 0 6px; }
+.pm-liens { gap: 2px; }
+.pm-liens a, .pm-liens button { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 12px; padding: 7px 0; color: var(--pm-texte, inherit); background: none; border: 0; font: inherit; text-align: start; cursor: pointer; }
+.pm-fleche { color: var(--pm-accent); margin-inline-start: auto; }
+[dir="rtl"] .pm-fleche { transform: scaleX(-1); }
+.pm-contact a:hover, .pm-liens a:hover, .pm-liens button:hover { color: var(--pm-accent); }
+
+/* ---- Dernière ligne : droits, version, pages légales ---- */
+.pm-bas { max-width: var(--pm-largeur); margin: 36px auto 0; padding-top: 20px; border-top: 1px solid var(--pm-bord, rgba(127,127,127,.25)); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--pm-doux, inherit); font-size: .86rem; }
+.pm-legal { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.pm-legal a, .pm-legal button { color: var(--pm-doux, inherit); background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
+.pm-legal a:hover, .pm-legal button:hover { color: var(--pm-accent); }
+.pm-version { opacity: .8; }
+
+/* ---- Téléphone, ou colonne étroite (barre latérale) ---- */
+@media (max-width: 860px) {
+  .pm-bande { padding: 44px 20px; }
+  .pm-bande-in { flex-direction: column; align-items: stretch; gap: 22px; }
+  .pm-bande h2 { font-size: 1.6rem; }
+  .pm-cols { grid-template-columns: 1fr; gap: 32px; }
+  .pm-bas { flex-direction: column; }
+}
+.pm.pm-etroit .pm-bande { padding: 32px 18px; }
+.pm.pm-etroit .pm-bande-in { flex-direction: column; align-items: stretch; gap: 18px; }
+.pm.pm-etroit .pm-bande h2 { font-size: 1.35rem; }
+.pm.pm-etroit .pm-pied { padding: 32px 18px 20px; }
+.pm.pm-etroit .pm-cols { grid-template-columns: 1fr; gap: 26px; }
+.pm.pm-etroit .pm-bas { flex-direction: column; margin-top: 26px; }
+@media print { .pm { display: none !important; } }

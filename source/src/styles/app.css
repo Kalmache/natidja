@@ -931,3 +931,8 @@ html.clavier .bottomnav { transform: translateY(160%); opacity: 0; pointer-event
 .pill--grise, .pill--grise:hover { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
 .ile-grise { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--border); color: var(--text-3); font-weight: 700; font-size: 0.88rem; opacity: 0.75; filter: grayscale(1); }
 .ile-grise em { font-style: normal; font-weight: 600; font-size: 0.8rem; }
+
+/* Bas de page commun MMBT (pied-mmbt.css) aux couleurs de Natidja : suit la couleur choisie et le mode sombre. */
+.pm { --pm-accent: var(--accent-text); --pm-bouton: var(--p-700); --pm-sur-accent: #fff; --pm-texte: var(--text); --pm-doux: var(--text-3); --pm-bord: var(--border); --pm-fond: var(--surface); --pm-bande: color-mix(in srgb, var(--p-700) 7%, var(--surface)); margin-top: 32px; font-family: var(--font); }
+.pm .signature { font-size: inherit; }
+@media (max-width: 820px) { .pm footer.pm-pied { padding-bottom: calc(110px + var(--safe-bottom)); } }
