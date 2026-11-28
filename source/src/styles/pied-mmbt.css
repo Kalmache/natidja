@@ -74,4 +74,10 @@
 .pm.pm-etroit .pm-pied { padding: 32px 18px 20px; }
 .pm.pm-etroit .pm-cols { grid-template-columns: 1fr; gap: 26px; }
 .pm.pm-etroit .pm-bas { flex-direction: column; margin-top: 26px; }
+/* ---- Réseaux : logos officiels dans des boutons ronds cerclés (une seule couleur) ---- */
+.pm-reseaux { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.pm-reseaux a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--pm-texte, currentColor) 38%, transparent); color: var(--pm-texte, inherit) !important; background: none; }
+.pm-col .pm-reseaux svg { width: 19px; height: 19px; fill: currentColor; stroke: none; }
+.pm-reseaux a:hover { border-color: var(--pm-accent); color: var(--pm-accent) !important; }
+.pm-reseaux a:focus-visible { outline: 2px solid var(--pm-accent); outline-offset: 3px; }
 @media print { .pm { display: none !important; } }
